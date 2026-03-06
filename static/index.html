@@ -5,11 +5,12 @@
     <title>atom</title>
     <style>
         :root {
-            --bg: #050505; /* deeper black for that void feeling */
-            --surface: #0d0d0d;
+            --bg: #050505;
+            --surface: #0a0a0a;
             --accent: #ffffff;
-            --border: rgba(255, 255, 255, 0.08);
-            --transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            --text-dim: #444;
+            --border: rgba(255, 255, 255, 0.03);
+            --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { box-sizing: border-box; outline: none; cursor: crosshair; }
@@ -20,112 +21,128 @@
             font-family: 'Inter', 'Segoe UI', sans-serif;
             margin: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             overflow: hidden;
-            animation: fadeIn 1.2s forwards;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+        /* luxury glass grain overlay */
+        body::before {
+            content: "";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url(https://grainy-gradients.vercel.app/noise.svg);
+            opacity: 0.03; pointer-events: none; z-index: 100;
+        }
 
-        .container { width: 90%; max-width: 850px; text-align: center; }
+        /* the "void" transition curtain */
+        #curtain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; transform: translateY(100%);
+            transition: var(--transition); z-index: 999;
+        }
+        #curtain.active { transform: translateY(0); }
 
-        /* the main title */
+        .container { 
+            width: 90%; max-width: 900px; text-align: center; 
+            animation: slideUp 1.5s var(--transition);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
         h1 {
-            font-size: 14px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 12px;
+            letter-spacing: 20px;
             margin: 0;
-            font-weight: 300;
-            color: #fff;
+            font-weight: 200;
+            opacity: 0.5;
+            transition: var(--transition);
         }
+        h1:hover { opacity: 1; letter-spacing: 25px; }
 
-        /* THE SUBTITLE (the funny part) */
+        /* typing subtitle */
         #subtitle {
             font-size: 13px;
-            font-weight: 300;
-            color: #555; /* subtle gray so it looks "aesthetic" */
-            margin-top: 10px;
-            margin-bottom: 50px;
+            color: var(--text-dim);
+            margin: 20px 0 80px 0;
+            min-height: 20px;
             font-style: italic;
+            font-weight: 300;
             text-transform: lowercase;
         }
 
-        /* luxury search bar */
-        .search-wrapper { margin-bottom: 60px; position: relative; }
+        .search-wrapper { margin-bottom: 80px; position: relative; }
 
         #uv-address {
             width: 100%;
             background: transparent;
             border: none;
             border-bottom: 1px solid var(--border);
-            padding: 25px 0;
-            font-size: 32px;
+            padding: 20px 0;
+            font-size: 48px;
             color: #fff;
-            font-weight: 200;
+            font-weight: 100;
             text-align: center;
             transition: var(--transition);
-            letter-spacing: -1px;
+            letter-spacing: -2px;
         }
 
         #uv-address:focus {
             border-bottom: 1px solid #fff;
             letter-spacing: 2px;
-            background: rgba(255, 255, 255, 0.02);
+            transform: scale(1.02);
         }
 
-        /* grid for the games */
+        /* minimalist library grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
         }
 
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
-            padding: 25px 15px;
+            padding: 35px 15px;
             text-decoration: none;
-            color: #666;
-            font-size: 10px;
+            color: #333;
+            font-size: 9px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
         .card:hover {
-            background: #fff;
             color: #000;
+            background: #fff;
+            transform: translateY(-10px);
             border-color: #fff;
-            transform: translateY(-8px);
-        }
-
-        /* luxury grain overlay */
-        body::before {
-            content: "";
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url(https://grainy-gradients.vercel.app/noise.svg);
-            opacity: 0.04; pointer-events: none;
         }
     </style>
 </head>
 <body>
 
+    <div id="curtain"></div>
+
     <div class="container">
         <h1>atom</h1>
-        <div id="subtitle">initializing brainrot...</div>
+        <div id="subtitle"></div>
         
         <div class="search-wrapper">
-            <input id="uv-address" type="text" placeholder="search brave..." autocomplete="off">
+            <input id="uv-address" type="text" placeholder="search the void" autocomplete="off">
         </div>
 
         <div class="grid">
             <a href="#" onclick="launch('https://vinmannie.github.io/SonicManiaWeb/')" class="card">Mania</a>
-            <a href="#" onclick="launch('https://vinmannie.github.io/Sonic-1-WASM/')" class="card">S1 WASM</a>
+            <a href="#" onclick="launch('https://vinmannie.github.io/Sonic-1-WASM/')" class="card">S1 Wasm</a>
             <a href="#" onclick="launch('https://jojudge.com/ICBINS1/')" class="card">Judge</a>
-            <a href="#" onclick="launch('https://heyjoeway.github.io/s2cx/')" class="card">S2 CX</a>
+            <a href="#" onclick="launch('https://heyjoeway.github.io/s2cx/')" class="card">S2 Cx</a>
             <a href="#" onclick="launch('https://projects.sappharad.com/s3air_ios/')" class="card">S3 Air</a>
         </div>
     </div>
@@ -133,34 +150,61 @@
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script>
-        // the "stupid stuff" pool
+        const sub = document.getElementById('subtitle');
         const phrases = [
-            "sponsored by your failing grades",
-            "definitely not a proxy, i promise",
-            "sonic is my only friend",
-            "your teacher is right behind you (just kidding)",
-            "more useless than a glass hammer",
-            "imagine using a regular browser lol",
-            "brave search because google is a snitch",
-            "executive level procrastinating",
-            "physics homework can wait",
-            "built with 0% effort and 100% spite"
+            "your grades are currently in the gulag", "calculating how much time you're wasting...", 
+            "sonic is faster than your future", "imagine being productive right now lol", 
+            "sponsored by 3am academic despair", "your teacher is watching... probably.", 
+            "less useful than a solar-powered flashlight", "welcome to the digital mid-life crisis", 
+            "don't look behind you. or do. i'm just code.", "loading your questionable search history...",
+            "my creator has 0 rizz but made this anyway", "brainrot level: critical",
+            "the gpa reaper is coming for you", "academic weapon? no, academic victim.",
+            "procrastinating like an executive", "physics homework? never heard of her.",
+            "your fbi agent is bored, give him a show", "even the dial-up era was faster than you",
+            "error: user lacks motivation", "why search when you can just vibe?",
+            "mom says it's my turn on the unblocker", "this proxy is the only thing passing this year",
+            "too many tabs, not enough brain cells", "rest in peace to your productivity",
+            "the principal called, he's actually impressed", "calculating the radius of your laziness...",
+            "sponsored by monster energy and regret", "you look like you're failing world history",
+            "stop searching for 'how to get a girlfriend' and do math", "luxury proxy, budget lifestyle",
+            "this design is more expensive than your outfit", "aesthetic > education",
+            "running on spite and coffee beans", "your math teacher misses your potential",
+            "the sonic addiction is getting concerning", "staying unblocked since 2026",
+            "if you type fast enough, the guilt can't catch you", "brave search because you're a coward",
+            "making the internet usable for once", "don't let the firewall win",
+            "your desk mate is sniffing your screen", "delete your history after this. seriously.",
+            "currently hiding from responsibility", "just one more game of sonic, i swear",
+            "the elite way to fail high school", "minimalism for your maximalist chaos",
+            "atom: because you're too smart for school filters", "the void is comfy, isn't it?",
+            "refreshing for new ways to roast you", "you still here? go to class."
         ];
 
-        // pick a random phrase
-        document.getElementById('subtitle').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+        let pIdx = 0, cIdx = 0, erasing = false;
+        function type() {
+            let cur = phrases[pIdx];
+            if (!erasing) {
+                sub.innerText = cur.substring(0, cIdx++);
+                if (cIdx > cur.length) { erasing = true; setTimeout(type, 3000); }
+                else setTimeout(type, 70);
+            } else {
+                sub.innerText = cur.substring(0, cIdx--);
+                if (cIdx < 0) { erasing = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 500); }
+                else setTimeout(type, 40);
+            }
+        }
+        type();
 
-        const input = document.getElementById('uv-address');
-        
         function launch(url) {
-            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            document.getElementById('curtain').classList.add('active');
+            setTimeout(() => {
+                window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            }, 800);
         }
 
-        input.addEventListener('keydown', e => {
-            if (e.key === 'Enter' && input.value.trim()) {
-                const url = input.value.includes('.') ? 
-                    (input.value.startsWith('http') ? input.value : 'https://' + input.value) : 
-                    `https://search.brave.com/search?q=${encodeURIComponent(input.value)}`;
+        document.getElementById('uv-address').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                const val = e.target.value;
+                const url = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : `https://search.brave.com/search?q=${encodeURIComponent(val)}`;
                 launch(url);
             }
         });

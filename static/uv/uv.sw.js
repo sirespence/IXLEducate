@@ -787,3 +787,6 @@ function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
     throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof emitter);
   }
 }
+
+const uv = new UVServiceWorker();
+self.addEventListener('fetch', event => uv.fetch(event));

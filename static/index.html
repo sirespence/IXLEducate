@@ -28,7 +28,6 @@
             overflow: hidden;
         }
 
-        /* the void curtain for smooth transitions */
         #void-curtain {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; transform: translateY(100%);
@@ -130,9 +129,30 @@
         </div>
     </div>
 
-    <script src="uv/uv.bundle.js"></script>
-    <script src="uv/uv.config.js"></script>
+    <!-- UV Scripts -->
+    <script src="/static/uv/uv.bundle.js"></script>
+    <script src="/static/uv/uv.config.js"></script>
+
     <script>
+        // UV Config — matches your provided config
+        self.__uv$config = {
+            prefix: '/static/tiw/',
+            bare: 'https://bare.benrogo.net',
+            encodeUrl: Ultraviolet.codec.xor.encode,
+            decodeUrl: Ultraviolet.codec.xor.decode,
+            handler: '/static/uv/uv.handler.js',
+            bundle: '/static/uv/uv.bundle.js',
+            config: '/static/uv/uv.config.js',
+            sw: '/static/uv/uv.sw.js',
+        };
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/uv/uv.sw.js', {
+                scope: __uv$config.prefix
+            }).catch(err => console.warn('SW registration failed:', err));
+        }
+
         const sub = document.getElementById('subtitle');
         const curtain = document.getElementById('void-curtain');
         const phrases = [
@@ -179,7 +199,6 @@
         function launch(url) {
             curtain.classList.add('active');
             setTimeout(() => {
-                // adding a small delay to let the worker register
                 window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             }, 800);
         }

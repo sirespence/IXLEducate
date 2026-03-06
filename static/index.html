@@ -308,8 +308,8 @@
     </div>
 </div>
 
-<script src="/static/uv/uv.bundle.js"></script>
-<script src="/static/uv/uv.config.js"></script>
+<script src="/uv/uv.bundle.js"></script>
+<script src="/uv/uv.config.js"></script>
 <script>
 // ── VINE RENDERER ──────────────────────────────────────────────
 const canvas = document.getElementById('vineCanvas');
@@ -471,7 +471,7 @@ var sub = document.getElementById('subtitle');
 
 var swReady = false;
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/uv/uv.sw.js', {
+    navigator.serviceWorker.register('/uv/uv.sw.js', {
         scope: __uv$config.prefix
     }).then(function(reg) {
         if (reg.active) { swReady = true; return; }

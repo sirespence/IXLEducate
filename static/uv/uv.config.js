@@ -1,6 +1,6 @@
 self.__uv$config = {
     prefix: '/tiw/~/',
-    bare: 'https://bare.benrogo.net',
+    bare: 'https://tomp.app',
     encodeUrl: Ultraviolet.codec.xor.encode,
     decodeUrl: Ultraviolet.codec.xor.decode,
     handler: '/uv/uv.handler.js',

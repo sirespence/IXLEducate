@@ -3,7 +3,10 @@
   "headers": [
     {
       "source": "/uv/uv.sw.js",
-      "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }]
+      "headers": [
+        { "key": "Service-Worker-Allowed", "value": "/" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
     }
   ]
 }

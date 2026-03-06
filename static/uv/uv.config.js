@@ -1,6 +1,6 @@
 self.__uv$config = {
     prefix: '/tiw/~/',
-    bare: 'https://atomserver-production-a861.up.railway.app/',
+    bare: 'https://atomserver-production-a861.up.railway.app',
     encodeUrl: Ultraviolet.codec.xor.encode,
     decodeUrl: Ultraviolet.codec.xor.decode,
     handler: '/uv/uv.handler.js',

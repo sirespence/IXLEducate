@@ -129,12 +129,21 @@
         </div>
     </div>
 
-    <!-- UV Scripts -->
-    <script src="/static/uv/uv.bundle.js"></script>
-    <script src="/static/uv/uv.config.js"></script>
+    <!--
+        FIX THE 404s: Change these src paths to wherever your server actually serves the UV files.
+        Examples:
+          "uv/uv.bundle.js"          if files sit next to index.html
+          "/uv/uv.bundle.js"         from site root
+          "/static/uv/uv.bundle.js"  in a /static folder
+    -->
+    <script src="uv/uv.bundle.js"></script>
+    <script src="uv/uv.config.js"></script>
 
     <script>
-        // UV Config — matches your provided config
+        // Use var (not const/let) so curtain is accessible by inline onclick handlers
+        var curtain = document.getElementById('void-curtain');
+        var sub = document.getElementById('subtitle');
+
         self.__uv$config = {
             prefix: '/static/tiw/',
             bare: 'https://bare.benrogo.net',
@@ -146,16 +155,13 @@
             sw: '/static/uv/uv.sw.js',
         };
 
-        // Register service worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/uv/uv.sw.js', {
                 scope: __uv$config.prefix
-            }).catch(err => console.warn('SW registration failed:', err));
+            }).catch(function(err) { console.warn('SW registration failed:', err); });
         }
 
-        const sub = document.getElementById('subtitle');
-        const curtain = document.getElementById('void-curtain');
-        const phrases = [
+        var phrases = [
             "your gpa just filed for divorce", "calculating your wasted potential...", 
             "sonic is faster than your career path", "imagine being productive right now", 
             "sponsored by 3am academic despair", "your teacher is watching. probably.", 
@@ -181,9 +187,9 @@
             "you still here? go to class.", "brainrot loading: 99%", "your future boss just saw your tab."
         ];
 
-        let pIdx = 0, cIdx = 0, erasing = false;
+        var pIdx = 0, cIdx = 0, erasing = false;
         function type() {
-            let cur = phrases[pIdx];
+            var cur = phrases[pIdx];
             if (!erasing) {
                 sub.innerText = cur.substring(0, cIdx++);
                 if (cIdx > cur.length) { erasing = true; setTimeout(type, 3000); }
@@ -198,15 +204,15 @@
 
         function launch(url) {
             curtain.classList.add('active');
-            setTimeout(() => {
+            setTimeout(function() {
                 window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             }, 800);
         }
 
-        document.getElementById('uv-address').addEventListener('keydown', e => {
+        document.getElementById('uv-address').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                const val = e.target.value;
-                const url = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : `https://search.brave.com/search?q=${encodeURIComponent(val)}`;
+                var val = e.target.value;
+                var url = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://search.brave.com/search?q=' + encodeURIComponent(val);
                 launch(url);
             }
         });

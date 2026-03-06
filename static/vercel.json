@@ -1,5 +1,8 @@
 {
   "headers": [
-    { "source": "/uv/uv.sw.js", "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }] }
+    {
+      "source": "/static/uv/uv.sw.js",
+      "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }]
+    }
   ]
 }

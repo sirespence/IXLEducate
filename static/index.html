@@ -5,19 +5,19 @@
     <title>atom</title>
     <style>
         :root {
-            --bg: #0a0a0a;
-            --surface: #111111;
+            --bg: #050505; /* deeper black for that void feeling */
+            --surface: #0d0d0d;
             --accent: #ffffff;
-            --border: rgba(255, 255, 255, 0.1);
-            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            --border: rgba(255, 255, 255, 0.08);
+            --transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        * { box-sizing: border-box; outline: none; }
+        * { box-sizing: border-box; outline: none; cursor: crosshair; }
         
         body {
             background-color: var(--bg);
             color: var(--accent);
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -25,84 +25,89 @@
             justify-content: center;
             min-height: 100vh;
             overflow: hidden;
-            opacity: 0;
-            animation: fadeIn 1s forwards;
+            animation: fadeIn 1.2s forwards;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
 
-        .container { width: 90%; max-width: 800px; text-align: center; }
+        .container { width: 90%; max-width: 850px; text-align: center; }
 
+        /* the main title */
         h1 {
-            font-size: 12px;
+            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 8px;
-            margin-bottom: 40px;
+            letter-spacing: 12px;
+            margin: 0;
             font-weight: 300;
-            opacity: 0.6;
+            color: #fff;
+        }
+
+        /* THE SUBTITLE (the funny part) */
+        #subtitle {
+            font-size: 13px;
+            font-weight: 300;
+            color: #555; /* subtle gray so it looks "aesthetic" */
+            margin-top: 10px;
+            margin-bottom: 50px;
+            font-style: italic;
+            text-transform: lowercase;
         }
 
         /* luxury search bar */
-        .search-wrapper {
-            position: relative;
-            margin-bottom: 60px;
-        }
+        .search-wrapper { margin-bottom: 60px; position: relative; }
 
         #uv-address {
             width: 100%;
             background: transparent;
             border: none;
             border-bottom: 1px solid var(--border);
-            padding: 20px 0;
+            padding: 25px 0;
             font-size: 32px;
             color: #fff;
             font-weight: 200;
             text-align: center;
             transition: var(--transition);
+            letter-spacing: -1px;
         }
 
         #uv-address:focus {
             border-bottom: 1px solid #fff;
             letter-spacing: 2px;
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        /* game grid (the arcade) */
+        /* grid for the games */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            width: 100%;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
         }
 
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
-            padding: 30px 20px;
+            padding: 25px 15px;
             text-decoration: none;
-            color: #888;
-            font-size: 11px;
+            color: #666;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
             transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
         }
 
         .card:hover {
             background: #fff;
             color: #000;
-            transform: translateY(-5px);
             border-color: #fff;
+            transform: translateY(-8px);
         }
 
-        /* subtle grain effect for that "luxury" feel */
+        /* luxury grain overlay */
         body::before {
             content: "";
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url(https://grainy-gradients.vercel.app/noise.svg);
-            opacity: 0.05; pointer-events: none; z-index: 99;
+            opacity: 0.04; pointer-events: none;
         }
     </style>
 </head>
@@ -110,9 +115,10 @@
 
     <div class="container">
         <h1>atom</h1>
+        <div id="subtitle">initializing brainrot...</div>
         
         <div class="search-wrapper">
-            <input id="uv-address" type="text" placeholder="search brave" autocomplete="off">
+            <input id="uv-address" type="text" placeholder="search brave..." autocomplete="off">
         </div>
 
         <div class="grid">
@@ -127,10 +133,26 @@
     <script src="uv/uv.bundle.js"></script>
     <script src="uv/uv.config.js"></script>
     <script>
+        // the "stupid stuff" pool
+        const phrases = [
+            "sponsored by your failing grades",
+            "definitely not a proxy, i promise",
+            "sonic is my only friend",
+            "your teacher is right behind you (just kidding)",
+            "more useless than a glass hammer",
+            "imagine using a regular browser lol",
+            "brave search because google is a snitch",
+            "executive level procrastinating",
+            "physics homework can wait",
+            "built with 0% effort and 100% spite"
+        ];
+
+        // pick a random phrase
+        document.getElementById('subtitle').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+
         const input = document.getElementById('uv-address');
         
         function launch(url) {
-            // using ultraviolet encoding
             window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
         }
 

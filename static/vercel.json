@@ -1,7 +1,8 @@
 {
+  "public": "static",
   "headers": [
     {
-      "source": "/static/uv/uv.sw.js",
+      "source": "/uv/uv.sw.js",
       "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }]
     }
   ]

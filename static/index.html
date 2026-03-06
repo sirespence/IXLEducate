@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>atom</title>
     <style>
         :root {
-            --bg: #050505;
+            --bg: #030303;
             --surface: #0a0a0a;
             --accent: #ffffff;
+            --border: rgba(255, 255, 255, 0.04);
             --text-dim: #444;
-            --border: rgba(255, 255, 255, 0.03);
-            --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
         * { box-sizing: border-box; outline: none; cursor: crosshair; }
@@ -18,7 +19,7 @@
         body {
             background-color: var(--bg);
             color: var(--accent);
-            font-family: 'Inter', 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             display: flex;
             align-items: center;
@@ -27,55 +28,42 @@
             overflow: hidden;
         }
 
-        /* luxury glass grain overlay */
-        body::before {
-            content: "";
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url(https://grainy-gradients.vercel.app/noise.svg);
-            opacity: 0.03; pointer-events: none; z-index: 100;
-        }
-
-        /* the "void" transition curtain */
-        #curtain {
+        /* the void curtain for smooth transitions */
+        #void-curtain {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; transform: translateY(100%);
-            transition: var(--transition); z-index: 999;
+            transition: var(--transition); z-index: 9999;
         }
-        #curtain.active { transform: translateY(0); }
+        #void-curtain.active { transform: translateY(0); }
 
         .container { 
             width: 90%; max-width: 900px; text-align: center; 
-            animation: slideUp 1.5s var(--transition);
+            animation: emerge 1.2s var(--transition);
         }
 
-        @keyframes slideUp {
+        @keyframes emerge {
             from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
         h1 {
-            font-size: 10px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 20px;
             margin: 0;
             font-weight: 200;
-            opacity: 0.5;
-            transition: var(--transition);
+            opacity: 0.6;
         }
-        h1:hover { opacity: 1; letter-spacing: 25px; }
 
-        /* typing subtitle */
         #subtitle {
             font-size: 13px;
             color: var(--text-dim);
-            margin: 20px 0 80px 0;
+            margin: 15px 0 70px 0;
             min-height: 20px;
-            font-style: italic;
             font-weight: 300;
             text-transform: lowercase;
+            font-style: italic;
         }
-
-        .search-wrapper { margin-bottom: 80px; position: relative; }
 
         #uv-address {
             width: 100%;
@@ -83,25 +71,24 @@
             border: none;
             border-bottom: 1px solid var(--border);
             padding: 20px 0;
-            font-size: 48px;
+            font-size: 42px;
             color: #fff;
             font-weight: 100;
             text-align: center;
             transition: var(--transition);
-            letter-spacing: -2px;
+            letter-spacing: -1px;
         }
 
         #uv-address:focus {
             border-bottom: 1px solid #fff;
-            letter-spacing: 2px;
-            transform: scale(1.02);
+            letter-spacing: 3px;
         }
 
-        /* minimalist library grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 15px;
+            margin-top: 60px;
         }
 
         .card {
@@ -114,13 +101,11 @@
             text-transform: uppercase;
             letter-spacing: 3px;
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
         }
 
         .card:hover {
-            color: #000;
             background: #fff;
+            color: #000;
             transform: translateY(-10px);
             border-color: #fff;
         }
@@ -128,22 +113,20 @@
 </head>
 <body>
 
-    <div id="curtain"></div>
+    <div id="void-curtain"></div>
 
     <div class="container">
         <h1>atom</h1>
         <div id="subtitle"></div>
         
-        <div class="search-wrapper">
-            <input id="uv-address" type="text" placeholder="search the void" autocomplete="off">
-        </div>
+        <input id="uv-address" type="text" placeholder="enter the void" autocomplete="off">
 
         <div class="grid">
-            <a href="#" onclick="launch('https://vinmannie.github.io/SonicManiaWeb/')" class="card">Mania</a>
-            <a href="#" onclick="launch('https://vinmannie.github.io/Sonic-1-WASM/')" class="card">S1 Wasm</a>
-            <a href="#" onclick="launch('https://jojudge.com/ICBINS1/')" class="card">Judge</a>
-            <a href="#" onclick="launch('https://heyjoeway.github.io/s2cx/')" class="card">S2 Cx</a>
-            <a href="#" onclick="launch('https://projects.sappharad.com/s3air_ios/')" class="card">S3 Air</a>
+            <a href="#" onclick="launch('https://vinmannie.github.io/SonicManiaWeb/')" class="card">Sonic Mania</a>
+            <a href="#" onclick="launch('https://jojudge.com/ICBINS1/')" class="card">Sonic 1</a>
+            <a href="#" onclick="launch('https://github.com/VinMannie/Sonic-1-WASM')" class="card">Sonic (2013)</a>
+            <a href="#" onclick="launch('https://heyjoeway.github.io/s2cx/')" class="card">Sonic 2: CC</a>
+            <a href="#" onclick="launch('https://projects.sappharad.com/s3air_ios/')" class="card">Sonic 3ak</a>
         </div>
     </div>
 
@@ -151,32 +134,31 @@
     <script src="uv/uv.config.js"></script>
     <script>
         const sub = document.getElementById('subtitle');
+        const curtain = document.getElementById('void-curtain');
         const phrases = [
-            "your grades are currently in the gulag", "calculating how much time you're wasting...", 
-            "sonic is faster than your future", "imagine being productive right now lol", 
-            "sponsored by 3am academic despair", "your teacher is watching... probably.", 
-            "less useful than a solar-powered flashlight", "welcome to the digital mid-life crisis", 
-            "don't look behind you. or do. i'm just code.", "loading your questionable search history...",
-            "my creator has 0 rizz but made this anyway", "brainrot level: critical",
-            "the gpa reaper is coming for you", "academic weapon? no, academic victim.",
-            "procrastinating like an executive", "physics homework? never heard of her.",
-            "your fbi agent is bored, give him a show", "even the dial-up era was faster than you",
-            "error: user lacks motivation", "why search when you can just vibe?",
+            "your gpa just filed for divorce", "calculating your wasted potential...", 
+            "sonic is faster than your career path", "imagine being productive right now", 
+            "sponsored by 3am academic despair", "your teacher is watching. probably.", 
+            "welcome to the digital mid-life crisis", "brainrot level: executive",
+            "the gpa reaper is outside your house", "academic victim vibes detected",
+            "procrastinating like a high-end ceo", "world history homework? never heard of her.",
+            "your fbi agent is bored, play something", "even dial-up era was faster than you",
+            "error: user lacks basic motivation", "why study when you can just vibe?",
             "mom says it's my turn on the unblocker", "this proxy is the only thing passing this year",
             "too many tabs, not enough brain cells", "rest in peace to your productivity",
             "the principal called, he's actually impressed", "calculating the radius of your laziness...",
-            "sponsored by monster energy and regret", "you look like you're failing world history",
-            "stop searching for 'how to get a girlfriend' and do math", "luxury proxy, budget lifestyle",
-            "this design is more expensive than your outfit", "aesthetic > education",
+            "sponsored by monster energy and regret", "you look like you're failing algebra 2",
+            "stop searching for rizz and do your math", "luxury proxy, budget lifestyle",
+            "this design is more expensive than your room", "aesthetic > education always",
             "running on spite and coffee beans", "your math teacher misses your potential",
-            "the sonic addiction is getting concerning", "staying unblocked since 2026",
-            "if you type fast enough, the guilt can't catch you", "brave search because you're a coward",
-            "making the internet usable for once", "don't let the firewall win",
-            "your desk mate is sniffing your screen", "delete your history after this. seriously.",
-            "currently hiding from responsibility", "just one more game of sonic, i swear",
-            "the elite way to fail high school", "minimalism for your maximalist chaos",
-            "atom: because you're too smart for school filters", "the void is comfy, isn't it?",
-            "refreshing for new ways to roast you", "you still here? go to class."
+            "the sonic obsession is getting weird", "staying unblocked since 2026",
+            "type fast, the guilt is catching up", "making the internet usable for once",
+            "don't let the firewall win the war", "your desk mate is sniffing your screen", 
+            "delete your history after this. seriously.", "currently hiding from responsibility", 
+            "just one more game of sonic, i swear", "the elite way to fail high school", 
+            "minimalism for your maximalist chaos", "atom: too smart for school filters", 
+            "the void is comfy, isn't it?", "refreshing for new ways to roast you", 
+            "you still here? go to class.", "brainrot loading: 99%", "your future boss just saw your tab."
         ];
 
         let pIdx = 0, cIdx = 0, erasing = false;
@@ -185,18 +167,19 @@
             if (!erasing) {
                 sub.innerText = cur.substring(0, cIdx++);
                 if (cIdx > cur.length) { erasing = true; setTimeout(type, 3000); }
-                else setTimeout(type, 70);
+                else setTimeout(type, 60);
             } else {
                 sub.innerText = cur.substring(0, cIdx--);
                 if (cIdx < 0) { erasing = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 500); }
-                else setTimeout(type, 40);
+                else setTimeout(type, 30);
             }
         }
         type();
 
         function launch(url) {
-            document.getElementById('curtain').classList.add('active');
+            curtain.classList.add('active');
             setTimeout(() => {
+                // adding a small delay to let the worker register
                 window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
             }, 800);
         }

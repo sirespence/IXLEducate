@@ -129,15 +129,9 @@
         </div>
     </div>
 
-    <!--
-        FIX THE 404s: Change these src paths to wherever your server actually serves the UV files.
-        Examples:
-          "uv/uv.bundle.js"          if files sit next to index.html
-          "/uv/uv.bundle.js"         from site root
-          "/static/uv/uv.bundle.js"  in a /static folder
-    -->
-    <script src="uv/uv.bundle.js"></script>
-    <script src="uv/uv.config.js"></script>
+    <!-- UV scripts served from /uv/ -->
+    <script src="/uv/uv.bundle.js"></script>
+    <script src="/uv/uv.config.js"></script>
 
     <script>
         // Use var (not const/let) so curtain is accessible by inline onclick handlers
@@ -149,16 +143,16 @@
             bare: 'https://bare.benrogo.net',
             encodeUrl: ultraviolet.codec.xor.encode,
             decodeUrl: ultraviolet.codec.xor.decode,
-            handler: '/static/uv/uv.handler.js',
-            bundle: '/static/uv/uv.bundle.js',
-            config: '/static/uv/uv.config.js',
-            sw: '/static/uv/uv.sw.js',
+            handler: '/uv/uv.handler.js',
+            bundle: '/uv/uv.bundle.js',
+            config: '/uv/uv.config.js',
+            sw: '/uv/uv.sw.js',
         };
 
         // Register SW and wait for active state before navigating
         var swReady = false;
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/static/uv/uv.sw.js', {
+            navigator.serviceWorker.register('/uv/uv.sw.js', {
                 scope: __uv$config.prefix
             }).then(function(reg) {
                 if (reg.active) { swReady = true; return; }

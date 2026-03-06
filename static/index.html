@@ -155,11 +155,24 @@
             sw: '/static/uv/uv.sw.js',
         };
 
+        // Register SW and wait for active state before navigating
+        var swReady = false;
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/uv/uv.sw.js', {
                 scope: __uv$config.prefix
-            }).catch(function(err) { console.warn('SW registration failed:', err); });
-        }
+            }).then(function(reg) {
+                if (reg.active) { swReady = true; return; }
+                var sw = reg.installing || reg.waiting;
+                if (sw) {
+                    sw.addEventListener('statechange', function() {
+                        if (sw.state === 'activated') swReady = true;
+                    });
+                }
+            }).catch(function(err) {
+                console.warn('SW registration failed:', err);
+                swReady = true;
+            });
+        } else { swReady = true; }
 
         var phrases = [
             "your gpa just filed for divorce", "calculating your wasted potential...", 
@@ -204,9 +217,16 @@
 
         function launch(url) {
             curtain.classList.add('active');
-            setTimeout(function() {
-                window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-            }, 800);
+            // Wait for SW to be active, then navigate
+            var attempts = 0;
+            function go() {
+                if (swReady || attempts++ > 30) {
+                    window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+                } else {
+                    setTimeout(go, 100);
+                }
+            }
+            setTimeout(go, 300);
         }
 
         document.getElementById('uv-address').addEventListener('keydown', function(e) {

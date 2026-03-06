@@ -472,7 +472,7 @@ var sub = document.getElementById('subtitle');
 var swReady = false;
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/uv/uv.sw.js', {
-        scope: __uv$config.prefix
+        scope: '/'
     }).then(function(reg) {
         if (reg.active) { swReady = true; return; }
         var sw = reg.installing || reg.waiting;

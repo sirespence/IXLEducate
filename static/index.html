@@ -4,309 +4,578 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>atom</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Caveat+Brush&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --glow: #4dd8f5;
-            --glow2: #7ef0ff;
-            --glass-border: rgba(255,255,255,0.08);
-            --text: #d8f4ff;
-            --text-dim: rgba(180,220,255,0.35);
-        }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        :root {
+            --paper: #111118;
+            --paper2: #14141c;
+            --line: rgba(100,120,255,0.12);
+            --ink: #e8e4d0;
+            --ink-dim: rgba(232,228,208,0.4);
+            --ink-faint: rgba(232,228,208,0.15);
+            --red: #ff6b6b;
+            --blue: #7eb8f7;
+            --yellow: #f7e07e;
+            --green: #7ef7a8;
+            --margin: rgba(255,100,100,0.18);
+        }
+
         body {
-            background: #020204;
-            color: var(--text);
-            font-family: 'Nunito', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'Caveat', cursive;
             min-height: 100vh;
             overflow: hidden;
-            cursor: default;
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23e8e4d0' opacity='0.8'/%3E%3C/svg%3E") 10 10, crosshair;
         }
 
-        .sky-bg {
+        /* ── NOTEBOOK LINES ─────────────────────── */
+        .notebook-bg {
             position: fixed; inset: 0; z-index: 0;
             background:
-                radial-gradient(ellipse 70% 40% at 50% 100%, rgba(8,18,50,0.7) 0%, transparent 70%),
-                linear-gradient(180deg, #010103 0%, #040410 40%, #060614 70%, #080a1c 100%);
+                repeating-linear-gradient(
+                    transparent,
+                    transparent 31px,
+                    var(--line) 31px,
+                    var(--line) 32px
+                );
+            background-position: 0 8px;
         }
 
-        .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .aurora-band {
-            position: absolute; width: 200%; height: 160px;
-            border-radius: 50%; filter: blur(50px); opacity: 0;
-            animation: auroraFloat 10s ease-in-out infinite;
-        }
-        .aurora-band:nth-child(1) {
-            background: linear-gradient(90deg, transparent, rgba(0,140,210,0.07), rgba(50,200,190,0.04), transparent);
-            top: 20%; left: -50%; animation-delay: 0s;
-        }
-        .aurora-band:nth-child(2) {
-            background: linear-gradient(90deg, transparent, rgba(20,90,190,0.06), rgba(0,180,170,0.03), transparent);
-            top: 33%; left: -30%; animation-delay: 3.5s;
-        }
-        .aurora-band:nth-child(3) {
-            background: linear-gradient(90deg, transparent, rgba(0,110,190,0.05), rgba(90,50,190,0.03), transparent);
-            top: 50%; left: -70%; animation-delay: 7s;
-        }
-        @keyframes auroraFloat {
-            0%   { opacity: 0; transform: translateX(0) scaleY(1); }
-            30%  { opacity: 1; }
-            70%  { opacity: 0.5; }
-            100% { opacity: 0; transform: translateX(55%) scaleY(1.2); }
+        /* margin line */
+        .notebook-bg::before {
+            content: '';
+            position: absolute;
+            left: 68px; top: 0; bottom: 0;
+            width: 2px;
+            background: var(--margin);
         }
 
-        #starCanvas { position: fixed; inset: 0; z-index: 0; }
-
-        .orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .orb { position: absolute; border-radius: 50%; filter: blur(70px); animation: orbDrift linear infinite; }
-        .orb:nth-child(1) { width: 260px; height: 260px; background: radial-gradient(circle, rgba(0,80,180,0.07) 0%, transparent 70%); top: 55%; left: 8%; animation-duration: 22s; }
-        .orb:nth-child(2) { width: 170px; height: 170px; background: radial-gradient(circle, rgba(40,160,210,0.06) 0%, transparent 70%); top: 35%; right: 6%; animation-duration: 17s; animation-delay: -8s; }
-        .orb:nth-child(3) { width: 130px; height: 130px; background: radial-gradient(circle, rgba(0,180,150,0.04) 0%, transparent 70%); top: 65%; right: 22%; animation-duration: 20s; animation-delay: -5s; }
-        @keyframes orbDrift {
-            0%,100% { transform: translateY(0) scale(1); opacity: 0.5; }
-            50%      { transform: translateY(-26px) scale(1.08); opacity: 0.9; }
+        /* spiral holes */
+        .notebook-bg::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 44px;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 48px,
+                rgba(0,0,0,0.6) 48px,
+                rgba(0,0,0,0.6) 72px
+            );
         }
 
-        .horizon {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 28%; z-index: 0;
-            background: linear-gradient(to top, rgba(6,16,45,0.18) 0%, transparent 100%);
+        .holes {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 44px;
+            z-index: 20;
             pointer-events: none;
         }
-        .horizon::after {
-            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(20,110,180,0.35), rgba(77,216,245,0.45), rgba(20,110,180,0.35), transparent);
-            box-shadow: 0 0 12px rgba(77,216,245,0.2), 0 0 35px rgba(0,80,180,0.08);
+
+        .hole {
+            position: absolute;
+            left: 8px;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: #0a0a10;
+            border: 2px solid rgba(255,255,255,0.08);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
         }
 
-        .planet {
-            position: fixed; bottom: -70px; right: 70px;
-            width: 190px; height: 190px; border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%,
-                rgba(160,210,255,0.1) 0%, rgba(30,65,145,0.22) 30%,
-                rgba(5,10,35,0.88) 70%, #010206 100%);
-            box-shadow: 0 0 25px rgba(0,60,140,0.18), 0 0 70px rgba(0,50,120,0.08),
-                inset -7px -7px 22px rgba(0,0,0,0.75), inset 3px 3px 12px rgba(40,120,200,0.07);
-            border: 1px solid rgba(25,65,140,0.12);
-            z-index: 0; pointer-events: none; animation: planetFloat 7s ease-in-out infinite;
+        /* ── FLOATING SPACE DOODLES ─────────────── */
+        .doodles {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
         }
-        .planet-ring {
-            position: absolute; width: 265px; height: 44px; border-radius: 50%;
-            border: 1px solid rgba(30,100,180,0.13);
-            top: 50%; left: 50%; transform: translate(-50%,-50%) rotateX(75deg);
-            box-shadow: 0 0 10px rgba(30,100,180,0.07);
-        }
-        .planet-sm {
-            position: fixed; top: 70px; left: -25px;
-            width: 92px; height: 92px; border-radius: 50%;
-            background: radial-gradient(circle at 40% 35%,
-                rgba(130,185,255,0.09) 0%, rgba(15,50,120,0.28) 40%,
-                rgba(3,8,22,0.92) 80%, #010104 100%);
-            box-shadow: 0 0 12px rgba(0,50,120,0.12), inset -3px -3px 10px rgba(0,0,0,0.75);
-            z-index: 0; pointer-events: none; opacity: 0.45;
-            animation: planetFloat 10s ease-in-out infinite; animation-delay: -4s;
-        }
-        @keyframes planetFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-        /* ── UI ─────────────────────────────── */
+        .doodle {
+            position: absolute;
+            font-family: 'Caveat', cursive;
+            color: var(--ink-faint);
+            font-size: 13px;
+            transform-origin: center;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        /* wandering stars drawn by hand */
+        .star-doodle {
+            position: absolute;
+            width: 0; height: 0;
+            animation: starFloat linear infinite;
+        }
+        .star-doodle::before {
+            content: attr(data-sym);
+            font-family: 'Caveat', cursive;
+            font-size: 22px;
+            color: var(--ink-faint);
+            position: absolute;
+            transform: translate(-50%, -50%);
+            animation: starWobble 2s ease-in-out infinite;
+        }
+        @keyframes starFloat {
+            0%   { transform: translate(0,0) rotate(0deg); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 0.6; }
+            100% { transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); opacity: 0; }
+        }
+        @keyframes starWobble {
+            0%,100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+            50%      { transform: translate(-50%,-50%) scale(1.3) rotate(15deg); }
+        }
+
+        /* ── CANVAS FOR DRIFTING SKETCHED PLANETS ── */
+        #spaceCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+        /* ── UI ─────────────────────────────────── */
         .ui {
             position: fixed; inset: 0; z-index: 10;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             pointer-events: none;
+            padding-left: 44px; /* account for holes */
         }
         .ui > * { pointer-events: all; }
 
-        .wordmark {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 64px; font-weight: 700;
-            letter-spacing: 14px; text-transform: uppercase;
-            color: transparent;
-            background: linear-gradient(180deg, rgba(255,255,255,0.88) 0%, var(--glow2) 45%, var(--glow) 75%, rgba(0,120,185,0.5) 100%);
-            -webkit-background-clip: text; background-clip: text;
-            filter: drop-shadow(0 0 22px rgba(77,216,245,0.35)) drop-shadow(0 0 55px rgba(0,100,180,0.18));
-            margin-bottom: 6px; user-select: none;
-            animation: wordmarkPulse 5s ease-in-out infinite;
+        /* title area */
+        .title-block {
+            position: relative;
+            text-align: center;
+            margin-bottom: 10px;
         }
-        @keyframes wordmarkPulse {
-            0%,100% { filter: drop-shadow(0 0 22px rgba(77,216,245,0.35)) drop-shadow(0 0 55px rgba(0,100,180,0.18)); }
-            50%      { filter: drop-shadow(0 0 32px rgba(77,216,245,0.6)) drop-shadow(0 0 75px rgba(0,100,180,0.3)); }
+
+        .wordmark {
+            font-family: 'Caveat Brush', cursive;
+            font-size: 88px;
+            color: var(--ink);
+            letter-spacing: 6px;
+            line-height: 1;
+            position: relative;
+            display: inline-block;
+            animation: titleWobble 3s ease-in-out infinite;
+            text-shadow: 3px 3px 0 rgba(126,184,247,0.2), -1px -1px 0 rgba(126,184,247,0.1);
+            filter: drop-shadow(0 0 18px rgba(126,184,247,0.15));
+        }
+
+        /* underline scribble */
+        .wordmark::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: -8px; right: -8px; height: 4px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='8' viewBox='0 0 200 8'%3E%3Cpath d='M0 5 Q25 1 50 5 Q75 9 100 4 Q125 0 150 5 Q175 9 200 4' stroke='%237eb8f7' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x center;
+            background-size: 200px 8px;
+            opacity: 0.6;
+        }
+
+        @keyframes titleWobble {
+            0%,100% { transform: rotate(-1deg) translateY(0px); }
+            25%      { transform: rotate(0.5deg) translateY(-3px); }
+            50%      { transform: rotate(1deg) translateY(0px); }
+            75%      { transform: rotate(-0.3deg) translateY(2px); }
+        }
+
+        /* subtitle annotation */
+        .annotation {
+            font-family: 'Caveat', cursive;
+            font-size: 14px;
+            color: var(--red);
+            opacity: 0.7;
+            position: absolute;
+            right: -120px;
+            top: 10px;
+            transform: rotate(8deg);
+            white-space: nowrap;
+            animation: annotationWiggle 4s ease-in-out infinite;
+        }
+        .annotation::before {
+            content: '';
+            position: absolute;
+            left: -22px; top: 8px;
+            width: 18px; height: 2px;
+            background: var(--red);
+            opacity: 0.6;
+            transform: rotate(-15deg);
+        }
+
+        @keyframes annotationWiggle {
+            0%,100% { transform: rotate(8deg) scale(1); }
+            50%      { transform: rotate(10deg) scale(1.04); }
         }
 
         #subtitle {
-            font-size: 11px; font-weight: 600; color: var(--text-dim);
-            letter-spacing: 4px; text-transform: lowercase;
-            min-height: 18px; text-align: center; margin-bottom: 40px;
+            font-family: 'Caveat', cursive;
+            font-size: 17px;
+            color: var(--ink-dim);
+            letter-spacing: 1px;
+            min-height: 24px;
+            text-align: center;
+            margin-bottom: 36px;
+            position: relative;
+            animation: subtitleDrift 5s ease-in-out infinite;
         }
-        #subtitle::after { content: '▌'; color: var(--glow); animation: blink 1s step-end infinite; }
+        #subtitle::after {
+            content: '|';
+            color: var(--blue);
+            animation: blink 0.9s step-end infinite;
+            margin-left: 2px;
+        }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes subtitleDrift {
+            0%,100% { transform: translateX(0); }
+            50%      { transform: translateX(3px); }
+        }
 
+        /* ── SEARCH ──────────────────────────────── */
         .search-wrap {
-            display: flex; width: 420px; margin-bottom: 36px;
-            border-radius: 50px;
-            background: rgba(4,5,14,0.72);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 0 0 1px rgba(77,216,245,0.05), 0 8px 32px rgba(0,0,0,0.65),
-                inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 18px rgba(0,40,100,0.05);
-            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            overflow: hidden; transition: box-shadow 0.3s, border-color 0.3s;
+            display: flex;
+            width: 400px;
+            margin-bottom: 30px;
+            position: relative;
         }
-        .search-wrap:focus-within {
-            border-color: rgba(77,216,245,0.22);
-            box-shadow: 0 0 0 1px rgba(77,216,245,0.14), 0 8px 40px rgba(0,0,0,0.75),
-                0 0 22px rgba(77,216,245,0.07), inset 0 1px 0 rgba(255,255,255,0.09);
+
+        /* hand-drawn border via SVG filter */
+        .search-inner {
+            display: flex;
+            width: 100%;
+            background: rgba(20,20,30,0.85);
+            border: 2.5px solid rgba(232,228,208,0.25);
+            border-radius: 4px;
+            position: relative;
+            transition: border-color 0.2s;
+            animation: searchWobble 6s ease-in-out infinite;
+            box-shadow: 3px 3px 0 rgba(126,184,247,0.1), -1px -1px 0 rgba(126,184,247,0.05);
         }
+
+        /* SVG wobbly border overlay */
+        .search-inner::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 6px;
+            background: transparent;
+            pointer-events: none;
+            border: 2px solid transparent;
+        }
+
+        .search-wrap:focus-within .search-inner {
+            border-color: rgba(126,184,247,0.55);
+            box-shadow: 3px 3px 0 rgba(126,184,247,0.2), 0 0 14px rgba(126,184,247,0.1);
+        }
+
+        @keyframes searchWobble {
+            0%,100% { transform: rotate(-0.3deg); }
+            50%      { transform: rotate(0.3deg); }
+        }
+
         #uv-address {
             flex: 1; background: transparent; border: none;
-            padding: 14px 22px; font-size: 13px;
-            font-family: 'Nunito', sans-serif; font-weight: 600;
-            color: var(--text); letter-spacing: 0.3px;
+            padding: 12px 16px;
+            font-size: 18px;
+            font-family: 'Caveat', cursive;
+            color: var(--ink);
+            letter-spacing: 0.5px;
         }
-        #uv-address::placeholder { color: var(--text-dim); }
+        #uv-address::placeholder { color: var(--ink-faint); }
         #uv-address:focus { outline: none; }
 
         .go-btn {
-            background: linear-gradient(135deg, rgba(0,100,160,0.18), rgba(0,65,120,0.12));
-            border: none; border-left: 1px solid var(--glass-border);
-            padding: 14px 22px; cursor: pointer;
-            color: var(--glow); font-size: 18px;
-            transition: all 0.2s; border-radius: 0 50px 50px 0;
+            background: none; border: none;
+            border-left: 2px solid rgba(232,228,208,0.15);
+            padding: 12px 18px;
+            cursor: pointer;
+            font-family: 'Caveat Brush', cursive;
+            font-size: 20px;
+            color: var(--blue);
+            transition: all 0.15s;
+            letter-spacing: 1px;
         }
-        .go-btn:hover { background: linear-gradient(135deg, rgba(0,140,200,0.28), rgba(0,100,180,0.18)); color: #fff; }
+        .go-btn:hover { color: var(--ink); transform: scale(1.1) rotate(-5deg); }
+        .go-btn:active { transform: scale(0.92) rotate(5deg); }
 
-        .tiles { display: flex; gap: 10px; }
+        /* search label */
+        .search-label {
+            position: absolute;
+            top: -22px; left: 4px;
+            font-family: 'Caveat', cursive;
+            font-size: 13px;
+            color: var(--ink-faint);
+            transform: rotate(-1deg);
+        }
+
+        /* ── TILES ───────────────────────────────── */
+        .tiles { display: flex; gap: 14px; }
 
         .tile {
-            width: 80px; height: 90px;
-            background: rgba(4,5,14,0.62);
-            border: 1px solid rgba(255,255,255,0.055);
-            border-radius: 16px;
+            width: 86px; height: 96px;
+            background: rgba(16,16,24,0.9);
+            border: 2.5px solid rgba(232,228,208,0.18);
+            border-radius: 6px;
             display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 7px;
-            text-decoration: none; color: rgba(120,185,225,0.5);
+            align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+            color: var(--ink-dim);
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-            position: relative; overflow: hidden;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+            transition: color 0.2s, border-color 0.2s;
         }
-        .tile::before {
-            content: ''; position: absolute; inset: 0; border-radius: 16px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.035) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .tile:hover {
-            transform: translateY(-6px) scale(1.05);
-            border-color: rgba(77,216,245,0.28); color: #c0eaff;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.65), 0 0 18px rgba(77,216,245,0.1),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            background: rgba(0,22,58,0.5);
-        }
-        .tile:active { transform: translateY(-2px) scale(0.98); }
-        .tile svg { transition: all 0.2s; }
-        .tile:hover svg { filter: drop-shadow(0 0 5px var(--glow)); transform: scale(1.1); }
-        .tile-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
 
+        .tile:nth-child(1) { animation: tileWobble1 3.2s ease-in-out infinite; }
+        .tile:nth-child(2) { animation: tileWobble2 2.8s ease-in-out infinite; }
+        .tile:nth-child(3) { animation: tileWobble3 3.6s ease-in-out infinite; }
+
+        @keyframes tileWobble1 { 0%,100%{transform:rotate(-1.5deg) translateY(0)} 50%{transform:rotate(1deg) translateY(-4px)} }
+        @keyframes tileWobble2 { 0%,100%{transform:rotate(1deg) translateY(-2px)} 50%{transform:rotate(-1.5deg) translateY(3px)} }
+        @keyframes tileWobble3 { 0%,100%{transform:rotate(-0.5deg) translateY(1px)} 50%{transform:rotate(2deg) translateY(-5px)} }
+
+        .tile::before {
+            content: attr(data-note);
+            position: absolute;
+            top: 4px; right: 5px;
+            font-family: 'Caveat', cursive;
+            font-size: 9px;
+            color: var(--ink-faint);
+            transform: rotate(6deg);
+        }
+
+        /* corner fold */
+        .tile::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 0; height: 0;
+            border-style: solid;
+            border-width: 0 14px 14px 0;
+            border-color: transparent var(--paper2) transparent transparent;
+            transition: border-width 0.2s;
+        }
+
+        .tile:hover {
+            border-color: rgba(232,228,208,0.45);
+            color: var(--ink);
+            animation-play-state: paused;
+            transform: rotate(0deg) scale(1.08) translateY(-6px) !important;
+            box-shadow: 4px 4px 0 rgba(126,184,247,0.15), -2px -2px 0 rgba(247,224,126,0.08);
+            z-index: 5;
+        }
+        .tile:hover::after { border-width: 0 22px 22px 0; }
+        .tile:active { transform: scale(0.95) rotate(-2deg) !important; }
+
+        .tile svg { transition: transform 0.2s; }
+        .tile:hover svg { transform: scale(1.15) rotate(-8deg); }
+
+        .tile-label {
+            font-family: 'Caveat', cursive;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* ── MARGIN NOTES ────────────────────────── */
+        .margin-note {
+            position: fixed;
+            left: 76px;
+            font-family: 'Caveat', cursive;
+            font-size: 12px;
+            color: var(--red);
+            opacity: 0.55;
+            transform: rotate(-90deg);
+            transform-origin: left center;
+            white-space: nowrap;
+            z-index: 5;
+            pointer-events: none;
+            animation: marginPulse 4s ease-in-out infinite;
+        }
+        @keyframes marginPulse { 0%,100%{opacity:0.55} 50%{opacity:0.85} }
+
+        /* ── RANDOM SCRIBBLES ────────────────────── */
+        .scribble {
+            position: fixed;
+            font-family: 'Caveat', cursive;
+            font-size: 11px;
+            color: var(--ink-faint);
+            transform-origin: center;
+            pointer-events: none;
+            z-index: 2;
+            animation: scribbleDrift ease-in-out infinite;
+        }
+        @keyframes scribbleDrift {
+            0%,100% { transform: rotate(var(--r0)) translateY(0); }
+            50%      { transform: rotate(var(--rh)) translateY(-8px); }
+        }
+
+        /* ── BOUNCING SPACE BLOBS ────────────────── */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: blobBounce ease-in-out infinite alternate;
+        }
+        @keyframes blobBounce {
+            0%   { transform: translate(0,0) scale(1) rotate(0deg); }
+            100% { transform: translate(var(--bx),var(--by)) scale(var(--bs)) rotate(var(--br)); }
+        }
+
+        /* ── CURTAIN ─────────────────────────────── */
         #curtain {
             position: fixed; inset: 0;
-            background: linear-gradient(180deg, #010103 0%, #040410 50%, #060614 100%);
+            background: var(--paper);
             z-index: 9999;
             transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.76,0,0.24,1);
+            transition: transform 0.55s cubic-bezier(0.76,0,0.24,1);
             display: flex; align-items: center; justify-content: center;
         }
         #curtain.active { transform: translateY(0); }
+
         .curtain-inner { text-align: center; }
 
-        .curtain-orb {
-            width: 54px; height: 54px; margin: 0 auto 20px; border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, rgba(190,235,255,0.45), rgba(0,120,185,0.45) 40%, rgba(0,35,90,0.5) 70%, transparent);
-            box-shadow: 0 0 22px rgba(77,216,245,0.3), 0 0 45px rgba(0,85,160,0.18), inset 0 2px 4px rgba(255,255,255,0.3);
-            opacity: 0; transition: opacity 0.3s 0.1s;
+        .curtain-sketch {
+            font-family: 'Caveat Brush', cursive;
+            font-size: 48px;
+            color: var(--ink);
+            margin-bottom: 14px;
+            opacity: 0;
+            transition: opacity 0.3s 0.1s;
+            animation: curtainBounce 0.6s ease-in-out infinite alternate;
+            display: inline-block;
         }
-        #curtain.active .curtain-orb { opacity: 1; animation: orbPulse 1.4s ease-in-out infinite; }
-        @keyframes orbPulse {
-            0%,100% { box-shadow: 0 0 22px rgba(77,216,245,0.3), 0 0 45px rgba(0,85,160,0.18); }
-            50%      { box-shadow: 0 0 36px rgba(77,216,245,0.55), 0 0 72px rgba(0,85,160,0.32); }
-        }
+        #curtain.active .curtain-sketch { opacity: 1; }
+        @keyframes curtainBounce { 0%{transform:scale(1) rotate(-5deg)} 100%{transform:scale(1.15) rotate(5deg)} }
 
-        .curtain-line { width: 150px; height: 2px; background: rgba(255,255,255,0.04); margin: 0 auto 14px; border-radius: 2px; overflow: hidden; }
-        .curtain-fill { height: 100%; background: linear-gradient(90deg, rgba(0,65,140,0.8), var(--glow), var(--glow2)); width: 0; border-radius: 2px; box-shadow: 0 0 6px var(--glow); }
-        #curtain.active .curtain-fill { animation: fillBar 0.8s 0.15s cubic-bezier(0.4,0,0.2,1) forwards; }
+        .curtain-line {
+            width: 160px; height: 3px;
+            background: rgba(232,228,208,0.08);
+            margin: 0 auto 12px;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        .curtain-line::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -4px; right: -4px; bottom: -1px;
+            border: 1.5px solid rgba(232,228,208,0.12);
+            border-radius: 4px;
+        }
+        .curtain-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--yellow));
+            width: 0; border-radius: 3px;
+        }
+        #curtain.active .curtain-fill { animation: fillBar 0.9s 0.1s ease forwards; }
         @keyframes fillBar { to { width: 100%; } }
 
         #curtain-msg {
-            font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 400;
-            color: var(--text-dim); letter-spacing: 4px; text-transform: uppercase;
-            opacity: 0; transition: opacity 0.3s 0.2s;
+            font-family: 'Caveat', cursive;
+            font-size: 18px;
+            color: var(--ink-dim);
+            letter-spacing: 2px;
+            opacity: 0;
+            transition: opacity 0.3s 0.2s;
         }
         #curtain.active #curtain-msg { opacity: 1; }
+
+        /* ── PAGE CURL ───────────────────────────── */
+        .page-curl {
+            position: fixed;
+            bottom: 0; right: 0;
+            width: 50px; height: 50px;
+            background: linear-gradient(225deg, var(--paper2) 45%, rgba(126,184,247,0.08) 100%);
+            z-index: 5;
+            pointer-events: none;
+            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+            border-top-left-radius: 2px;
+            box-shadow: -2px -2px 4px rgba(0,0,0,0.4);
+        }
     </style>
 </head>
 <body>
 
-<div class="sky-bg"></div>
-<div class="aurora">
-    <div class="aurora-band"></div>
-    <div class="aurora-band"></div>
-    <div class="aurora-band"></div>
-</div>
-<canvas id="starCanvas"></canvas>
-<div class="orbs">
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
-</div>
-<div class="horizon"></div>
-<div class="planet"><div class="planet-ring"></div></div>
-<div class="planet-sm"></div>
+<div class="notebook-bg"></div>
+<div class="holes" id="holes"></div>
+<canvas id="spaceCanvas"></canvas>
+<div class="doodles" id="doodles"></div>
 
+<!-- margin notes -->
+<div class="margin-note" style="top:18%">space is big btw</div>
+<div class="margin-note" style="top:42%; animation-delay:1.5s">DO NOT SHOW TEACHER</div>
+<div class="margin-note" style="top:66%; animation-delay:3s">still counts as studying</div>
+
+<!-- random scribbles around the page -->
+<div class="scribble" style="top:12%;right:8%;--r0:-8deg;--rh:-4deg;animation-duration:5s">* very important note</div>
+<div class="scribble" style="top:22%;right:14%;--r0:4deg;--rh:8deg;animation-duration:7s;animation-delay:1s">the universe is 13.8 billion years old (approx)</div>
+<div class="scribble" style="bottom:28%;right:5%;--r0:-3deg;--rh:-7deg;animation-duration:6s;animation-delay:2s">pluto is NOT a planet (rude)</div>
+<div class="scribble" style="bottom:18%;left:80px;--r0:2deg;--rh:5deg;animation-duration:8s;animation-delay:0.5s">speed of light = very fast</div>
+<div class="scribble" style="top:35%;right:6%;--r0:6deg;--rh:2deg;animation-duration:4.5s;animation-delay:1.8s">there are 8 planets (pluto is crying)</div>
+<div class="scribble" style="top:72%;right:11%;--r0:-5deg;--rh:0deg;animation-duration:9s;animation-delay:3s">black holes eat everything including homework</div>
+<div class="scribble" style="top:8%;left:90px;--r0:3deg;--rh:7deg;animation-duration:6.5s;animation-delay:0.2s">fig. 1: atom (the proxy, not the element)</div>
+
+<!-- blobs -->
+<div class="blob" style="width:180px;height:180px;top:10%;left:15%;background:radial-gradient(circle,rgba(126,184,247,0.04),transparent 70%);--bx:20px;--by:30px;--bs:1.1;--br:20deg;animation-duration:8s"></div>
+<div class="blob" style="width:120px;height:120px;top:55%;right:15%;background:radial-gradient(circle,rgba(247,224,126,0.04),transparent 70%);--bx:-15px;--by:-20px;--bs:0.9;--br:-15deg;animation-duration:6s;animation-delay:-3s"></div>
+<div class="blob" style="width:90px;height:90px;bottom:20%;left:20%;background:radial-gradient(circle,rgba(126,247,168,0.04),transparent 70%);--bx:10px;--by:-15px;--bs:1.2;--br:30deg;animation-duration:10s;animation-delay:-5s"></div>
+
+<div class="page-curl"></div>
+
+<!-- curtain -->
 <div id="curtain">
     <div class="curtain-inner">
-        <div class="curtain-orb"></div>
+        <div class="curtain-sketch" id="curtainSketch">. . .</div>
         <div class="curtain-line"><div class="curtain-fill"></div></div>
-        <div id="curtain-msg">routing</div>
+        <div id="curtain-msg">loading...</div>
     </div>
 </div>
 
+<!-- UI -->
 <div class="ui">
-    <div class="wordmark">atom</div>
+    <div class="title-block">
+        <div class="wordmark">atom</div>
+        <div class="annotation">educational*</div>
+    </div>
+
     <div id="subtitle"></div>
 
     <div class="search-wrap">
-        <input id="uv-address" type="text" placeholder="search the cosmos or enter a url" autocomplete="off" spellcheck="false">
-        <button class="go-btn" id="goBtn">⟶</button>
+        <div class="search-label">search query:</div>
+        <div class="search-inner">
+            <input id="uv-address" type="text" placeholder="what do you want to learn about" autocomplete="off" spellcheck="false">
+            <button class="go-btn" id="goBtn">go</button>
+        </div>
     </div>
 
     <div class="tiles">
-        <!-- Sonic Mania -->
-        <a href="#" onclick="launch('https://sonic-mania-online.web.app/');return false;" class="tile">
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                <circle cx="15" cy="16" r="8" fill="none" stroke="var(--glow)" stroke-width="1.2"/>
-                <circle cx="15" cy="11" r="4.5" fill="none" stroke="var(--glow)" stroke-width="1.2"/>
-                <path d="M12 9 L10 4M13.5 8.5 L13 3M15 8.5 L15.5 3M16.5 9 L18 4M18 10 L20.5 5.5" stroke="var(--glow)" stroke-width="1.2"/>
-                <circle cx="17" cy="10.5" r="1.2" fill="var(--glow)"/>
-                <path d="M3 19 L9 19M2 21 L8 21" stroke="var(--glow)" stroke-width="1" opacity="0.4"/>
+        <a href="#" onclick="launch('https://sonic-mania-online.web.app/');return false;" class="tile" data-note="fig.2">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="18" r="9" stroke="#e8e4d0" stroke-width="1.8" fill="none" stroke-dasharray="2 1"/>
+                <circle cx="16" cy="12" r="5" stroke="#e8e4d0" stroke-width="1.8" fill="none"/>
+                <path d="M13 10 L11 4M14.5 9 L14 3M16 9 L16.5 3M17.5 10 L19 5" stroke="#e8e4d0" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="18" cy="11" r="1.4" fill="#e8e4d0"/>
+                <path d="M4 20 L10 20M3 22 L9 22" stroke="#e8e4d0" stroke-width="1.2" opacity="0.5" stroke-linecap="round"/>
             </svg>
-            <span class="tile-label">mania</span>
+            <span class="tile-label">sonic mania</span>
         </a>
 
-        <!-- Roblox via EasyFun -->
-        <a href="#" onclick="launch('https://www.easyfun.gg/games/roblox.html');return false;" class="tile">
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                <rect x="9" y="7" width="12" height="12" rx="2" stroke="var(--glow)" stroke-width="1.2" fill="none" transform="rotate(15 15 13)"/>
-                <rect x="10" y="17" width="10" height="6" rx="1.5" stroke="var(--glow)" stroke-width="1.2" fill="none"/>
-                <circle cx="15" cy="20" r="1" fill="var(--glow)"/>
+        <a href="#" onclick="launch('https://www.easyfun.gg/games/roblox.html');return false;" class="tile" data-note="fig.4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="10" y="8" width="13" height="13" rx="2.5" stroke="#e8e4d0" stroke-width="1.8" fill="none" transform="rotate(12 16 14.5)"/>
+                <rect x="9" y="19" width="14" height="7" rx="2" stroke="#e8e4d0" stroke-width="1.8" fill="none"/>
+                <circle cx="16" cy="22.5" r="1.5" fill="#e8e4d0"/>
+                <line x1="12" y1="22.5" x2="12" y2="22.5" stroke="#e8e4d0" stroke-width="2" stroke-linecap="round"/>
+                <line x1="20" y1="22.5" x2="20" y2="22.5" stroke="#e8e4d0" stroke-width="2" stroke-linecap="round"/>
             </svg>
             <span class="tile-label">roblox</span>
         </a>
 
-        <!-- YouTube -->
-        <a href="#" onclick="launch('https://www.youtube.com');return false;" class="tile">
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                <rect x="3" y="8" width="24" height="16" rx="4" stroke="var(--glow)" stroke-width="1.2" fill="none"/>
-                <polygon points="12,11 12,20 21,15.5" fill="var(--glow)" opacity="0.8"/>
+        <a href="#" onclick="launch('https://www.youtube.com');return false;" class="tile" data-note="fig.7">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="3" y="9" width="26" height="16" rx="5" stroke="#e8e4d0" stroke-width="1.8" fill="none"/>
+                <path d="M13 12 L13 21 L22 16.5 Z" fill="#e8e4d0" opacity="0.85"/>
             </svg>
             <span class="tile-label">youtube</span>
         </a>
@@ -316,39 +585,171 @@
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
 <script>
-const starCanvas = document.getElementById('starCanvas');
-const sCtx = starCanvas.getContext('2d');
-function resizeStar() { starCanvas.width = window.innerWidth; starCanvas.height = window.innerHeight; }
-resizeStar();
-window.addEventListener('resize', resizeStar);
+// ── HOLES ────────────────────────────────────────────────────────
+(function() {
+    const holes = document.getElementById('holes');
+    const count = Math.floor(window.innerHeight / 60) + 2;
+    for (let i = 0; i < count; i++) {
+        const h = document.createElement('div');
+        h.className = 'hole';
+        h.style.top = (i * 60 + 18) + 'px';
+        holes.appendChild(h);
+    }
+})();
 
-const stars = [];
-for (let i = 0; i < 280; i++) {
-    stars.push({
-        x: Math.random(), y: Math.random() * 0.78,
-        r: Math.random() * 1.2 + 0.15,
-        a: Math.random() * 0.65 + 0.1,
-        speed: Math.random() * 0.006 + 0.002,
-        phase: Math.random() * Math.PI * 2
-    });
-}
-let t = 0;
-function drawStars() {
-    sCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
-    t += 0.01;
-    stars.forEach(s => {
-        const alpha = s.a * (0.5 + 0.5 * Math.sin(t * s.speed * 60 + s.phase));
-        sCtx.beginPath();
-        sCtx.arc(s.x * starCanvas.width, s.y * starCanvas.height, s.r, 0, Math.PI * 2);
-        sCtx.fillStyle = `rgba(200,232,255,${alpha})`;
-        sCtx.fill();
-    });
-    requestAnimationFrame(drawStars);
-}
-drawStars();
+// ── CANVAS SKETCHED SPACE THINGS ────────────────────────────────
+const canvas = document.getElementById('spaceCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
+// hand-drawn circle helper (slightly wobbly)
+function sketchCircle(x, y, r, color, alpha, lineWidth) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth || 1.5;
+    ctx.beginPath();
+    const steps = 60;
+    for (let i = 0; i <= steps; i++) {
+        const a = (i / steps) * Math.PI * 2;
+        const wobble = 1 + (Math.sin(i * 2.7) * 0.025 + Math.cos(i * 1.9) * 0.02);
+        const px = x + Math.cos(a) * r * wobble;
+        const py = y + Math.sin(a) * r * wobble;
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+}
+
+function sketchLine(x1,y1,x2,y2,color,alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+}
+
+class SketchPlanet {
+    constructor() { this.reset(true); }
+    reset(init) {
+        this.x = Math.random() * canvas.width * 0.85 + canvas.width * 0.08;
+        this.y = init ? Math.random() * canvas.height : -80;
+        this.r = Math.random() * 28 + 12;
+        this.vx = (Math.random() - 0.5) * 0.18;
+        this.vy = Math.random() * 0.22 + 0.06;
+        this.rot = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.008;
+        this.wobbleT = Math.random() * 100;
+        this.color = ['#e8e4d0','#7eb8f7','#f7e07e','#7ef7a8'][Math.floor(Math.random()*4)];
+        this.alpha = Math.random() * 0.12 + 0.04;
+        this.hasRing = Math.random() > 0.55;
+        this.hasCross = Math.random() > 0.6;
+        this.label = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'][Math.floor(Math.random()*8)];
+        this.showLabel = Math.random() > 0.5;
+    }
+    update() {
+        this.x += this.vx + Math.sin(this.wobbleT * 0.02) * 0.3;
+        this.y += this.vy;
+        this.rot += this.rotSpeed;
+        this.wobbleT++;
+        if (this.y > canvas.height + 100) this.reset(false);
+    }
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
+        sketchCircle(0, 0, this.r, this.color, this.alpha, 1.4);
+        if (this.hasRing) {
+            ctx.save();
+            ctx.globalAlpha = this.alpha * 0.7;
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, this.r * 1.7, this.r * 0.35, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+        if (this.hasCross) {
+            ctx.save();
+            ctx.globalAlpha = this.alpha * 0.5;
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(-this.r * 0.5, 0); ctx.lineTo(this.r * 0.5, 0);
+            ctx.moveTo(0, -this.r * 0.5); ctx.lineTo(0, this.r * 0.5);
+            ctx.stroke();
+            ctx.restore();
+        }
+        if (this.showLabel) {
+            ctx.save();
+            ctx.rotate(-this.rot);
+            ctx.globalAlpha = this.alpha * 2.5;
+            ctx.fillStyle = this.color;
+            ctx.font = "11px 'Caveat', cursive";
+            ctx.fillText(this.label, this.r + 4, 4);
+            ctx.restore();
+        }
+        ctx.restore();
+    }
+}
+
+class SketchStar {
+    constructor() { this.reset(true); }
+    reset(init) {
+        this.x = Math.random() * canvas.width;
+        this.y = init ? Math.random() * canvas.height * 0.8 : Math.random() * canvas.height * 0.4;
+        this.r = Math.random() * 2.5 + 0.5;
+        this.alpha = Math.random() * 0.4 + 0.05;
+        this.twinkleSpeed = Math.random() * 0.04 + 0.01;
+        this.t = Math.random() * 100;
+        this.isPlus = Math.random() > 0.7;
+    }
+    update() { this.t += this.twinkleSpeed; }
+    draw() {
+        const a = this.alpha * (0.5 + 0.5 * Math.sin(this.t));
+        if (this.isPlus) {
+            ctx.save();
+            ctx.globalAlpha = a;
+            ctx.strokeStyle = '#e8e4d0';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(this.x - this.r * 2, this.y); ctx.lineTo(this.x + this.r * 2, this.y);
+            ctx.moveTo(this.x, this.y - this.r * 2); ctx.lineTo(this.x, this.y + this.r * 2);
+            ctx.stroke();
+            ctx.restore();
+        } else {
+            ctx.save();
+            ctx.globalAlpha = a;
+            ctx.fillStyle = '#e8e4d0';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+}
+
+const planets = Array.from({length: 8}, () => new SketchPlanet());
+const sketStars = Array.from({length: 140}, () => new SketchStar());
+
+function renderCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sketStars.forEach(s => { s.update(); s.draw(); });
+    planets.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(renderCanvas);
+}
+renderCanvas();
+
+// ── PROXY ────────────────────────────────────────────────────────
 var curtain = document.getElementById('curtain');
 var curtainMsg = document.getElementById('curtain-msg');
+var curtainSketch = document.getElementById('curtainSketch');
 var sub = document.getElementById('subtitle');
 
 var swReady = false;
@@ -386,6 +787,8 @@ var phrases = [
     "staying unblocked since 2026",
     "the wifi blocker has been defeated. again.",
     "education.exe has stopped responding",
+    "nasa funded this. probably.",
+    "classified educational research tool",
 ];
 
 var pIdx = 0, cIdx = 0, erasing = false;
@@ -393,20 +796,24 @@ function type() {
     var cur = phrases[pIdx];
     if (!erasing) {
         sub.innerText = cur.substring(0, cIdx++);
-        if (cIdx > cur.length) { erasing = true; setTimeout(type, 2600); }
-        else setTimeout(type, 48);
+        if (cIdx > cur.length) { erasing = true; setTimeout(type, 2800); }
+        else setTimeout(type, 50);
     } else {
         sub.innerText = cur.substring(0, cIdx--);
-        if (cIdx < 0) { erasing = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 350); }
-        else setTimeout(type, 20);
+        if (cIdx < 0) { erasing = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 380); }
+        else setTimeout(type, 22);
     }
 }
 type();
 
-var loadMsgs = ["routing","bypassing firewall","going fast","loading chaos","escaping homework","launching into orbit","deploying brainrot","warping space"];
+var loadWords = ["loading","routing","bypassing","going fast","escaping","launching","deploying","warping"];
+var loadSubjects = ["homework avoidance","the firewall","low earth orbit","brainrot","academic despair","the grid","the void"];
 
 function launch(url) {
-    curtainMsg.innerText = loadMsgs[Math.floor(Math.random() * loadMsgs.length)];
+    var w = loadWords[Math.floor(Math.random() * loadWords.length)];
+    var s = loadSubjects[Math.floor(Math.random() * loadSubjects.length)];
+    curtainMsg.innerText = w + ' ' + s + '...';
+    curtainSketch.innerText = ['* * *','- - -','o o o','+ + +'][Math.floor(Math.random()*4)];
     curtain.classList.add('active');
     var attempts = 0;
     function go() {
@@ -414,7 +821,7 @@ function launch(url) {
             window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
         } else { setTimeout(go, 100); }
     }
-    setTimeout(go, 400);
+    setTimeout(go, 420);
 }
 
 function doSearch(val) {

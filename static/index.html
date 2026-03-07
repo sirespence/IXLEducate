@@ -1,844 +1,1270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>atom</title>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Caveat+Brush&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>atom</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Caveat+Brush&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
 
-        :root {
-            --paper: #111118;
-            --paper2: #14141c;
-            --line: rgba(100,120,255,0.12);
-            --ink: #e8e4d0;
-            --ink-dim: rgba(232,228,208,0.4);
-            --ink-faint: rgba(232,228,208,0.15);
-            --red: #ff6b6b;
-            --blue: #7eb8f7;
-            --yellow: #f7e07e;
-            --green: #7ef7a8;
-            --margin: rgba(255,100,100,0.18);
-        }
+:root{
+  --paper:#f5f0e8;
+  --paper2:#ede8d8;
+  --paper3:#e8e2d0;
+  --ink:#1a1612;
+  --ink2:#2d2820;
+  --ink-faint:rgba(26,22,18,0.18);
+  --ink-mid:rgba(26,22,18,0.45);
+  --red:#c0392b;
+  --red-faint:rgba(192,57,43,0.12);
+  --blue:#2563a8;
+  --blue-faint:rgba(37,99,168,0.12);
+  --pencil:#5a4a3a;
+  --line:rgba(37,99,168,0.13);
+  --margin-line:rgba(192,57,43,0.3);
+  --green-ink:#1a6e3a;
+  --purple-ink:#5b2d82;
+  --hole-bg:#c8bfaa;
+}
 
-        body {
-            background: var(--paper);
-            color: var(--ink);
-            font-family: 'Caveat', cursive;
-            min-height: 100vh;
-            overflow: hidden;
-            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23e8e4d0' opacity='0.8'/%3E%3C/svg%3E") 10 10, crosshair;
-        }
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Caveat',cursive;
+  min-height:100vh;
+  overflow:hidden;
+  cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cellipse cx='4' cy='20' rx='3' ry='4' fill='%231a1612' opacity='0.8' transform='rotate(-35 4 20)'/%3E%3C/svg%3E") 4 20, crosshair;
+}
 
-        /* ── NOTEBOOK LINES ─────────────────────── */
-        .notebook-bg {
-            position: fixed; inset: 0; z-index: 0;
-            background:
-                repeating-linear-gradient(
-                    transparent,
-                    transparent 31px,
-                    var(--line) 31px,
-                    var(--line) 32px
-                );
-            background-position: 0 8px;
-        }
+/* ── PAPER TEXTURE LAYERS ─────────────────── */
+.paper-base{
+  position:fixed;inset:0;z-index:0;
+  background:
+    /* grain */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+    /* ruled lines */
+    repeating-linear-gradient(transparent,transparent 31px,var(--line) 31px,var(--line) 32px),
+    /* paper gradient */
+    linear-gradient(160deg,#f9f4ec 0%,#f2ecdc 40%,#ede6d0 100%);
+  background-position:0 0, 0 8px, 0 0;
+}
 
-        /* margin line */
-        .notebook-bg::before {
-            content: '';
-            position: absolute;
-            left: 68px; top: 0; bottom: 0;
-            width: 2px;
-            background: var(--margin);
-        }
+/* paper edge shadow */
+.paper-base::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,0.06) 0px,transparent 12px),
+    linear-gradient(0deg,rgba(0,0,0,0.04) 0px,transparent 40px),
+    radial-gradient(ellipse at 50% 50%,transparent 60%,rgba(0,0,0,0.06) 100%);
+  pointer-events:none;
+}
 
-        /* spiral holes */
-        .notebook-bg::after {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 44px;
-            background: repeating-linear-gradient(
-                to bottom,
-                transparent 0px,
-                transparent 48px,
-                rgba(0,0,0,0.6) 48px,
-                rgba(0,0,0,0.6) 72px
-            );
-        }
+/* ── NOTEBOOK BINDING SIDE ───────────────── */
+.binding{
+  position:fixed;left:0;top:0;bottom:0;
+  width:58px;z-index:30;
+  background:linear-gradient(90deg,#d4cbb8 0%,#c8bfaa 40%,#bfb69e 100%);
+  box-shadow:inset -4px 0 8px rgba(0,0,0,0.12),2px 0 6px rgba(0,0,0,0.15);
+}
 
-        .holes {
-            position: fixed;
-            left: 0; top: 0; bottom: 0;
-            width: 44px;
-            z-index: 20;
-            pointer-events: none;
-        }
+.binding::before{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 28px,
+    rgba(0,0,0,0.04) 28px,rgba(0,0,0,0.04) 30px
+  );
+}
 
-        .hole {
-            position: absolute;
-            left: 8px;
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            background: #0a0a10;
-            border: 2px solid rgba(255,255,255,0.08);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
-        }
+/* spiral wire */
+.spiral{
+  position:fixed;left:22px;top:0;bottom:0;
+  width:16px;z-index:32;pointer-events:none;
+}
 
-        /* ── FLOATING SPACE DOODLES ─────────────── */
-        .doodles {
-            position: fixed; inset: 0; z-index: 1; pointer-events: none;
-        }
+.coil{
+  position:absolute;left:0;
+  width:16px;height:32px;
+  border:2.5px solid #7a6e5a;
+  border-radius:8px;
+  background:linear-gradient(90deg,#b8ae9a,#8a7e6a,#b8ae9a);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,0.3),0 1px 2px rgba(0,0,0,0.25);
+}
 
-        .doodle {
-            position: absolute;
-            font-family: 'Caveat', cursive;
-            color: var(--ink-faint);
-            font-size: 13px;
-            transform-origin: center;
-            line-height: 1.3;
-            white-space: nowrap;
-        }
+/* ── MARGIN LINE ─────────────────────────── */
+.margin-line{
+  position:fixed;left:80px;top:0;bottom:0;
+  width:2px;z-index:5;pointer-events:none;
+  background:var(--margin-line);
+}
 
-        /* wandering stars drawn by hand */
-        .star-doodle {
-            position: absolute;
-            width: 0; height: 0;
-            animation: starFloat linear infinite;
-        }
-        .star-doodle::before {
-            content: attr(data-sym);
-            font-family: 'Caveat', cursive;
-            font-size: 22px;
-            color: var(--ink-faint);
-            position: absolute;
-            transform: translate(-50%, -50%);
-            animation: starWobble 2s ease-in-out infinite;
-        }
-        @keyframes starFloat {
-            0%   { transform: translate(0,0) rotate(0deg); opacity: 0; }
-            10%  { opacity: 1; }
-            90%  { opacity: 0.6; }
-            100% { transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); opacity: 0; }
-        }
-        @keyframes starWobble {
-            0%,100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); }
-            50%      { transform: translate(-50%,-50%) scale(1.3) rotate(15deg); }
-        }
+/* ── RULED LINES VISIBLE ─────────────────── */
+.lines-layer{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(
+    transparent,transparent 31px,
+    var(--line) 31px,var(--line) 32px
+  );
+  background-position:0 8px;
+}
 
-        /* ── CANVAS FOR DRIFTING SKETCHED PLANETS ── */
-        #spaceCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+/* ── PAPER IMPERFECTIONS ─────────────────── */
+.imperfections{position:fixed;inset:0;z-index:2;pointer-events:none;}
 
-        /* ── UI ─────────────────────────────────── */
-        .ui {
-            position: fixed; inset: 0; z-index: 10;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            pointer-events: none;
-            padding-left: 44px; /* account for holes */
-        }
-        .ui > * { pointer-events: all; }
+/* coffee ring */
+.coffee-ring{
+  position:absolute;
+  border-radius:50%;
+  border:2px solid rgba(139,90,43,0.18);
+  box-shadow:inset 0 0 0 6px rgba(139,90,43,0.06),0 0 0 1px rgba(139,90,43,0.08);
+}
 
-        /* title area */
-        .title-block {
-            position: relative;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+/* tape piece */
+.tape{
+  position:absolute;
+  background:rgba(255,235,160,0.45);
+  border:1px solid rgba(200,180,100,0.3);
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  backdrop-filter:blur(0.5px);
+}
 
-        .wordmark {
-            font-family: 'Caveat Brush', cursive;
-            font-size: 88px;
-            color: var(--ink);
-            letter-spacing: 6px;
-            line-height: 1;
-            position: relative;
-            display: inline-block;
-            animation: titleWobble 3s ease-in-out infinite;
-            text-shadow: 3px 3px 0 rgba(126,184,247,0.2), -1px -1px 0 rgba(126,184,247,0.1);
-            filter: drop-shadow(0 0 18px rgba(126,184,247,0.15));
-        }
+/* eraser smudge */
+.smudge{
+  position:absolute;
+  background:radial-gradient(ellipse,rgba(180,170,150,0.25),transparent 70%);
+  border-radius:50%;
+}
 
-        /* underline scribble */
-        .wordmark::after {
-            content: '';
-            position: absolute;
-            bottom: -4px; left: -8px; right: -8px; height: 4px;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='8' viewBox='0 0 200 8'%3E%3Cpath d='M0 5 Q25 1 50 5 Q75 9 100 4 Q125 0 150 5 Q175 9 200 4' stroke='%237eb8f7' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x center;
-            background-size: 200px 8px;
-            opacity: 0.6;
-        }
+/* ink blot */
+.ink-blot{
+  position:absolute;
+  background:radial-gradient(ellipse,rgba(26,22,18,0.08),transparent 70%);
+  border-radius:60% 40% 70% 30%;
+}
 
-        @keyframes titleWobble {
-            0%,100% { transform: rotate(-1deg) translateY(0px); }
-            25%      { transform: rotate(0.5deg) translateY(-3px); }
-            50%      { transform: rotate(1deg) translateY(0px); }
-            75%      { transform: rotate(-0.3deg) translateY(2px); }
-        }
+/* ── STICKY NOTE ─────────────────────────── */
+.sticky{
+  position:fixed;
+  background:linear-gradient(135deg,#fef08a,#fde047);
+  padding:10px 14px 14px;
+  font-family:'Kalam',cursive;
+  font-size:13px;
+  color:#3a3020;
+  line-height:1.5;
+  box-shadow:2px 3px 8px rgba(0,0,0,0.15),inset 0 -2px 4px rgba(0,0,0,0.05);
+  transform:rotate(3.5deg);
+  z-index:8;
+  min-width:120px;
+}
+.sticky::before{
+  content:'';
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  width:28px;height:16px;
+  background:rgba(255,235,160,0.7);
+  border:1px solid rgba(200,180,100,0.4);
+  box-shadow:0 1px 2px rgba(0,0,0,0.1);
+}
 
-        /* subtitle annotation */
-        .annotation {
-            font-family: 'Caveat', cursive;
-            font-size: 14px;
-            color: var(--red);
-            opacity: 0.7;
-            position: absolute;
-            right: -120px;
-            top: 10px;
-            transform: rotate(8deg);
-            white-space: nowrap;
-            animation: annotationWiggle 4s ease-in-out infinite;
-        }
-        .annotation::before {
-            content: '';
-            position: absolute;
-            left: -22px; top: 8px;
-            width: 18px; height: 2px;
-            background: var(--red);
-            opacity: 0.6;
-            transform: rotate(-15deg);
-        }
+.sticky2{
+  position:fixed;
+  background:linear-gradient(135deg,#86efac,#4ade80);
+  padding:10px 14px 12px;
+  font-family:'Kalam',cursive;
+  font-size:12px;
+  color:#1a3020;
+  line-height:1.5;
+  box-shadow:2px 3px 8px rgba(0,0,0,0.12);
+  transform:rotate(-2deg);
+  z-index:8;
+  min-width:100px;
+}
 
-        @keyframes annotationWiggle {
-            0%,100% { transform: rotate(8deg) scale(1); }
-            50%      { transform: rotate(10deg) scale(1.04); }
-        }
+/* ── MARGIN ANNOTATIONS ──────────────────── */
+.margin-note{
+  position:fixed;
+  left:82px;
+  font-family:'Caveat',cursive;
+  font-size:12px;
+  line-height:1.4;
+  z-index:6;pointer-events:none;
+  white-space:nowrap;
+}
 
-        #subtitle {
-            font-family: 'Caveat', cursive;
-            font-size: 17px;
-            color: var(--ink-dim);
-            letter-spacing: 1px;
-            min-height: 24px;
-            text-align: center;
-            margin-bottom: 36px;
-            position: relative;
-            animation: subtitleDrift 5s ease-in-out infinite;
-        }
-        #subtitle::after {
-            content: '|';
-            color: var(--blue);
-            animation: blink 0.9s step-end infinite;
-            margin-left: 2px;
-        }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes subtitleDrift {
-            0%,100% { transform: translateX(0); }
-            50%      { transform: translateX(3px); }
-        }
+.margin-note.red{color:var(--red);transform:rotate(-1deg);}
+.margin-note.blue{color:var(--blue);transform:rotate(0.5deg);}
+.margin-note.pencil{color:var(--pencil);transform:rotate(-0.5deg);}
 
-        /* ── SEARCH ──────────────────────────────── */
-        .search-wrap {
-            display: flex;
-            width: 400px;
-            margin-bottom: 30px;
-            position: relative;
-        }
+/* arrow doodle after some notes */
+.margin-note.has-arrow::after{
+  content:'→';
+  position:absolute;right:-22px;top:1px;
+  font-size:14px;opacity:0.7;
+}
 
-        /* hand-drawn border via SVG filter */
-        .search-inner {
-            display: flex;
-            width: 100%;
-            background: rgba(20,20,30,0.85);
-            border: 2.5px solid rgba(232,228,208,0.25);
-            border-radius: 4px;
-            position: relative;
-            transition: border-color 0.2s;
-            animation: searchWobble 6s ease-in-out infinite;
-            box-shadow: 3px 3px 0 rgba(126,184,247,0.1), -1px -1px 0 rgba(126,184,247,0.05);
-        }
+/* ── SCRIBBLES ACROSS PAGE ───────────────── */
+.scribble{
+  position:fixed;
+  font-family:'Caveat',cursive;
+  pointer-events:none;z-index:4;
+  line-height:1.4;
+}
 
-        /* SVG wobbly border overlay */
-        .search-inner::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 6px;
-            background: transparent;
-            pointer-events: none;
-            border: 2px solid transparent;
-        }
+.scribble.red{color:rgba(192,57,43,0.6);font-size:12px;}
+.scribble.blue{color:rgba(37,99,168,0.55);font-size:11px;}
+.scribble.pencil{color:rgba(90,74,58,0.5);font-size:12px;}
+.scribble.green{color:rgba(26,110,58,0.55);font-size:11px;}
+.scribble.purple{color:rgba(91,45,130,0.5);font-size:12px;}
 
-        .search-wrap:focus-within .search-inner {
-            border-color: rgba(126,184,247,0.55);
-            box-shadow: 3px 3px 0 rgba(126,184,247,0.2), 0 0 14px rgba(126,184,247,0.1);
-        }
+/* underlines on some scribbles */
+.scribble u{text-decoration-color:currentColor;text-underline-offset:2px;}
+.scribble del{text-decoration-color:currentColor;}
 
-        @keyframes searchWobble {
-            0%,100% { transform: rotate(-0.3deg); }
-            50%      { transform: rotate(0.3deg); }
-        }
+/* circled items */
+.circled{
+  display:inline-block;
+  border:2px solid currentColor;
+  border-radius:50%;padding:1px 6px;
+  transform:rotate(-2deg);
+}
 
-        #uv-address {
-            flex: 1; background: transparent; border: none;
-            padding: 12px 16px;
-            font-size: 18px;
-            font-family: 'Caveat', cursive;
-            color: var(--ink);
-            letter-spacing: 0.5px;
-        }
-        #uv-address::placeholder { color: var(--ink-faint); }
-        #uv-address:focus { outline: none; }
+/* ── DOODLE DRAWINGS ─────────────────────── */
+.doodle-svg{
+  position:fixed;pointer-events:none;z-index:3;
+  opacity:0.35;
+}
 
-        .go-btn {
-            background: none; border: none;
-            border-left: 2px solid rgba(232,228,208,0.15);
-            padding: 12px 18px;
-            cursor: pointer;
-            font-family: 'Caveat Brush', cursive;
-            font-size: 20px;
-            color: var(--blue);
-            transition: all 0.15s;
-            letter-spacing: 1px;
-        }
-        .go-btn:hover { color: var(--ink); transform: scale(1.1) rotate(-5deg); }
-        .go-btn:active { transform: scale(0.92) rotate(5deg); }
+/* ── FLOATING STARS / ASTERISKS ──────────── */
+@keyframes twinkle{0%,100%{opacity:0.2;transform:scale(1) rotate(0deg)}50%{opacity:0.55;transform:scale(1.3) rotate(20deg)}}
+.star-float{
+  position:fixed;pointer-events:none;z-index:3;
+  font-family:'Caveat Brush',cursive;
+  color:var(--ink-faint);
+  animation:twinkle ease-in-out infinite;
+}
 
-        /* search label */
-        .search-label {
-            position: absolute;
-            top: -22px; left: 4px;
-            font-family: 'Caveat', cursive;
-            font-size: 13px;
-            color: var(--ink-faint);
-            transform: rotate(-1deg);
-        }
+/* ── CANVAS ──────────────────────────────── */
+#spaceCanvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
 
-        /* ── TILES ───────────────────────────────── */
-        .tiles { display: flex; gap: 14px; }
+/* ── TITLE ───────────────────────────────── */
+@keyframes titleWobble{
+  0%,100%{transform:rotate(-1.2deg) translateY(0)}
+  33%{transform:rotate(0.4deg) translateY(-4px)}
+  66%{transform:rotate(1deg) translateY(1px)}
+}
 
-        .tile {
-            width: 86px; height: 96px;
-            background: rgba(16,16,24,0.9);
-            border: 2.5px solid rgba(232,228,208,0.18);
-            border-radius: 6px;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 8px;
-            text-decoration: none;
-            color: var(--ink-dim);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: color 0.2s, border-color 0.2s;
-        }
+.wordmark{
+  font-family:'Caveat Brush',cursive;
+  font-size:96px;
+  color:var(--ink);
+  letter-spacing:8px;
+  line-height:0.9;
+  display:inline-block;
+  position:relative;
+  animation:titleWobble 4s ease-in-out infinite;
+  /* ink bleed effect */
+  text-shadow:
+    1px 1px 0 rgba(26,22,18,0.15),
+    -0.5px 0.5px 0 rgba(26,22,18,0.08),
+    2px 2px 8px rgba(26,22,18,0.06);
+}
 
-        .tile:nth-child(1) { animation: tileWobble1 3.2s ease-in-out infinite; }
-        .tile:nth-child(2) { animation: tileWobble2 2.8s ease-in-out infinite; }
-        .tile:nth-child(3) { animation: tileWobble3 3.6s ease-in-out infinite; }
+/* hand drawn underline - SVG wavy */
+.title-underline{
+  position:absolute;
+  bottom:-6px;left:-12px;right:-12px;
+  height:12px;overflow:visible;
+}
 
-        @keyframes tileWobble1 { 0%,100%{transform:rotate(-1.5deg) translateY(0)} 50%{transform:rotate(1deg) translateY(-4px)} }
-        @keyframes tileWobble2 { 0%,100%{transform:rotate(1deg) translateY(-2px)} 50%{transform:rotate(-1.5deg) translateY(3px)} }
-        @keyframes tileWobble3 { 0%,100%{transform:rotate(-0.5deg) translateY(1px)} 50%{transform:rotate(2deg) translateY(-5px)} }
+.title-underline path{
+  stroke:var(--blue);stroke-width:3;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:500;
+  stroke-dashoffset:500;
+  animation:drawLine 1.2s 0.3s ease forwards;
+}
 
-        .tile::before {
-            content: attr(data-note);
-            position: absolute;
-            top: 4px; right: 5px;
-            font-family: 'Caveat', cursive;
-            font-size: 9px;
-            color: var(--ink-faint);
-            transform: rotate(6deg);
-        }
+@keyframes drawLine{to{stroke-dashoffset:0}}
 
-        /* corner fold */
-        .tile::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 0; height: 0;
-            border-style: solid;
-            border-width: 0 14px 14px 0;
-            border-color: transparent var(--paper2) transparent transparent;
-            transition: border-width 0.2s;
-        }
+.title-block{
+  position:relative;text-align:center;
+  margin-bottom:8px;
+}
 
-        .tile:hover {
-            border-color: rgba(232,228,208,0.45);
-            color: var(--ink);
-            animation-play-state: paused;
-            transform: rotate(0deg) scale(1.08) translateY(-6px) !important;
-            box-shadow: 4px 4px 0 rgba(126,184,247,0.15), -2px -2px 0 rgba(247,224,126,0.08);
-            z-index: 5;
-        }
-        .tile:hover::after { border-width: 0 22px 22px 0; }
-        .tile:active { transform: scale(0.95) rotate(-2deg) !important; }
+/* annotation arrow */
+.title-annotation{
+  position:absolute;
+  right:-148px;top:8px;
+  font-family:'Kalam',cursive;
+  font-size:14px;
+  color:var(--red);
+  opacity:0.75;
+  transform:rotate(7deg);
+  white-space:nowrap;
+  pointer-events:none;
+}
+.title-annotation svg{
+  position:absolute;left:-30px;top:-2px;
+  overflow:visible;opacity:0.6;
+}
 
-        .tile svg { transition: transform 0.2s; }
-        .tile:hover svg { transform: scale(1.15) rotate(-8deg); }
+/* subtitle */
+#subtitle{
+  font-family:'Kalam',cursive;
+  font-size:16px;
+  color:var(--ink-mid);
+  letter-spacing:0.5px;
+  min-height:22px;
+  text-align:center;
+  margin-bottom:40px;
+}
+#subtitle::after{
+  content:'|';color:var(--blue);
+  animation:blink 0.85s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-        .tile-label {
-            font-family: 'Caveat', cursive;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-align: center;
-            line-height: 1.2;
-        }
+/* ── SEARCH ──────────────────────────────── */
+.search-wrap{
+  width:420px;
+  margin-bottom:32px;
+  position:relative;
+}
 
-        /* ── MARGIN NOTES ────────────────────────── */
-        .margin-note {
-            position: fixed;
-            left: 76px;
-            font-family: 'Caveat', cursive;
-            font-size: 12px;
-            color: var(--red);
-            opacity: 0.55;
-            transform: rotate(-90deg);
-            transform-origin: left center;
-            white-space: nowrap;
-            z-index: 5;
-            pointer-events: none;
-            animation: marginPulse 4s ease-in-out infinite;
-        }
-        @keyframes marginPulse { 0%,100%{opacity:0.55} 50%{opacity:0.85} }
+.search-label{
+  position:absolute;
+  top:-20px;left:6px;
+  font-family:'Kalam',cursive;
+  font-size:12px;
+  color:var(--ink-mid);
+  transform:rotate(-1deg);
+}
 
-        /* ── RANDOM SCRIBBLES ────────────────────── */
-        .scribble {
-            position: fixed;
-            font-family: 'Caveat', cursive;
-            font-size: 11px;
-            color: var(--ink-faint);
-            transform-origin: center;
-            pointer-events: none;
-            z-index: 2;
-            animation: scribbleDrift ease-in-out infinite;
-        }
-        @keyframes scribbleDrift {
-            0%,100% { transform: rotate(var(--r0)) translateY(0); }
-            50%      { transform: rotate(var(--rh)) translateY(-8px); }
-        }
+/* hand-drawn box via SVG border */
+.search-box-svg{
+  position:absolute;inset:-3px;pointer-events:none;z-index:2;
+  overflow:visible;
+}
+.search-box-svg rect{
+  fill:none;stroke:var(--ink);stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:4 2;
+  opacity:0.3;
+}
+.search-wrap:focus-within .search-box-svg rect{
+  opacity:0.6;stroke:var(--blue);stroke-dasharray:none;
+}
 
-        /* ── BOUNCING SPACE BLOBS ────────────────── */
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-            animation: blobBounce ease-in-out infinite alternate;
-        }
-        @keyframes blobBounce {
-            0%   { transform: translate(0,0) scale(1) rotate(0deg); }
-            100% { transform: translate(var(--bx),var(--by)) scale(var(--bs)) rotate(var(--br)); }
-        }
+.search-inner{
+  display:flex;width:100%;
+  background:rgba(255,252,245,0.92);
+  border:2.5px solid rgba(26,22,18,0.28);
+  border-radius:3px;
+  position:relative;overflow:hidden;
+  box-shadow:3px 3px 0 rgba(26,22,18,0.1),inset 0 1px 0 rgba(255,255,255,0.6);
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.search-wrap:focus-within .search-inner{
+  border-color:var(--blue);
+  box-shadow:3px 3px 0 rgba(37,99,168,0.2),inset 0 1px 0 rgba(255,255,255,0.6);
+}
 
-        /* ── CURTAIN ─────────────────────────────── */
-        #curtain {
-            position: fixed; inset: 0;
-            background: var(--paper);
-            z-index: 9999;
-            transform: translateY(100%);
-            transition: transform 0.55s cubic-bezier(0.76,0,0.24,1);
-            display: flex; align-items: center; justify-content: center;
-        }
-        #curtain.active { transform: translateY(0); }
+#uv-address{
+  flex:1;background:transparent;border:none;
+  padding:13px 16px;
+  font-size:19px;
+  font-family:'Caveat',cursive;
+  color:var(--ink);letter-spacing:0.3px;
+}
+#uv-address::placeholder{color:rgba(26,22,18,0.3);}
+#uv-address:focus{outline:none;}
 
-        .curtain-inner { text-align: center; }
+.go-btn{
+  background:none;border:none;
+  border-left:2px solid rgba(26,22,18,0.15);
+  padding:13px 20px;
+  cursor:pointer;
+  font-family:'Caveat Brush',cursive;
+  font-size:20px;
+  color:var(--blue);
+  transition:all 0.15s;
+  letter-spacing:1px;
+  position:relative;
+}
+.go-btn::after{
+  content:'';
+  position:absolute;
+  bottom:8px;left:14px;right:14px;height:2px;
+  background:var(--blue);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform 0.2s;
+  border-radius:2px;
+}
+.go-btn:hover::after{transform:scaleX(1);}
+.go-btn:hover{color:var(--ink);}
+.go-btn:active{transform:scale(0.92) rotate(5deg);}
 
-        .curtain-sketch {
-            font-family: 'Caveat Brush', cursive;
-            font-size: 48px;
-            color: var(--ink);
-            margin-bottom: 14px;
-            opacity: 0;
-            transition: opacity 0.3s 0.1s;
-            animation: curtainBounce 0.6s ease-in-out infinite alternate;
-            display: inline-block;
-        }
-        #curtain.active .curtain-sketch { opacity: 1; }
-        @keyframes curtainBounce { 0%{transform:scale(1) rotate(-5deg)} 100%{transform:scale(1.15) rotate(5deg)} }
+/* ── TILES ───────────────────────────────── */
+.tiles{display:flex;gap:16px;}
 
-        .curtain-line {
-            width: 160px; height: 3px;
-            background: rgba(232,228,208,0.08);
-            margin: 0 auto 12px;
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-        .curtain-line::before {
-            content: '';
-            position: absolute;
-            top: -1px; left: -4px; right: -4px; bottom: -1px;
-            border: 1.5px solid rgba(232,228,208,0.12);
-            border-radius: 4px;
-        }
-        .curtain-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--blue), var(--yellow));
-            width: 0; border-radius: 3px;
-        }
-        #curtain.active .curtain-fill { animation: fillBar 0.9s 0.1s ease forwards; }
-        @keyframes fillBar { to { width: 100%; } }
+.tile{
+  width:92px;height:104px;
+  background:rgba(255,252,245,0.85);
+  border:2.5px solid rgba(26,22,18,0.22);
+  border-radius:4px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:9px;
+  text-decoration:none;
+  color:var(--ink-mid);
+  cursor:pointer;
+  position:relative;
+  overflow:visible;
+  transition:color 0.2s,transform 0.2s,box-shadow 0.2s;
+  box-shadow:2px 2px 0 rgba(26,22,18,0.1);
+}
 
-        #curtain-msg {
-            font-family: 'Caveat', cursive;
-            font-size: 18px;
-            color: var(--ink-dim);
-            letter-spacing: 2px;
-            opacity: 0;
-            transition: opacity 0.3s 0.2s;
-        }
-        #curtain.active #curtain-msg { opacity: 1; }
+.tile:nth-child(1){animation:tileFloat1 3.5s ease-in-out infinite;}
+.tile:nth-child(2){animation:tileFloat2 2.9s ease-in-out infinite;}
+.tile:nth-child(3){animation:tileFloat3 4.1s ease-in-out infinite;}
 
-        /* ── PAGE CURL ───────────────────────────── */
-        .page-curl {
-            position: fixed;
-            bottom: 0; right: 0;
-            width: 50px; height: 50px;
-            background: linear-gradient(225deg, var(--paper2) 45%, rgba(126,184,247,0.08) 100%);
-            z-index: 5;
-            pointer-events: none;
-            clip-path: polygon(100% 0, 100% 100%, 0 100%);
-            border-top-left-radius: 2px;
-            box-shadow: -2px -2px 4px rgba(0,0,0,0.4);
-        }
-    </style>
+@keyframes tileFloat1{0%,100%{transform:rotate(-1.8deg) translateY(0)}50%{transform:rotate(0.8deg) translateY(-5px)}}
+@keyframes tileFloat2{0%,100%{transform:rotate(1.2deg) translateY(-3px)}50%{transform:rotate(-1.5deg) translateY(4px)}}
+@keyframes tileFloat3{0%,100%{transform:rotate(-0.5deg) translateY(2px)}50%{transform:rotate(2.2deg) translateY(-6px)}}
+
+/* tile corner annotation */
+.tile::before{
+  content:attr(data-note);
+  position:absolute;
+  top:3px;right:5px;
+  font-family:'Kalam',cursive;
+  font-size:9px;
+  color:var(--ink-faint);
+  transform:rotate(5deg);
+}
+
+/* corner fold */
+.tile-fold{
+  position:absolute;top:0;right:0;
+  width:0;height:0;
+  border-style:solid;
+  border-width:0 16px 16px 0;
+  border-color:transparent var(--paper3) transparent transparent;
+  transition:border-width 0.2s;
+  filter:drop-shadow(-1px 1px 1px rgba(0,0,0,0.12));
+}
+
+.tile:hover{
+  color:var(--ink);
+  animation-play-state:paused;
+  transform:rotate(0deg) scale(1.1) translateY(-8px)!important;
+  box-shadow:4px 6px 0 rgba(26,22,18,0.15),-1px -1px 0 rgba(255,255,255,0.5);
+  z-index:5;
+  border-color:rgba(26,22,18,0.45);
+}
+.tile:hover .tile-fold{border-width:0 24px 24px 0;}
+.tile:active{transform:scale(0.94) rotate(-2deg)!important;}
+
+.tile svg{transition:transform 0.2s;}
+.tile:hover svg{transform:scale(1.2) rotate(-10deg);}
+
+.tile-label{
+  font-family:'Kalam',cursive;
+  font-size:13px;font-weight:700;
+  letter-spacing:0.3px;text-align:center;
+  line-height:1.2;
+}
+
+/* ── UI LAYOUT ───────────────────────────── */
+.ui{
+  position:fixed;inset:0;z-index:10;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  pointer-events:none;
+  padding-left:58px;
+}
+.ui>*{pointer-events:all;}
+
+/* ────────────────────────────────────────── */
+/* ── LOADER OVERLAY ──────────────────────── */
+/* ────────────────────────────────────────── */
+#loader{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--paper);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s ease;
+}
+#loader.active{opacity:1;pointer-events:all;}
+
+.loader-paper{
+  position:relative;
+  width:340px;
+  background:rgba(255,252,245,0.95);
+  border:2.5px solid rgba(26,22,18,0.25);
+  border-radius:3px;
+  padding:36px 32px 32px;
+  box-shadow:5px 5px 0 rgba(26,22,18,0.12),inset 0 1px 0 rgba(255,255,255,0.7);
+  overflow:hidden;
+}
+
+/* torn top edge */
+.loader-paper::before{
+  content:'';
+  position:absolute;top:-2px;left:0;right:0;height:6px;
+  background:
+    radial-gradient(circle at 5% 0,var(--paper) 5px,transparent 5px),
+    radial-gradient(circle at 12% 0,var(--paper) 4px,transparent 4px),
+    radial-gradient(circle at 22% 0,var(--paper) 6px,transparent 6px),
+    radial-gradient(circle at 31% 0,var(--paper) 3px,transparent 3px),
+    radial-gradient(circle at 40% 0,var(--paper) 5px,transparent 5px),
+    radial-gradient(circle at 51% 0,var(--paper) 4px,transparent 4px),
+    radial-gradient(circle at 60% 0,var(--paper) 6px,transparent 6px),
+    radial-gradient(circle at 71% 0,var(--paper) 3px,transparent 3px),
+    radial-gradient(circle at 82% 0,var(--paper) 5px,transparent 5px),
+    radial-gradient(circle at 91% 0,var(--paper) 4px,transparent 4px);
+  background-size:100% 6px;
+  background-repeat:no-repeat;
+}
+
+/* lined background on loader card */
+.loader-paper::after{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    transparent,transparent 31px,
+    rgba(37,99,168,0.1) 31px,rgba(37,99,168,0.1) 32px
+  );
+  background-position:0 8px;
+  pointer-events:none;
+}
+
+.loader-title{
+  font-family:'Caveat Brush',cursive;
+  font-size:32px;
+  color:var(--ink);
+  text-align:center;
+  margin-bottom:6px;
+  position:relative;z-index:1;
+}
+
+.loader-subtitle{
+  font-family:'Kalam',cursive;
+  font-size:14px;
+  color:var(--ink-mid);
+  text-align:center;
+  margin-bottom:24px;
+  min-height:20px;
+  position:relative;z-index:1;
+}
+
+/* The hand-drawing canvas */
+#drawCanvas{
+  display:block;
+  margin:0 auto 20px;
+  position:relative;z-index:1;
+}
+
+/* progress bar - hand ruled */
+.prog-track{
+  width:100%;height:10px;
+  background:rgba(26,22,18,0.07);
+  border:1.5px solid rgba(26,22,18,0.2);
+  border-radius:2px;
+  margin-bottom:22px;
+  position:relative;z-index:1;
+  overflow:hidden;
+}
+.prog-fill{
+  height:100%;width:0%;
+  background:repeating-linear-gradient(
+    45deg,
+    var(--blue),var(--blue) 6px,
+    rgba(37,99,168,0.4) 6px,rgba(37,99,168,0.4) 12px
+  );
+  border-radius:1px;
+  transition:width 0.25s ease;
+}
+
+/* status messages */
+.loader-status{
+  font-family:'Kalam',cursive;
+  font-size:13px;
+  color:var(--ink-mid);
+  text-align:center;
+  margin-bottom:20px;
+  position:relative;z-index:1;
+  min-height:18px;
+}
+
+/* back home button */
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Kalam',cursive;
+  font-size:15px;
+  color:var(--red);
+  background:none;
+  border:2px solid var(--red);
+  border-radius:3px;
+  padding:8px 18px;
+  cursor:pointer;
+  transition:all 0.15s;
+  position:relative;z-index:1;
+  box-shadow:2px 2px 0 rgba(192,57,43,0.2);
+}
+.back-btn:hover{background:var(--red-faint);transform:translate(-1px,-1px);box-shadow:3px 3px 0 rgba(192,57,43,0.25);}
+.back-btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(192,57,43,0.15);}
+
+/* small doodles on loader card corners */
+.loader-doodle{
+  position:absolute;
+  font-family:'Caveat',cursive;
+  font-size:10px;
+  color:rgba(26,22,18,0.2);
+  pointer-events:none;z-index:1;
+}
+
+/* ── MISC ─────────────────────────────────── */
+@keyframes float1{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(2deg) translateY(-6px)}}
+@keyframes float2{0%,100%{transform:rotate(4deg) translateY(-2px)}50%{transform:rotate(-2deg) translateY(5px)}}
+@keyframes float3{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(3deg) translateY(-4px)}}
+
+.page-curl{
+  position:fixed;bottom:0;right:0;
+  width:55px;height:55px;z-index:5;pointer-events:none;
+  background:linear-gradient(225deg,#e8e2d0 45%,rgba(37,99,168,0.1) 100%);
+  clip-path:polygon(100% 0,100% 100%,0 100%);
+  box-shadow:-2px -2px 5px rgba(0,0,0,0.1);
+}
+
+/* page number bottom right */
+.page-num{
+  position:fixed;bottom:18px;right:72px;
+  font-family:'Kalam',cursive;
+  font-size:13px;color:var(--ink-faint);
+  z-index:5;pointer-events:none;
+  transform:rotate(-1deg);
+}
+</style>
 </head>
 <body>
 
-<div class="notebook-bg"></div>
-<div class="holes" id="holes"></div>
+<!-- Background layers -->
+<div class="paper-base"></div>
+<div class="lines-layer"></div>
+
+<!-- Notebook binding -->
+<div class="binding"></div>
+<div class="spiral" id="spiral"></div>
+<div class="margin-line"></div>
+
+<!-- Paper imperfections -->
+<div class="imperfections" id="imperfections"></div>
+
+<!-- Canvas for space sketch things -->
 <canvas id="spaceCanvas"></canvas>
-<div class="doodles" id="doodles"></div>
 
-<!-- margin notes -->
-<div class="margin-note" style="top:18%">space is big btw</div>
-<div class="margin-note" style="top:42%; animation-delay:1.5s">DO NOT SHOW TEACHER</div>
-<div class="margin-note" style="top:66%; animation-delay:3s">still counts as studying</div>
+<!-- Margin notes -->
+<div class="margin-note red has-arrow" style="top:14%">DO NOT let</div>
+<div class="margin-note red" style="top:18%">ms. johnson see this</div>
+<div class="margin-note blue" style="top:34%">atom v2.0</div>
+<div class="margin-note pencil" style="top:40%">still counts as research?</div>
+<div class="margin-note red" style="top:57%">priority: sonic</div>
+<div class="margin-note blue" style="top:63%">secondary: youtube</div>
+<div class="margin-note pencil" style="top:72%">check back later</div>
+<div class="margin-note red" style="top:78%">NOT a planet (pluto)</div>
 
-<!-- random scribbles around the page -->
-<div class="scribble" style="top:12%;right:8%;--r0:-8deg;--rh:-4deg;animation-duration:5s">* very important note</div>
-<div class="scribble" style="top:22%;right:14%;--r0:4deg;--rh:8deg;animation-duration:7s;animation-delay:1s">the universe is 13.8 billion years old (approx)</div>
-<div class="scribble" style="bottom:28%;right:5%;--r0:-3deg;--rh:-7deg;animation-duration:6s;animation-delay:2s">pluto is NOT a planet (rude)</div>
-<div class="scribble" style="bottom:18%;left:80px;--r0:2deg;--rh:5deg;animation-duration:8s;animation-delay:0.5s">speed of light = very fast</div>
-<div class="scribble" style="top:35%;right:6%;--r0:6deg;--rh:2deg;animation-duration:4.5s;animation-delay:1.8s">there are 8 planets (pluto is crying)</div>
-<div class="scribble" style="top:72%;right:11%;--r0:-5deg;--rh:0deg;animation-duration:9s;animation-delay:3s">black holes eat everything including homework</div>
-<div class="scribble" style="top:8%;left:90px;--r0:3deg;--rh:7deg;animation-duration:6.5s;animation-delay:0.2s">fig. 1: atom (the proxy, not the element)</div>
+<!-- Scribbles -->
+<div class="scribble red" style="top:9%;right:7%;transform:rotate(-7deg)">* very <u>important</u> note *</div>
+<div class="scribble pencil" style="top:15%;right:12%;transform:rotate(3deg)">fig. 1 — the universe is big (source: trust me)</div>
+<div class="scribble blue" style="top:24%;right:6%;transform:rotate(-2deg)">speed of light = 3×10⁸ m/s <span class="circled">fast</span></div>
+<div class="scribble pencil" style="top:31%;right:9%;transform:rotate(5deg);opacity:0.7"><del>do homework</del> → later</div>
+<div class="scribble green" style="top:40%;right:5%;transform:rotate(-4deg)">8 planets (pluto ≠ planet, sorry)</div>
+<div class="scribble purple" style="top:50%;right:8%;transform:rotate(2deg)">black holes eat everything incl. my motivation</div>
+<div class="scribble red" style="top:60%;right:10%;transform:rotate(-3deg)">firewall status: <u>defeated</u> ✓</div>
+<div class="scribble pencil" style="top:68%;right:6%;transform:rotate(4deg)">13.8 billion yrs old (the universe, not me)</div>
+<div class="scribble blue" style="top:78%;right:9%;transform:rotate(-5deg)">proxy technology: <span class="circled">advanced</span></div>
+<div class="scribble pencil" style="top:86%;right:7%;transform:rotate(2deg)">this is educational. probably.</div>
 
-<!-- blobs -->
-<div class="blob" style="width:180px;height:180px;top:10%;left:15%;background:radial-gradient(circle,rgba(126,184,247,0.04),transparent 70%);--bx:20px;--by:30px;--bs:1.1;--br:20deg;animation-duration:8s"></div>
-<div class="blob" style="width:120px;height:120px;top:55%;right:15%;background:radial-gradient(circle,rgba(247,224,126,0.04),transparent 70%);--bx:-15px;--by:-20px;--bs:0.9;--br:-15deg;animation-duration:6s;animation-delay:-3s"></div>
-<div class="blob" style="width:90px;height:90px;bottom:20%;left:20%;background:radial-gradient(circle,rgba(126,247,168,0.04),transparent 70%);--bx:10px;--by:-15px;--bs:1.2;--br:30deg;animation-duration:10s;animation-delay:-5s"></div>
+<div class="scribble pencil" style="top:8%;left:90px;transform:rotate(1deg)">class notes — period 4 — astronomy (maybe)</div>
+<div class="scribble red" style="bottom:22%;left:90px;transform:rotate(-2deg)">reminder: delete history</div>
 
-<div class="page-curl"></div>
+<!-- SVG doodles -->
+<svg class="doodle-svg" style="top:8%;right:19%;width:80px;height:60px" viewBox="0 0 80 60">
+  <!-- rocket sketch -->
+  <path d="M40 50 L40 15 M35 30 L25 45 M45 30 L55 45" stroke="#1a1612" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M33 15 Q40 5 47 15 L47 32 Q40 28 33 32 Z" stroke="#1a1612" stroke-width="1.5" fill="none"/>
+  <circle cx="40" cy="23" r="3.5" stroke="#1a1612" stroke-width="1.2" fill="none"/>
+  <path d="M36 34 Q38 40 40 38 Q42 40 44 34" stroke="#2563a8" stroke-width="1.5" fill="none"/>
+  <text x="48" y="52" font-family="Caveat" font-size="9" fill="#1a1612" opacity="0.5">rocket?</text>
+</svg>
 
-<!-- curtain -->
-<div id="curtain">
-    <div class="curtain-inner">
-        <div class="curtain-sketch" id="curtainSketch">. . .</div>
-        <div class="curtain-line"><div class="curtain-fill"></div></div>
-        <div id="curtain-msg">loading...</div>
-    </div>
+<svg class="doodle-svg" style="bottom:30%;left:90px;width:90px;height:70px" viewBox="0 0 90 70">
+  <!-- planet with ring sketch -->
+  <circle cx="45" cy="38" r="18" stroke="#2563a8" stroke-width="1.5" fill="none"/>
+  <ellipse cx="45" cy="38" rx="30" ry="8" stroke="#2563a8" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/>
+  <path d="M32 26 Q45 20 58 26" stroke="#1a1612" stroke-width="1" fill="none"/>
+  <text x="32" y="10" font-family="Kalam" font-size="9" fill="#1a1612" opacity="0.5">fig. 3 — saturn?</text>
+</svg>
+
+<svg class="doodle-svg" style="top:42%;left:85px;width:70px;height:50px" viewBox="0 0 70 50">
+  <!-- atom doodle -->
+  <circle cx="35" cy="25" r="4" fill="rgba(26,22,18,0.3)" stroke="none"/>
+  <ellipse cx="35" cy="25" rx="22" ry="8" stroke="#c0392b" stroke-width="1.2" fill="none" transform="rotate(0 35 25)"/>
+  <ellipse cx="35" cy="25" rx="22" ry="8" stroke="#c0392b" stroke-width="1.2" fill="none" transform="rotate(60 35 25)"/>
+  <ellipse cx="35" cy="25" rx="22" ry="8" stroke="#c0392b" stroke-width="1.2" fill="none" transform="rotate(-60 35 25)"/>
+  <text x="42" y="44" font-family="Kalam" font-size="8" fill="#1a1612" opacity="0.4">atom!</text>
+</svg>
+
+<svg class="doodle-svg" style="top:19%;left:85px;width:65px;height:45px" viewBox="0 0 65 45">
+  <!-- telescope sketch -->
+  <rect x="18" y="16" width="32" height="12" rx="2" stroke="#5a4a3a" stroke-width="1.5" fill="none" transform="rotate(-20 34 22)"/>
+  <line x1="34" y1="28" x2="34" y2="42" stroke="#5a4a3a" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="25" y1="42" x2="43" y2="42" stroke="#5a4a3a" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="12" cy="10" r="3" stroke="#5a4a3a" stroke-width="1" fill="none"/>
+  <line x1="14" y1="12" x2="18" y2="16" stroke="#5a4a3a" stroke-width="1" stroke-dasharray="2 1"/>
+</svg>
+
+<!-- Sticky notes -->
+<div class="sticky" style="top:12%;right:3%;font-size:12px">
+  to-do:<br>
+  ☐ sonic mania<br>
+  ☑ avoid math<br>
+  ☐ yt rabbit hole
+</div>
+<div class="sticky2" style="bottom:24%;right:3%;transform:rotate(-3deg)">
+  atom proxy<br>
+  <strong>v2.0</strong> ✓
 </div>
 
-<!-- UI -->
+<!-- Floating stars/asterisks -->
+<div class="star-float" style="top:6%;left:14%;font-size:20px;animation-duration:3.2s;animation-delay:0.4s">✦</div>
+<div class="star-float" style="top:18%;left:22%;font-size:12px;animation-duration:4.5s;animation-delay:1.2s">*</div>
+<div class="star-float" style="top:32%;right:22%;font-size:16px;animation-duration:3.8s;animation-delay:0.8s">✦</div>
+<div class="star-float" style="top:55%;left:16%;font-size:14px;animation-duration:5s;animation-delay:2.1s">★</div>
+<div class="star-float" style="bottom:25%;right:20%;font-size:18px;animation-duration:3.5s;animation-delay:0.6s">✦</div>
+<div class="star-float" style="bottom:10%;left:22%;font-size:11px;animation-duration:6s;animation-delay:1.8s">*</div>
+
+<div class="page-num">— 4 —</div>
+<div class="page-curl"></div>
+
+<!-- ── LOADER ──────────────────────────────────────────── -->
+<div id="loader">
+  <div class="loader-paper">
+    <div class="loader-doodle" style="top:8px;left:10px;transform:rotate(-5deg)">✦</div>
+    <div class="loader-doodle" style="top:8px;right:10px;transform:rotate(3deg)">fig.9</div>
+    <div class="loader-doodle" style="bottom:8px;left:10px;transform:rotate(2deg)">~</div>
+    <div class="loader-doodle" style="bottom:8px;right:10px;transform:rotate(-4deg)">✦</div>
+
+    <div class="loader-title">loading...</div>
+    <div class="loader-subtitle" id="loaderSubtitle">preparing escape route</div>
+
+    <canvas id="drawCanvas" width="276" height="140"></canvas>
+
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+    <div class="loader-status" id="loaderStatus">initializing</div>
+
+    <div style="text-align:center">
+      <button class="back-btn" id="backBtn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        go back home
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN UI ──────────────────────────────────────────── -->
 <div class="ui">
-    <div class="title-block">
-        <div class="wordmark">atom</div>
-        <div class="annotation">educational*</div>
+  <div class="title-block">
+    <div class="wordmark">atom</div>
+    <svg class="title-underline" viewBox="0 0 300 12" preserveAspectRatio="none">
+      <path d="M0 7 Q30 2 60 7 Q90 12 120 6 Q150 1 180 7 Q210 12 240 5 Q270 1 300 7" stroke="#2563a8" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="title-annotation">
+      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M20 4 Q8 8 10 20" stroke="#c0392b" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M8 18 L10 22 L14 18" stroke="#c0392b" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      definitely educational
     </div>
+  </div>
 
-    <div id="subtitle"></div>
+  <div id="subtitle"></div>
 
-    <div class="search-wrap">
-        <div class="search-label">search query:</div>
-        <div class="search-inner">
-            <input id="uv-address" type="text" placeholder="what do you want to learn about" autocomplete="off" spellcheck="false">
-            <button class="go-btn" id="goBtn">go</button>
-        </div>
+  <div class="search-wrap">
+    <div class="search-label">type a url or search:</div>
+    <div class="search-inner">
+      <input id="uv-address" type="text" placeholder="where do you want to go..." autocomplete="off" spellcheck="false">
+      <button class="go-btn" id="goBtn">go →</button>
     </div>
+  </div>
 
-    <div class="tiles">
-        <a href="#" onclick="launch('https://3duser-sys.github.io/SonicManiaWeb/RSDKv5.html');return false;" class="tile" data-note="fig.2">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <circle cx="16" cy="18" r="9" stroke="#e8e4d0" stroke-width="1.8" fill="none" stroke-dasharray="2 1"/>
-                <circle cx="16" cy="12" r="5" stroke="#e8e4d0" stroke-width="1.8" fill="none"/>
-                <path d="M13 10 L11 4M14.5 9 L14 3M16 9 L16.5 3M17.5 10 L19 5" stroke="#e8e4d0" stroke-width="1.5" stroke-linecap="round"/>
-                <circle cx="18" cy="11" r="1.4" fill="#e8e4d0"/>
-                <path d="M4 20 L10 20M3 22 L9 22" stroke="#e8e4d0" stroke-width="1.2" opacity="0.5" stroke-linecap="round"/>
-            </svg>
-            <span class="tile-label">sonic mania</span>
-        </a>
+  <div class="tiles">
+    <a href="#" onclick="launch('https://3duser-sys.github.io/SonicManiaWeb/RSDKv5.html');return false;" class="tile" data-note="fig.2">
+      <div class="tile-fold"></div>
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="17" r="8" stroke="#1a1612" stroke-width="1.8" fill="none" stroke-dasharray="2 1.5"/>
+        <circle cx="15" cy="11" r="4.5" stroke="#1a1612" stroke-width="1.8" fill="none"/>
+        <path d="M12 9.5L10 3.5M13.5 8.5L13 2.5M15 8.5L15.5 2.5M16.5 9.5L18 4" stroke="#1a1612" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="17" cy="10" r="1.3" fill="#2563a8" opacity="0.8"/>
+        <path d="M3 19L9 19M2.5 21L8.5 21" stroke="#1a1612" stroke-width="1.1" opacity="0.45" stroke-linecap="round"/>
+      </svg>
+      <span class="tile-label">sonic mania</span>
+    </a>
 
-        <a href="#" onclick="launch('https://www.easyfun.gg/games/roblox.html');return false;" class="tile" data-note="fig.4">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect x="10" y="8" width="13" height="13" rx="2.5" stroke="#e8e4d0" stroke-width="1.8" fill="none" transform="rotate(12 16 14.5)"/>
-                <rect x="9" y="19" width="14" height="7" rx="2" stroke="#e8e4d0" stroke-width="1.8" fill="none"/>
-                <circle cx="16" cy="22.5" r="1.5" fill="#e8e4d0"/>
-                <line x1="12" y1="22.5" x2="12" y2="22.5" stroke="#e8e4d0" stroke-width="2" stroke-linecap="round"/>
-                <line x1="20" y1="22.5" x2="20" y2="22.5" stroke="#e8e4d0" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span class="tile-label">roblox</span>
-        </a>
+    <a href="#" onclick="launch('https://www.easyfun.gg/games/roblox.html');return false;" class="tile" data-note="fig.4">
+      <div class="tile-fold"></div>
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <rect x="9" y="7" width="12" height="12" rx="2" stroke="#1a1612" stroke-width="1.8" fill="none" transform="rotate(12 15 13)"/>
+        <rect x="8" y="18" width="14" height="7" rx="2" stroke="#1a1612" stroke-width="1.8" fill="none"/>
+        <circle cx="15" cy="21.5" r="1.5" fill="#c0392b" opacity="0.7"/>
+        <circle cx="10.5" cy="21.5" r="1" fill="#1a1612" opacity="0.4"/>
+        <circle cx="19.5" cy="21.5" r="1" fill="#1a1612" opacity="0.4"/>
+      </svg>
+      <span class="tile-label">roblox</span>
+    </a>
 
-        <a href="#" onclick="launch('https://www.youtube.com');return false;" class="tile" data-note="fig.7">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect x="3" y="9" width="26" height="16" rx="5" stroke="#e8e4d0" stroke-width="1.8" fill="none"/>
-                <path d="M13 12 L13 21 L22 16.5 Z" fill="#e8e4d0" opacity="0.85"/>
-            </svg>
-            <span class="tile-label">youtube</span>
-        </a>
-    </div>
+    <a href="#" onclick="launch('https://www.youtube.com');return false;" class="tile" data-note="fig.7">
+      <div class="tile-fold"></div>
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <rect x="2" y="8" width="26" height="15" rx="5" stroke="#1a1612" stroke-width="1.8" fill="none"/>
+        <path d="M12 11.5 L12 19.5 L21 15.5 Z" fill="#c0392b" opacity="0.75"/>
+      </svg>
+      <span class="tile-label">youtube</span>
+    </a>
+  </div>
 </div>
 
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
 <script>
-// ── HOLES ────────────────────────────────────────────────────────
-(function() {
-    const holes = document.getElementById('holes');
-    const count = Math.floor(window.innerHeight / 60) + 2;
-    for (let i = 0; i < count; i++) {
-        const h = document.createElement('div');
-        h.className = 'hole';
-        h.style.top = (i * 60 + 18) + 'px';
-        holes.appendChild(h);
-    }
+/* ── SPIRAL COILS ──────────────────────────────────────── */
+(function(){
+  const s=document.getElementById('spiral');
+  const n=Math.floor(window.innerHeight/40)+2;
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    c.className='coil';
+    c.style.top=(i*40+10)+'px';
+    s.appendChild(c);
+  }
 })();
 
-// ── CANVAS SKETCHED SPACE THINGS ────────────────────────────────
-const canvas = document.getElementById('spaceCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+/* ── PAPER IMPERFECTIONS ───────────────────────────────── */
+(function(){
+  const el=document.getElementById('imperfections');
+  // coffee rings
+  const rings=[
+    {x:'72%',y:'15%',w:90,h:90},
+    {x:'18%',y:'62%',w:65,h:65},
+  ];
+  rings.forEach(r=>{
+    const d=document.createElement('div');
+    d.className='coffee-ring';
+    d.style.cssText=`left:${r.x};top:${r.y};width:${r.w}px;height:${r.h}px`;
+    el.appendChild(d);
+    // inner ring
+    const d2=document.createElement('div');
+    d2.className='coffee-ring';
+    d2.style.cssText=`left:calc(${r.x} + ${r.w*0.12}px);top:calc(${r.y} + ${r.h*0.12}px);width:${r.w*0.76}px;height:${r.h*0.76}px;border-width:1px;opacity:0.5`;
+    el.appendChild(d2);
+  });
+  // tape pieces
+  const tapes=[
+    {x:'calc(50% - 40px)',y:'2%',w:80,h:22,r:'-1deg'},
+    {x:'15%',y:'38%',w:60,h:18,r:'3deg'},
+    {x:'74%',y:'55%',w:70,h:20,r:'-2deg'},
+  ];
+  tapes.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='tape';
+    d.style.cssText=`left:${t.x};top:${t.y};width:${t.w}px;height:${t.h}px;transform:rotate(${t.r})`;
+    el.appendChild(d);
+  });
+  // smudges
+  for(let i=0;i<5;i++){
+    const d=document.createElement('div');
+    d.className='smudge';
+    d.style.cssText=`left:${Math.random()*80+10}%;top:${Math.random()*80+10}%;width:${Math.random()*80+40}px;height:${Math.random()*50+25}px;transform:rotate(${Math.random()*30-15}deg)`;
+    el.appendChild(d);
+  }
+  // ink blots
+  for(let i=0;i<4;i++){
+    const d=document.createElement('div');
+    d.className='ink-blot';
+    d.style.cssText=`left:${Math.random()*80+10}%;top:${Math.random()*80+5}%;width:${Math.random()*30+15}px;height:${Math.random()*20+10}px;transform:rotate(${Math.random()*60-30}deg)`;
+    el.appendChild(d);
+  }
+})();
 
-// hand-drawn circle helper (slightly wobbly)
-function sketchCircle(x, y, r, color, alpha, lineWidth) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth || 1.5;
-    ctx.beginPath();
-    const steps = 60;
-    for (let i = 0; i <= steps; i++) {
-        const a = (i / steps) * Math.PI * 2;
-        const wobble = 1 + (Math.sin(i * 2.7) * 0.025 + Math.cos(i * 1.9) * 0.02);
-        const px = x + Math.cos(a) * r * wobble;
-        const py = y + Math.sin(a) * r * wobble;
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+/* ── BACKGROUND CANVAS ─────────────────────────────────── */
+const canvas=document.getElementById('spaceCanvas');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+
+function sketchCircle(cx,cy,r,color,alpha,lw){
+  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lw||1.3;
+  ctx.beginPath();
+  for(let i=0;i<=60;i++){
+    const a=(i/60)*Math.PI*2;
+    const w=1+(Math.sin(i*2.7)*0.025+Math.cos(i*1.9)*0.018);
+    const px=cx+Math.cos(a)*r*w,py=cy+Math.sin(a)*r*w;
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.closePath();ctx.stroke();ctx.restore();
+}
+
+class SketchPlanet{
+  constructor(){this.reset(true);}
+  reset(init){
+    this.x=Math.random()*canvas.width*0.8+canvas.width*0.1;
+    this.y=init?Math.random()*canvas.height:-80;
+    this.r=Math.random()*24+10;
+    this.vx=(Math.random()-0.5)*0.15;
+    this.vy=Math.random()*0.18+0.05;
+    this.rot=Math.random()*Math.PI*2;
+    this.rotSpd=(Math.random()-0.5)*0.006;
+    this.t=Math.random()*100;
+    this.color=['#2563a8','#c0392b','#1a6e3a','#5b2d82','#1a1612'][Math.floor(Math.random()*5)];
+    this.alpha=Math.random()*0.08+0.03;
+    this.hasRing=Math.random()>0.5;
+    this.label=['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'][Math.floor(Math.random()*8)];
+    this.showLabel=Math.random()>0.45;
+  }
+  update(){
+    this.x+=this.vx+Math.sin(this.t*0.018)*0.25;
+    this.y+=this.vy;this.rot+=this.rotSpd;this.t++;
+    if(this.y>canvas.height+100)this.reset(false);
+  }
+  draw(){
+    ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);
+    sketchCircle(0,0,this.r,this.color,this.alpha,1.2);
+    if(this.hasRing){
+      ctx.save();ctx.globalAlpha=this.alpha*0.6;ctx.strokeStyle=this.color;ctx.lineWidth=0.8;
+      ctx.beginPath();ctx.ellipse(0,0,this.r*1.65,this.r*0.32,0,0,Math.PI*2);ctx.stroke();ctx.restore();
     }
-    ctx.closePath();
-    ctx.stroke();
+    if(this.showLabel){
+      ctx.save();ctx.rotate(-this.rot);ctx.globalAlpha=this.alpha*2.8;ctx.fillStyle=this.color;
+      ctx.font="10px 'Kalam',cursive";ctx.fillText(this.label,this.r+3,3);ctx.restore();
+    }
     ctx.restore();
+  }
 }
 
-function sketchLine(x1,y1,x2,y2,color,alpha) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.2;
-    ctx.setLineDash([3,4]);
-    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-}
-
-class SketchPlanet {
-    constructor() { this.reset(true); }
-    reset(init) {
-        this.x = Math.random() * canvas.width * 0.85 + canvas.width * 0.08;
-        this.y = init ? Math.random() * canvas.height : -80;
-        this.r = Math.random() * 28 + 12;
-        this.vx = (Math.random() - 0.5) * 0.18;
-        this.vy = Math.random() * 0.22 + 0.06;
-        this.rot = Math.random() * Math.PI * 2;
-        this.rotSpeed = (Math.random() - 0.5) * 0.008;
-        this.wobbleT = Math.random() * 100;
-        this.color = ['#e8e4d0','#7eb8f7','#f7e07e','#7ef7a8'][Math.floor(Math.random()*4)];
-        this.alpha = Math.random() * 0.12 + 0.04;
-        this.hasRing = Math.random() > 0.55;
-        this.hasCross = Math.random() > 0.6;
-        this.label = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'][Math.floor(Math.random()*8)];
-        this.showLabel = Math.random() > 0.5;
-    }
-    update() {
-        this.x += this.vx + Math.sin(this.wobbleT * 0.02) * 0.3;
-        this.y += this.vy;
-        this.rot += this.rotSpeed;
-        this.wobbleT++;
-        if (this.y > canvas.height + 100) this.reset(false);
-    }
-    draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.rot);
-        sketchCircle(0, 0, this.r, this.color, this.alpha, 1.4);
-        if (this.hasRing) {
-            ctx.save();
-            ctx.globalAlpha = this.alpha * 0.7;
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, this.r * 1.7, this.r * 0.35, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
-        }
-        if (this.hasCross) {
-            ctx.save();
-            ctx.globalAlpha = this.alpha * 0.5;
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(-this.r * 0.5, 0); ctx.lineTo(this.r * 0.5, 0);
-            ctx.moveTo(0, -this.r * 0.5); ctx.lineTo(0, this.r * 0.5);
-            ctx.stroke();
-            ctx.restore();
-        }
-        if (this.showLabel) {
-            ctx.save();
-            ctx.rotate(-this.rot);
-            ctx.globalAlpha = this.alpha * 2.5;
-            ctx.fillStyle = this.color;
-            ctx.font = "11px 'Caveat', cursive";
-            ctx.fillText(this.label, this.r + 4, 4);
-            ctx.restore();
-        }
-        ctx.restore();
-    }
-}
-
-class SketchStar {
-    constructor() { this.reset(true); }
-    reset(init) {
-        this.x = Math.random() * canvas.width;
-        this.y = init ? Math.random() * canvas.height * 0.8 : Math.random() * canvas.height * 0.4;
-        this.r = Math.random() * 2.5 + 0.5;
-        this.alpha = Math.random() * 0.4 + 0.05;
-        this.twinkleSpeed = Math.random() * 0.04 + 0.01;
-        this.t = Math.random() * 100;
-        this.isPlus = Math.random() > 0.7;
-    }
-    update() { this.t += this.twinkleSpeed; }
-    draw() {
-        const a = this.alpha * (0.5 + 0.5 * Math.sin(this.t));
-        if (this.isPlus) {
-            ctx.save();
-            ctx.globalAlpha = a;
-            ctx.strokeStyle = '#e8e4d0';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(this.x - this.r * 2, this.y); ctx.lineTo(this.x + this.r * 2, this.y);
-            ctx.moveTo(this.x, this.y - this.r * 2); ctx.lineTo(this.x, this.y + this.r * 2);
-            ctx.stroke();
-            ctx.restore();
-        } else {
-            ctx.save();
-            ctx.globalAlpha = a;
-            ctx.fillStyle = '#e8e4d0';
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-    }
-}
-
-const planets = Array.from({length: 8}, () => new SketchPlanet());
-const sketStars = Array.from({length: 140}, () => new SketchStar());
-
-function renderCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sketStars.forEach(s => { s.update(); s.draw(); });
-    planets.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(renderCanvas);
-}
-renderCanvas();
-
-// ── PROXY ────────────────────────────────────────────────────────
-var curtain = document.getElementById('curtain');
-var curtainMsg = document.getElementById('curtain-msg');
-var curtainSketch = document.getElementById('curtainSketch');
-var sub = document.getElementById('subtitle');
-
-var swReady = false;
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/' })
-        .then(reg => {
-            if (reg.active) { swReady = true; return; }
-            var sw = reg.installing || reg.waiting;
-            if (sw) sw.addEventListener('statechange', () => {
-                if (sw.state === 'activated') swReady = true;
-            });
-        }).catch(() => { swReady = true; });
-} else { swReady = true; }
-
-var phrases = [
-    "your gpa just filed for divorce",
-    "sonic is faster than your career path",
-    "sponsored by 3am academic despair",
-    "your teacher is watching. probably.",
-    "brainrot level: executive",
-    "procrastinating like a high-end ceo",
-    "world history homework? never heard of her",
-    "your fbi agent is bored, play something",
-    "why study when you can just vibe",
-    "this proxy is the only thing passing this year",
-    "too many tabs, not enough brain cells",
-    "luxury proxy, budget lifestyle",
-    "running on spite and caffeine",
-    "don't let the firewall win",
-    "delete your history after this. seriously.",
-    "just one more game of sonic, i swear",
-    "error 404: homework not found",
-    "currently hiring: one (1) motivation",
-    "your future boss just saw your tab",
-    "staying unblocked since 2026",
-    "the wifi blocker has been defeated. again.",
-    "education.exe has stopped responding",
-    "nasa funded this. probably.",
-    "classified educational research tool",
-    "is this even educational?",
-    "should (not) be used for assignments",
-];
-
-var pIdx = 0, cIdx = 0, erasing = false;
-function type() {
-    var cur = phrases[pIdx];
-    if (!erasing) {
-        sub.innerText = cur.substring(0, cIdx++);
-        if (cIdx > cur.length) { erasing = true; setTimeout(type, 2800); }
-        else setTimeout(type, 50);
+class SketchStar{
+  constructor(){this.reset(true);}
+  reset(init){
+    this.x=Math.random()*canvas.width;
+    this.y=init?Math.random()*canvas.height*0.85:Math.random()*canvas.height*0.4;
+    this.r=Math.random()*1.8+0.4;
+    this.a=Math.random()*0.3+0.05;
+    this.ts=Math.random()*0.035+0.008;
+    this.t=Math.random()*100;
+    this.isPlus=Math.random()>0.65;
+  }
+  update(){this.t+=this.ts;}
+  draw(){
+    const al=this.a*(0.5+0.5*Math.sin(this.t));
+    if(this.isPlus){
+      ctx.save();ctx.globalAlpha=al;ctx.strokeStyle='#1a1612';ctx.lineWidth=0.8;
+      ctx.beginPath();ctx.moveTo(this.x-this.r*2.2,this.y);ctx.lineTo(this.x+this.r*2.2,this.y);
+      ctx.moveTo(this.x,this.y-this.r*2.2);ctx.lineTo(this.x,this.y+this.r*2.2);ctx.stroke();ctx.restore();
     } else {
-        sub.innerText = cur.substring(0, cIdx--);
-        if (cIdx < 0) { erasing = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 380); }
-        else setTimeout(type, 22);
+      ctx.save();ctx.globalAlpha=al;ctx.fillStyle='#1a1612';
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fill();ctx.restore();
     }
+  }
+}
+
+const planets=Array.from({length:7},()=>new SketchPlanet());
+const stars=Array.from({length:120},()=>new SketchStar());
+function renderBg(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{s.update();s.draw();});
+  planets.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(renderBg);
+}
+renderBg();
+
+/* ── SUBTITLE TYPEWRITER ───────────────────────────────── */
+const sub=document.getElementById('subtitle');
+const phrases=[
+  "your gpa just filed for bankruptcy","sonic > literally everything","sponsored by 3am academic despair",
+  "your teacher is watching. blink twice if u need help.","brainrot operating at full capacity",
+  "procrastinating like a top-tier ceo","world history homework? never heard of her",
+  "your fbi agent took a personal day","why study when you can just vibe",
+  "this proxy is the only thing passing this year","too many tabs, zero brain cells remaining",
+  "delete ur history. i'm serious. NOW.","running on spite and one singular coffee",
+  "just ONE more sonic level. i promise.","error 404: motivation.exe not found",
+  "currently accepting applications for one (1) focus","your future boss just screenshot ur screen",
+  "atom — keeping you unblocked since 2026","the wifi filter has been neutralized. again.",
+  "education.exe has encountered a critical error","nasa definitely funded this. probably.",
+  "classified as educational research. trust.","is this educational? (yes. legally.)",
+];
+let pIdx=0,cIdx=0,erasing=false;
+function type(){
+  const cur=phrases[pIdx];
+  if(!erasing){
+    sub.innerText=cur.substring(0,cIdx++);
+    if(cIdx>cur.length){erasing=true;setTimeout(type,2600);}
+    else setTimeout(type,46);
+  } else {
+    sub.innerText=cur.substring(0,cIdx--);
+    if(cIdx<0){erasing=false;pIdx=(pIdx+1)%phrases.length;setTimeout(type,350);}
+    else setTimeout(type,20);
+  }
 }
 type();
 
-var loadWords = ["loading","routing","bypassing","going fast","escaping","launching","deploying","warping","eating bits"];
-var loadSubjects = ["homework avoidance","the firewall","low earth orbit","brainrot","academic despair","the grid","the void"];
+/* ── SERVICE WORKER ────────────────────────────────────── */
+var swReady=false;
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/uv/uv.sw.js',{scope:'/'})
+    .then(reg=>{
+      if(reg.active){swReady=true;return;}
+      const sw=reg.installing||reg.waiting;
+      if(sw)sw.addEventListener('statechange',()=>{if(sw.state==='activated')swReady=true;});
+    }).catch(()=>{swReady=true;});
+} else swReady=true;
 
-function launch(url) {
-    var w = loadWords[Math.floor(Math.random() * loadWords.length)];
-    var s = loadSubjects[Math.floor(Math.random() * loadSubjects.length)];
-    curtainMsg.innerText = w + ' ' + s + '...';
-    curtainSketch.innerText = ['* * *','- - -','o o o','+ + +'][Math.floor(Math.random()*4)];
-    curtain.classList.add('active');
-    var attempts = 0;
-    function go() {
-        if (swReady || attempts++ > 40) {
-            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-        } else { setTimeout(go, 100); }
+/* ── DRAWING CANVAS ────────────────────────────────────── */
+const dc=document.getElementById('drawCanvas');
+const dctx=dc.getContext('2d');
+dctx.strokeStyle='rgba(26,22,18,0.7)';
+dctx.lineWidth=2;
+dctx.lineCap='round';
+dctx.lineJoin='round';
+
+// Set of sketches to draw — each is an array of strokes, each stroke is an array of [x,y] points
+const sketches={
+  rocket:[
+    // body
+    [[138,130],[138,50]],
+    // nose
+    [[138,50],[118,90],[138,85],[158,90],[138,50]],
+    // fins
+    [[120,115],[105,135],[120,120]],
+    [[156,115],[171,135],[156,120]],
+    // window
+    [[130,75],[138,68],[146,75],[138,82],[130,75]],
+    // flames
+    [[128,130],[124,140],[131,133],[128,145],[135,130]],
+    [[148,130],[152,140],[145,133],[148,145],[141,130]],
+    // label
+    // dots trail
+    [[138,145],[138,148]],[[138,152],[138,155]],[[137,159],[137,162]],
+  ],
+  planet:[
+    // planet circle
+    (()=>{const pts=[];for(let i=0;i<=40;i++){const a=(i/40)*Math.PI*2,w=1+Math.sin(i*2.3)*0.03;pts.push([138+Math.cos(a)*55*w,70+Math.sin(a)*55*w]);}return pts;})(),
+    // ring
+    (()=>{const pts=[];for(let i=0;i<=50;i++){const a=(i/50)*Math.PI*2;pts.push([138+Math.cos(a)*80,70+Math.sin(a)*22]);}return pts;})(),
+    // surface lines
+    [[90,55],[105,60],[115,52],[130,58],[145,52]],
+    [[88,70],[100,75],[120,68],[140,73],[160,67],[180,70]],
+    [[90,85],[110,88],[130,83],[150,87]],
+    // star doodles around
+    [[25,20],[27,26],[25,32],[23,26],[25,20]],
+    [[23,24],[31,24]],
+    [[248,30],[250,36],[248,42],[246,36],[248,30]],
+    [[246,34],[254,34]],
+    [[20,110],[22,116],[20,122],[18,116],[20,110]],
+    [[18,114],[26,114]],
+  ],
+  spaceship:[
+    // hull
+    [[80,90],[138,55],[196,90],[190,105],[86,105],[80,90]],
+    // cockpit dome
+    (()=>{const pts=[];for(let i=0;i<=25;i++){const a=Math.PI+(i/25)*Math.PI;pts.push([138+Math.cos(a)*30,88+Math.sin(a)*22]);}return pts;})(),
+    // windows
+    [[108,88],[116,84],[124,88],[116,92],[108,88]],
+    [[138,82],[146,78],[154,82],[146,86],[138,82]],
+    [[162,88],[170,84],[178,88],[170,92],[162,88]],
+    // engine glow
+    [[96,105],[96,118],[104,115],[110,122],[118,112],[126,120],[138,108],[150,120],[158,112],[166,122],[172,115],[180,118],[180,105]],
+    // antenna
+    [[138,55],[138,38],[132,30]],[[138,38],[144,30]],
+    // undercarriage details
+    [[100,105],[100,112]],[[138,105],[138,115]],[[176,105],[176,112]],
+  ],
+  satellite:[
+    // body
+    [[108,55],[168,55],[168,95],[108,95],[108,55]],
+    // solar panels left
+    [[108,68],[68,68],[68,82],[108,82]],
+    [[68,68],[68,55]],[[68,82],[68,95]],[[68,61],[108,61]],[[68,75],[108,75]],[[68,89],[108,89]],
+    // solar panels right
+    [[168,68],[208,68],[208,82],[168,82]],
+    [[208,68],[208,55]],[[208,82],[208,95]],[[208,61],[168,61]],[[208,75],[168,75]],[[208,89],[168,89]],
+    // antenna
+    [[138,55],[138,35],[128,22]],[[138,35],[148,22]],
+    // dish
+    (()=>{const pts=[];for(let i=0;i<=20;i++){const a=Math.PI+(i/20)*Math.PI*0.8;pts.push([148+Math.cos(a)*12,28+Math.sin(a)*8]);}return pts;})(),
+    // details on body
+    [[118,65],[158,65]],[[118,75],[158,75]],[[118,85],[158,85]],
+    [[128,55],[128,95]],[[148,55],[148,95]],
+    // orbit dots
+    (()=>{const pts=[];for(let i=0;i<=30;i++){const a=(i/30)*Math.PI*2;pts.push([138+Math.cos(a)*85,75+Math.sin(a)*32]);}return pts;})(),
+  ],
+};
+
+const sketchKeys=Object.keys(sketches);
+let currentSketch=null;
+let drawAnim=null;
+let drawDone=false;
+
+function clearDraw(){
+  dctx.clearRect(0,0,dc.width,dc.height);
+}
+
+function drawSketchAnimated(key,onDone){
+  const strokes=sketches[key];
+  clearDraw();
+  let si=0,pi=0;
+  let prevPt=null;
+  
+  function step(){
+    if(si>=strokes.length){
+      // add label
+      dctx.save();
+      dctx.font="bold 14px 'Kalam',cursive";
+      dctx.fillStyle='rgba(26,22,18,0.45)';
+      dctx.fillText(key,dc.width/2-20,dc.height-6);
+      dctx.restore();
+      drawDone=true;
+      if(onDone)onDone();
+      return;
     }
-    setTimeout(go, 420);
+    const stroke=strokes[si];
+    if(pi===0){
+      // add a tiny wobble to feel hand-drawn
+      dctx.beginPath();
+      dctx.moveTo(stroke[0][0]+Math.random()*1-0.5,stroke[0][1]+Math.random()*1-0.5);
+      prevPt=stroke[0];pi=1;
+    }
+    if(pi<stroke.length){
+      const pt=stroke[pi];
+      const wx=pt[0]+Math.random()*1.2-0.6;
+      const wy=pt[1]+Math.random()*1.2-0.6;
+      dctx.lineTo(wx,wy);
+      dctx.stroke();
+      // restart path from current point to avoid closing
+      dctx.beginPath();dctx.moveTo(wx,wy);
+      prevPt=[wx,wy];
+      pi++;
+      drawAnim=requestAnimationFrame(step);
+    } else {
+      si++;pi=0;
+      // tiny pause between strokes
+      drawAnim=setTimeout(()=>requestAnimationFrame(step),18+Math.random()*25);
+    }
+  }
+  
+  dctx.beginPath();
+  requestAnimationFrame(step);
 }
 
-function doSearch(val) {
-    if (!val.trim()) return;
-    var url = (val.includes('.') && !val.includes(' '))
-        ? (val.startsWith('http') ? val : 'https://' + val)
-        : 'https://search.brave.com/search?q=' + encodeURIComponent(val);
-    launch(url);
+/* ── LOADER LOGIC ──────────────────────────────────────── */
+const loader=document.getElementById('loader');
+const loaderSubtitle=document.getElementById('loaderSubtitle');
+const loaderStatus=document.getElementById('loaderStatus');
+const progFill=document.getElementById('progFill');
+const backBtn=document.getElementById('backBtn');
+
+const loadMsgs=[
+  ["routing through the void","initializing escape sequence","bypassing the firewall","warping to destination","almost there..."],
+  ["eating your homework","disguising as a study session","confusing the wifi filter","loading at light speed","nearly escaped..."],
+  ["deploying the satellites","calculating orbital trajectory","compressing school anxiety","transmitting to servers","touchdown imminent..."],
+  ["launching from earth","entering low orbit","deploying heat shield","approaching destination","landing sequence begun..."],
+];
+
+let loadInterval=null;
+let currentUrl=null;
+
+function startLoader(url){
+  currentUrl=url;
+  // pick random sketch & messages
+  const sk=sketchKeys[Math.floor(Math.random()*sketchKeys.length)];
+  const msgs=loadMsgs[Math.floor(Math.random()*loadMsgs.length)];
+  
+  loader.classList.add('active');
+  progFill.style.width='0%';
+  drawDone=false;
+  loaderSubtitle.innerText=msgs[0];
+  loaderStatus.innerText=msgs[0];
+  
+  // start drawing animation
+  dctx.clearRect(0,0,dc.width,dc.height);
+  drawSketchAnimated(sk,null);
+  
+  // progress + message sequence
+  let step=0;
+  const steps=[8,28,52,74,92,100];
+  const delay=[300,500,600,700,600,400];
+  function nextStep(){
+    if(step<steps.length){
+      progFill.style.width=steps[step]+'%';
+      loaderStatus.innerText=(msgs[Math.min(step,msgs.length-1)]);
+      if(step===msgs.length-1)loaderSubtitle.innerText=msgs[msgs.length-1];
+      step++;
+      if(step<steps.length)loadInterval=setTimeout(nextStep,delay[step-1]);
+      else {
+        // ready to navigate
+        loadInterval=setTimeout(()=>{
+          doNavigate(url);
+        },350);
+      }
+    }
+  }
+  loadInterval=setTimeout(nextStep,delay[0]);
 }
 
-document.getElementById('uv-address').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doSearch(e.target.value);
+function doNavigate(url){
+  let attempts=0;
+  function go(){
+    if(swReady||attempts++>40){
+      try{
+        window.location.href=__uv$config.prefix+__uv$config.encodeUrl(url);
+      } catch(e){
+        // fallback if UV not configured (dev/preview)
+        window.location.href=url;
+      }
+    } else setTimeout(go,100);
+  }
+  go();
+}
+
+function closeLoader(){
+  if(loadInterval)clearTimeout(loadInterval);
+  if(drawAnim){cancelAnimationFrame(drawAnim);clearTimeout(drawAnim);}
+  loader.classList.remove('active');
+  setTimeout(()=>{
+    clearDraw();
+    progFill.style.width='0%';
+    loaderStatus.innerText='';
+    loaderSubtitle.innerText='';
+    currentUrl=null;
+  },350);
+}
+
+backBtn.addEventListener('click',closeLoader);
+
+/* ── SEARCH & NAVIGATION ───────────────────────────────── */
+function launch(url){startLoader(url);}
+
+function doSearch(val){
+  if(!val.trim())return;
+  const url=(val.includes('.')&&!val.includes(' '))
+    ?(val.startsWith('http')?val:'https://'+val)
+    :'https://search.brave.com/search?q='+encodeURIComponent(val);
+  launch(url);
+}
+
+document.getElementById('uv-address').addEventListener('keydown',e=>{
+  if(e.key==='Enter')doSearch(e.target.value);
 });
-document.getElementById('goBtn').addEventListener('click', () => {
-    doSearch(document.getElementById('uv-address').value);
+document.getElementById('goBtn').addEventListener('click',()=>{
+  doSearch(document.getElementById('uv-address').value);
 });
 </script>
 </body>

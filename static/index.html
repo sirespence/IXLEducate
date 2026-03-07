@@ -511,65 +511,11 @@ body{
   letter-spacing:0.3px;text-align:center;line-height:1.2;
 }
 
-/* ══ 3D PAGE FLIP OVERLAY ════════════════════════ */
-#flipOverlay{
+/* ══ PAGE PEEL CANVAS ════════════════════════════ */
+#peelCanvas{
   position:fixed;inset:0;z-index:999;
   pointer-events:none;
-  perspective:1800px;
-  perspective-origin:50% 42%;
-}
-
-#flipPage{
-  position:absolute;
-  width:900px;height:620px;
-  left:50%;top:50%;
-  margin-left:-450px;margin-top:-310px;
-  transform-style:preserve-3d;
-  transform-origin:left center;
-  transform:rotateY(0deg);
-  backface-visibility:hidden;
   display:none;
-}
-
-#flipPage.flipping{
-  display:block;
-  animation:pageFlip 0.85s cubic-bezier(0.4,0,0.2,1) forwards;
-}
-
-@keyframes pageFlip{
-  0%{transform:rotateX(8deg) rotateY(0deg) rotateZ(0.5deg) translateY(-310px) translateX(-450px);
-     margin-left:0;margin-top:0;left:0;top:0;}
-  30%{transform:rotateX(5deg) rotateY(-55deg) rotateZ(1deg) translateY(-310px) translateX(-450px);}
-  60%{transform:rotateX(3deg) rotateY(-120deg) rotateZ(2deg) translateY(-310px) translateX(-450px);}
-  100%{transform:rotateX(8deg) rotateY(-180deg) rotateZ(0.5deg) translateY(-310px) translateX(-450px);}
-}
-
-.flip-front,.flip-back{
-  position:absolute;inset:0;
-  background:var(--paper);
-  border-radius:2px 8px 8px 2px;
-  backface-visibility:hidden;
-}
-.flip-front{
-  background:linear-gradient(110deg,#f0e8d4,var(--paper) 60%,#ede5d0);
-}
-.flip-back{
-  transform:rotateY(180deg);
-  background:linear-gradient(250deg,#f0e8d4,var(--paper) 60%);
-}
-
-/* ruled lines on flip pages */
-.flip-front::before,.flip-back::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(transparent,transparent 31px,rgba(37,99,168,0.1) 31px,rgba(37,99,168,0.1) 32px);
-  background-position:0 10px;
-}
-
-/* page fold shadow during flip */
-.flip-shadow{
-  position:absolute;top:0;bottom:0;right:0;width:60px;
-  background:linear-gradient(90deg,transparent,rgba(0,0,0,0.12));
-  pointer-events:none;
 }
 
 /* ══ LOADER ══════════════════════════════════════ */
@@ -992,16 +938,8 @@ body{
   </div><!-- /book -->
 </div><!-- /scene -->
 
-<!-- ══ 3D PAGE FLIP OVERLAY ══════════════════════════════ -->
-<div id="flipOverlay">
-  <div id="flipPage">
-    <div class="flip-front">
-      <div class="flip-shadow"></div>
-      <!-- ruled lines visual on front of flipping page -->
-    </div>
-    <div class="flip-back"></div>
-  </div>
-</div>
+<!-- ══ PAGE PEEL CANVAS ══════════════════════════════════ -->
+<canvas id="peelCanvas"></canvas>
 
 <!-- ══ LOADER ══════════════════════════════════════════════ -->
 <div id="loader">
@@ -1345,17 +1283,181 @@ function drawSketchAnimated(key,onDone){
   requestAnimationFrame(step);
 }
 
-/* ══ 3D PAGE FLIP ════════════════════════════════════════ */
-function triggerPageFlip(cb){
-  flipPage.classList.add('flipping');
-  // dim book slightly
-  book.style.filter='brightness(0.85)';
-  setTimeout(()=>{
-    flipPage.classList.remove('flipping');
-    book.style.filter='';
-    if(cb)cb();
-  },850);
-}
+/* ══ PAGE PEEL ANIMATION ════════════════════════════════ */
+var flipPage=null; // unused now, kept so no ref errors
+var book=document.getElementById('book');
+
+(function(){
+  const pc=document.getElementById('peelCanvas');
+  const ctx=pc.getContext('2d');
+
+  function resize(){pc.width=window.innerWidth;pc.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+
+  // Book rect on screen (approximate centre position)
+  function bookRect(){
+    const W=window.innerWidth,H=window.innerHeight;
+    const bw=900,bh=620;
+    return{x:(W-bw)/2,y:(H-bh)/2,w:bw,h:bh};
+  }
+
+  // Draw ruled-paper lines into an offscreen canvas the size of the book
+  function makePageCanvas(side){
+    const oc=document.createElement('canvas');
+    const r=bookRect();
+    oc.width=r.w;oc.height=r.h;
+    const c=oc.getContext('2d');
+    // paper fill
+    const grad=c.createLinearGradient(0,0,r.w,r.h);
+    if(side==='front'){
+      grad.addColorStop(0,'#f0e8d4');
+      grad.addColorStop(0.6,'#f4ede0');
+      grad.addColorStop(1,'#ede5d0');
+    } else {
+      grad.addColorStop(0,'#ede5d0');
+      grad.addColorStop(1,'#f0e8d4');
+    }
+    c.fillStyle=grad;c.fillRect(0,0,r.w,r.h);
+    // ruled lines
+    c.strokeStyle='rgba(37,99,168,0.1)';c.lineWidth=1;
+    for(let y=10;y<r.h;y+=32){
+      c.beginPath();c.moveTo(0,y);c.lineTo(r.w,y);c.stroke();
+    }
+    // margin line
+    c.strokeStyle='rgba(192,57,43,0.25)';c.lineWidth=2;
+    c.beginPath();c.moveTo(62,0);c.lineTo(62,r.h);c.stroke();
+    // binding strip
+    c.fillStyle='rgba(200,190,170,0.5)';c.fillRect(0,0,52,r.h);
+    // some scribble flavour on back
+    if(side==='back'){
+      c.font="14px 'Kalam',cursive";
+      c.fillStyle='rgba(26,20,16,0.18)';
+      c.save();c.rotate(-0.015);c.fillText('* this page intentionally left blank (not really)',80,80);c.restore();
+      c.save();c.rotate(0.01);c.fillText('← go back ←',200,200);c.restore();
+      c.font="11px 'Kalam',cursive";
+      c.save();c.rotate(0.02);c.fillStyle='rgba(37,99,168,0.2)';
+      c.fillText('E = mc²  ·  v = d/t  ·  F = ma',100,320);c.restore();
+    }
+    return oc;
+  }
+
+  let raf=null;
+  let onDoneCb=null;
+
+  function runPeel(cb){
+    onDoneCb=cb;
+    pc.style.display='block';
+    const r=bookRect();
+    const frontImg=makePageCanvas('front');
+    const backImg=makePageCanvas('back');
+    const duration=820; // ms
+    const start=performance.now();
+
+    function easeInOut(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
+
+    function frame(now){
+      const raw=Math.min((now-start)/duration,1);
+      const t=easeInOut(raw);
+      ctx.clearRect(0,0,pc.width,pc.height);
+
+      // The fold origin is the RIGHT edge of the page, halfway down
+      // As t goes 0→1, the peel sweeps from right-edge top-right corner to left
+      // We simulate by splitting the page at a vertical fold line that moves left
+
+      const foldX=r.x+r.w - t*r.w*1.08; // fold line x, sweeps left past the edge
+      const clampedFoldX=Math.max(r.x-20,foldX);
+
+      // ── LEFT PART: still flat, reveal original page underneath
+      if(clampedFoldX>r.x){
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(r.x,r.y,clampedFoldX-r.x,r.h);
+        ctx.clip();
+        // draw the "underneath" page (slightly darker, next page)
+        ctx.fillStyle='#e8dfc8';
+        ctx.fillRect(r.x,r.y,r.w,r.h);
+        // ruled lines on underneath page
+        ctx.strokeStyle='rgba(37,99,168,0.08)';ctx.lineWidth=1;
+        for(let y=r.y+10;y<r.y+r.h;y+=32){ctx.beginPath();ctx.moveTo(r.x,y);ctx.lineTo(r.x+r.w,y);ctx.stroke();}
+        // shadow cast by peeling page onto underlying page
+        const shadowW=Math.min(80,clampedFoldX-r.x);
+        const sg=ctx.createLinearGradient(clampedFoldX-shadowW,0,clampedFoldX,0);
+        sg.addColorStop(0,'rgba(0,0,0,0)');
+        sg.addColorStop(1,'rgba(0,0,0,0.18)');
+        ctx.fillStyle=sg;
+        ctx.fillRect(clampedFoldX-shadowW,r.y,shadowW,r.h);
+        ctx.restore();
+      }
+
+      // ── RIGHT PART: the peeling flap (front face, foreshortened)
+      const flapW=r.x+r.w-clampedFoldX;
+      if(flapW>0){
+        const squish=1-t*0.85; // foreshorten as it curls away
+        const flapDrawW=flapW*squish;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(clampedFoldX,r.y,flapDrawW,r.h);
+        ctx.clip();
+        // draw front page content squished
+        ctx.drawImage(frontImg,
+          r.w-flapW,0,flapW,r.h,        // source slice from right
+          clampedFoldX,r.y,flapDrawW,r.h // dest squished
+        );
+        // highlight at fold edge (light reflection)
+        const hg=ctx.createLinearGradient(clampedFoldX,0,clampedFoldX+Math.min(18,flapDrawW),0);
+        hg.addColorStop(0,'rgba(255,255,255,0.55)');
+        hg.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.fillStyle=hg;
+        ctx.fillRect(clampedFoldX,r.y,Math.min(18,flapDrawW),r.h);
+        ctx.restore();
+      }
+
+      // ── BACK FACE: visible after fold passes halfway, squished growing leftward
+      if(t>0.08){
+        const backProgress=Math.max(0,(t-0.08)/0.92);
+        const backW=(r.x+r.w-clampedFoldX)*(1-Math.max(0,1-backProgress*1.5));
+        if(backW>1){
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(clampedFoldX,r.y,backW,r.h);
+          ctx.clip();
+          // draw back page slightly desaturated/darker
+          ctx.globalAlpha=0.92;
+          ctx.drawImage(backImg,
+            0,0,backW/Math.max(0.01,1-t*0.85),r.h,
+            clampedFoldX,r.y,backW,r.h
+          );
+          // dark edge shadow on back
+          const bg=ctx.createLinearGradient(clampedFoldX,0,clampedFoldX+Math.min(24,backW),0);
+          bg.addColorStop(0,'rgba(0,0,0,0.28)');
+          bg.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.globalAlpha=1;
+          ctx.fillStyle=bg;
+          ctx.fillRect(clampedFoldX,r.y,Math.min(24,backW),r.h);
+          ctx.restore();
+        }
+      }
+
+      if(raw<1){
+        raf=requestAnimationFrame(frame);
+      } else {
+        // done — hide canvas and fire callback
+        setTimeout(()=>{
+          pc.style.display='none';
+          ctx.clearRect(0,0,pc.width,pc.height);
+          if(onDoneCb)onDoneCb();
+        },60);
+      }
+    }
+    raf=requestAnimationFrame(frame);
+  }
+
+  // expose globally
+  window.triggerPageFlip=function(cb){
+    if(raf)cancelAnimationFrame(raf);
+    runPeel(cb);
+  };
+})();
 
 /* ══ LOADER ══════════════════════════════════════════════ */
 const loader=document.getElementById('loader');

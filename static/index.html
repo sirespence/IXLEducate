@@ -1,7 +1,10 @@
 <!-- 
-  ATOM OS // ULTIMATE EDITION
-  Date: March 07, 2026
-  Status: Optimized / Fullscreen / High-Fidelity
+  ATOM OS // OBSIDIAN EDITION (Build 4.0)
+  Changelog:
+  - Switched game provider to nowgg.fun
+  - Added Draggable Windows
+  - Fixed Spotify/YouTube Embedding
+  - Added specific requested titles (COD, Melon, etc.)
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -9,493 +12,419 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Atom OS</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #050505;
-  --glass: rgba(20, 20, 20, 0.6);
-  --glass-b: rgba(255, 255, 255, 0.03);
-  --border: rgba(255, 255, 255, 0.08);
-  --acc: #3b82f6; 
-  --acc-glow: rgba(59, 130, 246, 0.4);
-  --text: #e5e5e5;
-  --text-m: #a3a3a3;
-  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --bg: #000000;
+  --glass: rgba(28, 28, 28, 0.75);
+  --glass-b: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.1);
+  --acc: #0a84ff;
+  --text: #ffffff;
+  --text-m: #a1a1a6;
+  --dock-bg: rgba(20, 20, 20, 0.6);
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; -webkit-user-drag: none; cursor: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; -webkit-user-drag: none; cursor: default; }
 
 body {
   width: 100vw; height: 100vh; overflow: hidden;
   background: var(--bg);
-  font-family: 'Inter', sans-serif;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
   color: var(--text);
 }
 
-/* ─── BACKGROUND FX ─── */
+/* ─── FLUID BACKDROP ─── */
 #canvas-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.6; }
-#vignette {
-  position: fixed; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, transparent 40%, #000 100%);
-}
 #noise {
-  position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.03;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-/* ─── CUSTOM CURSOR ─── */
-#cursor {
-  position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
-  mix-blend-mode: difference; transition: transform 0.1s var(--ease);
-}
-#c-dot {
-  width: 8px; height: 8px; background: white; border-radius: 50%;
-  position: absolute; transform: translate(-50%, -50%);
-}
-#c-ring {
-  width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%;
-  position: absolute; transform: translate(-50%, -50%);
-  transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.3s;
-}
-body.hover #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-color: transparent; }
-body.hover #c-dot { transform: translate(-50%, -50%) scale(0.5); }
+/* ─── UI LAYER ─── */
+#os { position: fixed; inset: 0; z-index: 10; padding-top: 32px; padding-bottom: 90px; }
 
-/* ─── MAIN UI LAYOUT ─── */
-#ui {
-  position: fixed; inset: 1.5vmin; z-index: 10;
-  display: flex; flex-direction: column;
-  border-radius: 24px;
-  background: rgba(10, 10, 10, 0.4);
-  backdrop-filter: blur(50px) saturate(120%);
-  -webkit-backdrop-filter: blur(50px) saturate(120%);
-  box-shadow: 0 0 0 1px var(--border), 0 20px 50px rgba(0,0,0,0.5);
-  overflow: hidden;
-  transition: transform 0.6s var(--ease), opacity 0.6s;
+/* ─── STATUS BAR ─── */
+#status-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 32px; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; font-size: 13px; font-weight: 500;
+  background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
+.sb-left { display: flex; gap: 18px; }
+.sb-item { opacity: 0.8; transition: 0.2s; cursor: pointer; }
+.sb-item:hover { opacity: 1; color: #fff; }
 
-/* ─── VIEWS (PAGES) ─── */
-#view-container { flex: 1; position: relative; overflow: hidden; }
+/* ─── HOME VIEW ─── */
 .view {
-  position: absolute; inset: 0; 
+  position: absolute; inset: 32px 0 90px 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transform: scale(1.02);
-  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
-  padding: 40px;
+  opacity: 0; pointer-events: none; transform: scale(1.1);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
 }
 .view.active { opacity: 1; pointer-events: all; transform: scale(1); }
 
-/* ─── HOME VIEW ─── */
-.hero-logo {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 80px; font-weight: 700; letter-spacing: -4px;
-  background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+#v-home h1 {
+  font-size: 80px; font-weight: 700; letter-spacing: -3px; margin-bottom: 30px;
+  background: linear-gradient(135deg, #fff 0%, #777 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin-bottom: 30px;
   filter: drop-shadow(0 0 30px rgba(255,255,255,0.1));
 }
-.search-box {
-  position: relative; width: 100%; max-width: 600px;
-  margin-bottom: 60px; group;
-}
-.sb-in {
-  width: 100%; background: var(--glass-b); border: 1px solid var(--border);
-  padding: 20px 24px; border-radius: 18px;
-  color: #fff; font-size: 18px; font-family: 'Inter', sans-serif;
-  transition: all 0.3s var(--ease);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-.sb-in:focus {
-  background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2);
-  box-shadow: 0 0 0 4px rgba(255,255,255,0.05); transform: translateY(-2px);
-}
-.grid {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
-  width: 100%; max-width: 1000px;
-}
-.card {
-  aspect-ratio: 1/1;
+
+.search-wrap {
+  position: relative; width: 400px; margin-bottom: 50px;
   background: var(--glass-b); border: 1px solid var(--border);
-  border-radius: 20px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 12px; cursor: pointer;
-  transition: all 0.4s var(--ease);
-  position: relative; overflow: hidden;
+  border-radius: 12px; transition: 0.3s var(--ease);
 }
-.card:hover {
-  background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3);
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+.search-wrap:hover { background: rgba(255,255,255,0.12); width: 420px; }
+.search-input {
+  width: 100%; padding: 14px 18px; background: transparent; border: none;
+  color: #fff; font-size: 15px; text-align: center; cursor: text;
 }
-.card-icon { width: 36px; height: 36px; fill: var(--text); transition: 0.3s; }
-.card:hover .card-icon { fill: #fff; transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,255,255,0.5)); }
-.card-lbl { font-size: 13px; color: var(--text-m); font-weight: 500; }
+.search-input::placeholder { color: rgba(255,255,255,0.4); }
 
-/* ─── BROWSER VIEW ─── */
-#browser-view { padding: 0; }
-.url-bar {
-  width: 100%; height: 60px;
-  display: flex; align-items: center; gap: 12px;
-  padding: 0 20px; border-bottom: 1px solid var(--border);
-  background: rgba(0,0,0,0.2);
-}
-.nav-btn {
-  width: 32px; height: 32px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px solid transparent; color: var(--text-m);
-  transition: 0.2s;
-}
-.nav-btn:hover { background: var(--glass-b); color: #fff; }
-#url-input {
-  flex: 1; background: transparent; border: none;
-  color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 13px;
-}
-#frame-wrap { flex: 1; width: 100%; position: relative; background: #fff; }
-#web-frame { width: 100%; height: 100%; border: none; }
-#placeholder-screen {
-  position: absolute; inset: 0; background: #080808;
+/* ─── APPS GRID ─── */
+.app-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; }
+.app-icon {
+  width: 68px; height: 68px; border-radius: 18px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; cursor: pointer; transition: 0.3s var(--ease);
 }
+.app-icon:hover { transform: translateY(-8px) scale(1.05); background: rgba(255,255,255,0.15); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+.app-icon svg, .app-icon img { width: 34px; height: 34px; border-radius: 8px; fill: white; object-fit: cover; pointer-events: none; }
+.app-name {
+  position: absolute; bottom: -22px; font-size: 11px; color: var(--text-m);
+  opacity: 0; transition: 0.2s; pointer-events: none;
+}
+.app-icon:hover .app-name { opacity: 1; transform: translateY(4px); }
 
-/* ─── GAMES VIEW ─── */
-.games-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px; width: 100%; max-width: 1200px; padding: 20px;
-  overflow-y: auto; height: 100%;
-}
-.game-poster {
-  aspect-ratio: 16/9; border-radius: 12px; overflow: hidden;
-  position: relative; background: #111;
+/* ─── WINDOW (Browser) ─── */
+#win-drag {
+  position: fixed; top: 100px; left: 15%; width: 70%; height: 70%;
+  background: #101010; border-radius: 14px;
   border: 1px solid var(--border);
-  transition: 0.3s var(--ease); cursor: pointer;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none; transform: scale(0.95);
+  transition: opacity 0.3s, transform 0.3s, width 0.3s, height 0.3s, top 0.3s, left 0.3s;
+  overflow: hidden; z-index: 50;
 }
-.game-poster:hover {
-  transform: scale(1.05); border-color: var(--acc);
-  box-shadow: 0 0 30px var(--acc-glow); z-index: 2;
+#win-drag.open { opacity: 1; pointer-events: all; transform: scale(1); }
+#win-drag.max { top: 32px!important; left: 0!important; width: 100%!important; height: calc(100% - 110px)!important; border-radius: 0; }
+
+.win-bar {
+  height: 38px; background: #1a1a1a; border-bottom: 1px solid #333;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
+  cursor: grab;
 }
-.gp-img {
-  width: 100%; height: 100%; object-fit: cover; opacity: 0.6;
+.win-bar:active { cursor: grabbing; }
+.win-ctrls { display: flex; gap: 8px; }
+.trf { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; }
+.trf.cl { background: #ff5f56; } .trf.mn { background: #ffbd2e; } .trf.mx { background: #27c93f; }
+.win-title { color: #666; font-size: 12px; font-family: 'SF Pro Display'; pointer-events: none; }
+.win-acts { display: flex; gap: 10px; }
+.btn-act {
+  background: #333; border: none; color: #ccc; font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer;
+}
+.btn-act:hover { background: #555; color: #fff; }
+
+#win-content { flex: 1; position: relative; background: #000; }
+iframe { width: 100%; height: 100%; border: none; background: #fff; }
+#loader-ol {
+  position: absolute; inset: 0; background: #000; display: flex; align-items: center; justify-content: center;
+  z-index: 2; transition: opacity 0.4s; pointer-events: none;
+}
+
+/* ─── GAMES LIST ─── */
+.games-wall {
+  width: 100%; height: 100%; overflow-y: auto; padding: 40px 10%;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px;
+}
+.game-card {
+  aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; position: relative;
+  background: #111; border: 1px solid var(--border); cursor: pointer;
   transition: 0.3s;
 }
-.game-poster:hover .gp-img { opacity: 1; }
-.gp-info {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 15px; background: linear-gradient(0deg, #000 0%, transparent 100%);
+.game-card:hover { transform: scale(1.06); z-index: 10; border-color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.gc-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.3s; }
+.game-card:hover .gc-img { opacity: 1; }
+.gc-meta {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 10px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.9));
+  opacity: 0; transition: 0.3s;
 }
-.gp-title { font-weight: 600; font-size: 14px; color: #fff; }
-.gp-tag { font-size: 10px; color: var(--acc); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.game-card:hover .gc-meta { opacity: 1; }
+.gc-tit { font-size: 13px; font-weight: 600; color: #fff; }
 
 /* ─── DOCK ─── */
+#dock-wrap {
+  position: fixed; bottom: 15px; left: 0; right: 0;
+  display: flex; justify-content: center; z-index: 1000;
+}
 #dock {
-  height: 80px; width: 100%;
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  border-top: 1px solid var(--border);
-  background: rgba(0,0,0,0.3);
+  background: var(--dock-bg); backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 10px;
+  display: flex; gap: 8px; align-items: flex-end;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
-.dock-item {
-  position: relative;
-  padding: 10px 20px; border-radius: 12px;
-  display: flex; align-items: center; gap: 8px;
-  color: var(--text-m); font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: 0.3s var(--ease);
+.dock-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; cursor: pointer; transition: 0.2s var(--ease);
 }
-.dock-item:hover { background: var(--glass-b); color: #fff; transform: translateY(-4px); }
-.dock-item.active { background: rgba(255,255,255,0.08); color: #fff; }
-.dock-item.active::after {
-  content:''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
-  width: 4px; height: 4px; background: var(--acc); border-radius: 50%;
-  box-shadow: 0 0 10px var(--acc);
+.dock-icon:hover { transform: translateY(-8px) scale(1.1); background: rgba(255,255,255,0.15); margin: 0 4px; }
+.dock-icon svg { width: 24px; height: 24px; stroke: #fff; stroke-width: 2; fill: none; }
+.dock-dot {
+  position: absolute; bottom: -6px; width: 4px; height: 4px; border-radius: 50%;
+  background: #fff; opacity: 0; transition: 0.2s;
 }
+.dock-icon.active .dock-dot { opacity: 1; bottom: -4px; }
 
-/* ─── LOADER ─── */
-#loader {
-  position: fixed; inset: 0; z-index: 99999;
-  background: #000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  transition: opacity 0.8s ease;
-}
-.load-bar { width: 200px; height: 2px; background: #222; margin-top: 20px; border-radius: 2px; overflow: hidden; }
-.load-prog { width: 0%; height: 100%; background: #fff; transition: width 0.1s linear; box-shadow: 0 0 15px #fff; }
-
-/* ─── UTILS ─── */
+/* ─── CUSTOM SCROLL ─── */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
 </style>
 </head>
 <body>
 
-<!-- VISUALS -->
 <canvas id="canvas-bg"></canvas>
 <div id="noise"></div>
-<div id="vignette"></div>
-<div id="cursor"><div id="c-dot"></div><div id="c-ring"></div></div>
 
-<!-- LOADING SCREEN -->
-<div id="loader">
-  <div style="font-family:'JetBrains Mono'; font-size: 24px; font-weight:700; letter-spacing:-1px">ATOM_OS</div>
-  <div class="load-bar"><div class="load-prog" id="lp"></div></div>
+<!-- STATUS BAR -->
+<div id="status-bar">
+  <div class="sb-left">
+    <span class="sb-item" style="font-weight:700">Atom</span>
+    <span class="sb-item">File</span>
+    <span class="sb-item">Window</span>
+    <span class="sb-item">Help</span>
+  </div>
+  <div class="sb-item" id="clock">12:00</div>
 </div>
 
-<!-- MAIN INTERFACE -->
-<div id="ui">
+<!-- VIEWS -->
+<div id="os">
   
-  <div id="view-container">
-    
-    <!-- HOME PAGE -->
-    <div class="view active" id="v-home">
-      <div class="hero-logo">ATOM</div>
-      
-      <div class="search-box">
-        <input type="text" class="sb-in" id="main-search" placeholder="Search the web or enter URL..." autocomplete="off">
-      </div>
-
-      <div class="grid" id="quick-grid">
-        <!-- JS Populated -->
-      </div>
+  <!-- HOME -->
+  <div class="view active" id="v-home">
+    <h1>Atom</h1>
+    <div class="search-wrap">
+      <input type="text" class="search-input" id="search" placeholder="Search web or enter URL..." autocomplete="off">
     </div>
-
-    <!-- BROWSER PAGE -->
-    <div class="view" id="v-browser">
-      <div id="browser-view" style="width:100%; height:100%; display:flex; flex-direction:column">
-        <div class="url-bar">
-          <button class="nav-btn" onclick="bn('back')">←</button>
-          <button class="nav-btn" onclick="bn('reload')">↻</button>
-          <input type="text" id="url-input" placeholder="https://">
-          <button class="nav-btn" onclick="goUrl()">→</button>
-        </div>
-        <div id="frame-wrap">
-          <div id="placeholder-screen">
-            <div style="opacity:0.3; font-size:80px">⊕</div>
-            <div style="margin-top:20px; opacity:0.5; font-family:'JetBrains Mono'">SECURE PROXY BROWSER</div>
-          </div>
-          <iframe id="web-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"></iframe>
-        </div>
-      </div>
-    </div>
-
-    <!-- APPS/GAMES PAGE -->
-    <div class="view" id="v-apps">
-      <div class="games-grid" id="games-grid">
-        <!-- JS Populated -->
-      </div>
-    </div>
-
+    <div class="app-grid" id="ag"></div>
   </div>
 
-  <!-- DOCK -->
-  <div id="dock">
-    <div class="dock-item active" onclick="sw('v-home', this)">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-      <span>Home</span>
-    </div>
-    <div class="dock-item" onclick="sw('v-browser', this)">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-      <span>Web</span>
-    </div>
-    <div class="dock-item" onclick="sw('v-apps', this)">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-      <span>Apps</span>
-    </div>
+  <!-- GAMES LIBRARY -->
+  <div class="view" id="v-games">
+    <div class="games-wall" id="gl"></div>
   </div>
 
 </div>
 
-<!-- UV SCRIPTS (Required for Proxy) -->
+<!-- DRAGGABLE BROWSER WINDOW -->
+<div id="win-drag">
+  <div class="win-bar" id="drag-handle">
+    <div class="win-ctrls">
+      <div class="trf cl" onclick="winClose()"></div>
+      <div class="trf mn" onclick="winClose()"></div>
+      <div class="trf mx" onclick="winMax()"></div>
+    </div>
+    <div class="win-title" id="w-tit">Browser</div>
+    <div class="win-acts">
+      <button class="btn-act" onclick="winReload()">↻</button>
+      <button class="btn-act" onclick="winPop()">↗ Full</button>
+    </div>
+  </div>
+  <div id="win-content">
+    <div id="loader-ol"><div style="color:#444; font-family:'JetBrains Mono'">LOADING RESOURCES...</div></div>
+    <iframe id="w-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"></iframe>
+  </div>
+</div>
+
+<!-- DOCK -->
+<div id="dock-wrap">
+  <div id="dock">
+    <div class="dock-icon active" onclick="swView('v-home', this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-icon" onclick="swView('v-games', this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-icon" onclick="openWeb('about:blank')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-icon" onclick="openWeb('https://discord.com/app')">
+      <svg viewBox="0 0 24 24"><path d="M18.9 5.3a16 16 0 0 0-4-1.2c0 .1 0 .1-.1.2-1.7-.7-3.6-.7-5.3 0-.1-.1-.1-.1-.1-.2a16 16 0 0 0-4 1.2c-.1 0-.1.1-.1.1-2.5 3.8-3.2 7.4-2.8 11 .5 1.7 2.2 3 4.2 4.2 1-.8 1.9-1.7 2.6-2.6-1.1-.4-2.1-.9-3-1.6.2-.2.5-.3.7-.5 4.3 2 8.9 2 13.2 0 .2.2.5.3.7.5-.9.7-1.9 1.2-3 1.6.7.9 1.5 1.8 2.6 2.6 2-1.1 3.7-2.5 4.2-4.2.5-3.6-.2-7.2-2.8-11 0 0-.1-.1-.1-.1zM9.5 14.3c-1.2 0-2.2-1.1-2.2-2.4 0-1.3 1-2.4 2.2-2.4 1.2 0 2.2 1.1 2.2 2.4 0 1.3-1 2.4-2.2 2.4zm5 0c-1.2 0-2.2-1.1-2.2-2.4 0-1.3 1-2.4 2.2-2.4 1.2 0 2.2 1.1 2.2 2.4 0 1.3-1 2.4-2.2 2.4z"/></svg>
+      <div class="dock-dot"></div>
+    </div>
+  </div>
+</div>
+
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
-
 <script>
-/* ─── DATA: LINKS & APPS ─── */
+/* ─── APP DATA (FIXED EMBEDS) ─── */
 const APPS = [
-  { n: 'Discord', u: 'https://discord.com/app', i: '<path d="M18.894 4.344a16.035 16.035 0 00-3.963-1.226.06.06 0 00-.064.03A16.076 16.076 0 0013.8 5.76a15.98 15.98 0 00-5.6 0 15.9 15.9 0 00-1.07-2.607.06.06 0 00-.064-.031 16.04 16.04 0 00-3.963 1.226.061.061 0 00-.03.056c-2.52 3.764-3.21 7.42-2.85 11.02a.062.062 0 00.024.048 16.066 16.066 0 005.3 2.665.061.061 0 00.066-.021 11.516 11.516 0 001.077-1.748.061.061 0 00-.034-.085 7.6 7.6 0 01-1.127-.538.06.06 0 01.004-.102c.224-.167.442-.34.653-.52a.061.061 0 01.063-.008 12.28 12.28 0 0010.53 0 .061.061 0 01.063.008c.21.18.43.353.653.52a.06.06 0 01.004.102 7.55 7.55 0 01-1.128.538.06.06 0 00-.033.085 11.39 11.39 0 001.076 1.748.061.061 0 00.066.021 16.08 16.08 0 005.3-2.665.061.061 0 00.024-.048c.417-4.17-.674-7.817-2.85-11.02a.06.06 0 00-.03-.056zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.419 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.175 1.096 2.157 2.419 0 1.334-.946 2.419-2.157 2.419z" fill="currentColor"/>' },
-  { n: 'VS Code', u: 'https://vscode.dev', i: '<path d="M23.15 2.587l-2.666-1.544a1.865 1.865 0 0 0-1.895.04L2.83 11.652a1.882 1.882 0 0 0 0 3.235l15.757 10.57a1.865 1.865 0 0 0 1.895.04l2.667-1.543a1.885 1.885 0 0 0 .942-1.63V4.22a1.885 1.885 0 0 0-.94-1.633zM15.86 19.38L4.69 13.56v-2.13L15.86 5.6v13.78z" fill="currentColor"/>' },
-  { n: 'YouTube', u: 'https://www.youtube.com', i: '<path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="currentColor"/>' },
-  { n: 'TikTok', u: 'https://www.tiktok.com', i: '<path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" fill="currentColor"/>' },
-  { n: 'Spotify', u: 'https://open.spotify.com', i: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.59 14.42a.63.63 0 0 1-.86.21c-2.36-1.44-5.34-1.76-8.84-.96a.63.63 0 0 1-.28-1.22c3.84-.88 7.15-.51 9.78 1.1a.63.63 0 0 1 .2 .87zm1.23-2.73a.79.79 0 0 1-1.08.26c-2.71-1.66-6.85-2.14-10.05-1.17a.79.79 0 0 1-.46-1.51c3.67-1.11 8.27-.58 11.33 1.3a.79.79 0 0 1 .26 1.12zm.1-2.79a.95.95 0 0 1-1.31.31c-3.15-1.87-8.32-2.29-11.32-1.25a.94.94 0 0 1-1.2-1.32c3.56-1.24 9.28-.75 12.91 1.4a.95.95 0 0 1 .92 .86z" fill="currentColor"/>' }
+  { n: 'YouTube', u: 'https://www.youtube.com/embed/?autoplay=1', i: '<path d="M22.5 6.2c-.3-1-.9-1.8-1.9-2C18.9 3.5 12 3.5 12 3.5s-6.9 0-8.6.7c-1 .3-1.8 1-2 2C.5 8.1.5 12 .5 12s0 3.9.9 5.8c.3 1 1 1.9 2 2 1.7.7 8.6.7 8.6.7s6.9 0 8.6-.7c1-.3 1.8-1 1.9-2 .9-1.9.9-5.8.9-5.8s0-3.9-.9-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/>', direct: true },
+  { n: 'Spotify', u: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M', i: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.6 14.4a.6.6 0 0 1-.9.2c-2.4-1.4-5.3-1.8-8.8-1a.6.6 0 0 1-.3-1.2c3.8-.9 7.2-.5 9.8 1a.6.6 0 0 1 .2.9zm1.2-2.7a.8.8 0 0 1-1.1.3c-2.7-1.7-6.9-2.1-10-1.2a.8.8 0 0 1-.5-1.5c3.7-1.1 8.3-.6 11.3 1.3a.8.8 0 0 1 .3 1.1zm.1-2.8a1 1 0 0 1-1.3.3c-3.2-1.9-8.3-2.3-11.3-1.3a.9.9 0 0 1-1.2-1.3c3.6-1.2 9.3-.8 12.9 1.4a1 1 0 0 1 .9.9z"/>', direct: true },
+  { n: 'Discord', u: 'https://discord.com/app', i: '<path d="M18.9 5.3a16 16 0 0 0-4-1.2c0 .1 0 .1-.1.2-1.7-.7-3.6-.7-5.3 0-.1-.1-.1-.1-.1-.2a16 16 0 0 0-4 1.2c-.1 0-.1.1-.1.1-2.5 3.8-3.2 7.4-2.8 11 .5 1.7 2.2 3 4.2 4.2 1-.8 1.9-1.7 2.6-2.6-1.1-.4-2.1-.9-3-1.6.2-.2.5-.3.7-.5 4.3 2 8.9 2 13.2 0 .2.2.5.3.7.5-.9.7-1.9 1.2-3 1.6.7.9 1.5 1.8 2.6 2.6 2-1.1 3.7-2.5 4.2-4.2.5-3.6-.2-7.2-2.8-11 0 0-.1-.1-.1-.1z"/>' },
+  { n: 'TikTok', u: 'https://www.tiktok.com', i: '<path d="M19.6 6.7a4.8 4.8 0 0 1-3.8-4.3V2h-3.4v13.7a2.9 2.9 0 0 1-5.2 1.7 2.9 2.9 0 0 1 2.3-4.6 2.9 2.9 0 0 1 .9.1V9.4a6.8 6.8 0 0 0-1 0 6.3 6.3 0 0 0-4.2 10.8 6.3 6.3 0 0 0 10.9-4.4v-7a8.2 8.2 0 0 0 4.8 1.5v-3.4a4.9 4.9 0 0 1-1-.1z"/>' },
+  { n: 'VS Code', u: 'https://vscode.dev', i: '<path d="M23.2 2.6l-2.7-1.5a1.9 1.9 0 0 0-1.9 0L2.8 11.7a1.9 1.9 0 0 0 0 3.2l15.8 10.6a1.9 1.9 0 0 0 1.9 0l2.7-1.5a1.9 1.9 0 0 0 .9-1.6V4.2a1.9 1.9 0 0 0-.9-1.6zM15.9 19.4L4.7 13.6v-2.1l11.2-5.9v13.8z"/>' },
+  { n: 'Twitch', u: 'https://player.twitch.tv/?channel=kaicenat&parent='+location.hostname, i: '<path d="M21 2H3v18h6v3h3l3-3h3l3-3V2zm-3 15h-4l-3 3v-3H6V5h12v12z"/>', direct: true }
 ];
 
+/* ─── GAMES DATA (UPDATED TO nowgg.fun) ─── */
 const GAMES = [
-  { n: '1v1.lol', u: 'https://1v1.lol', t: 'Shooter', img: 'https://play-lh.googleusercontent.com/L8r3fH8iC_1d3-Qj1k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4=w512' },
-  { n: 'Slope', u: 'https://slope-game.github.io', t: 'Arcade', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/8c062c3b879486c476722c1592398696.png' },
-  { n: 'Subway Surfers', u: 'https://poki.com/en/g/subway-surfers', t: 'Runner', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/b8a213500201217e2962372f69466549.png' },
-  { n: 'Paper.io 2', u: 'https://paper-io.com/', t: 'Strategy', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/6429f4931a2935817c807b198150499e.png' },
-  { n: 'Retro Bowl', u: 'https://retrobowl.me', t: 'Sports', img: 'https://play-lh.googleusercontent.com/damt9t2N_U2oUjwYj-9d8w_j0d8w_j0d8w_j0d8w_j0d8w_j0d8w_j0d8w_j0d8w_j0d8w_j0=w512' },
-  { n: 'Venge.io', u: 'https://venge.io', t: 'FPS', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/65324424368536647900760076007600.png' },
-  { n: 'Moto X3M', u: 'https://poki.com/en/g/moto-x3m', t: 'Racing', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/b0d77e48b43f9d519d08620255375492.png' },
-  { n: 'Minecraft (Web)', u: 'https://eaglercraft.com', t: 'Sandbox', img: 'https://play-lh.googleusercontent.com/VSwHQjcAttxsLE47RuS4PqpC4LT7lCoSjE7Hx5AW_yCxtDvcnsHHvm5CTuL5BPN-uRTP' },
-  { n: 'Krunker', u: 'https://krunker.io', t: 'FPS', img: 'https://play-lh.googleusercontent.com/jM-57v_hQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4=w512' },
-  { n: 'Drift Hunters', u: 'https://www.drifthunters.com', t: 'Racing', img: 'https://play-lh.googleusercontent.com/L8r3fH8iC_1d3-Qj1k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4=w512' },
-  { n: 'Shell Shockers', u: 'https://shellshock.io', t: 'FPS', img: 'https://play-lh.googleusercontent.com/P4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4F_l4=w512' },
-  { n: 'Crossy Road', u: 'https://poki.com/en/g/crossy-road', t: 'Arcade', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/51016538965825482548254825482548.png' }
+  { n: 'Roblox', t: 'MMO', u: 'https://nowgg.fun/play/roblox-corporation/5349/roblox', img: 'https://play-lh.googleusercontent.com/WNWZ42LBGl_lsZqkV_N_GsKwbED1V_nDS1c5F9F60pM-fE90eL0C6Y5t3sE0f_0w_0w=w400' },
+  { n: 'Geometry Dash', t: 'Arcade', u: 'https://nowgg.fun/play/robtop-games/5690/geometry-dash', img: 'https://play-lh.googleusercontent.com/2o9r4hJ91d3yY2q9e8b_y9a3r5d0f1g2h3i4j5k6l7m8n9o0=w400' },
+  { n: 'Call of Duty', t: 'Shooter', u: 'https://nowgg.fun/play/activision-publishing-inc/2165/call-of-duty-mobile', img: 'https://play-lh.googleusercontent.com/os245A4_tX8_C6Q7_W8_Y9a0b1c2d3e4f5g6h7i8j9k0l1=w400' },
+  { n: 'Fortnite', t: 'Battle Royale', u: 'https://nowgg.fun/play/epic-games/fortnite', img: 'https://play-lh.googleusercontent.com/coXW3Y_rZgHjX9y4F3d2E5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0=w400' },
+  { n: 'Stumble Guys', t: 'Party', u: 'https://nowgg.fun/play/scopely/2767/stumble-guys', img: 'https://play-lh.googleusercontent.com/5a4b3c2d1e0f9g8h7i6j5k4l3m2n1o0p9q8r7s6t5u=w400' },
+  { n: 'Cookie Run', t: 'RPG', u: 'https://nowgg.fun/play/devsisters-corporation/5874/cookie-run-kingdom', img: 'https://play-lh.googleusercontent.com/6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u=w400' },
+  { n: 'Melon Sandbox', t: 'Sim', u: 'https://nowgg.fun/play/playducky/4146/melon-playground', img: 'https://play-lh.googleusercontent.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t=w400' },
+  { n: 'Android Launcher', t: 'System', u: 'https://nowgg.fun/apps/now-gg/8454/app-launcher.html', img: 'https://play-lh.googleusercontent.com/8454/icon.png' },
+  { n: 'Subway Surfers', t: 'Runner', u: 'https://poki.com/en/g/subway-surfers', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/b8a213500201217e2962372f69466549.png' },
+  { n: '1v1.lol', t: 'Shooter', u: 'https://1v1.lol', img: 'https://play-lh.googleusercontent.com/L8r3fH8iC_1d3-Qj1k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4=w400' }
 ];
 
-/* ─── INITIALIZATION ─── */
-const qGrid = document.getElementById('quick-grid');
-const gGrid = document.getElementById('games-grid');
-
-// Populate Quick Apps
-APPS.forEach(app => {
-  const el = document.createElement('div');
-  el.className = 'card';
-  el.innerHTML = `<svg class="card-icon" viewBox="0 0 24 24">${app.i}</svg><span class="card-lbl">${app.n}</span>`;
-  el.onclick = () => launch(app.u);
-  qGrid.appendChild(el);
+/* ─── INITIALIZE ─── */
+const ag = document.getElementById('ag');
+APPS.forEach(a => {
+  const d = document.createElement('div');
+  d.className = 'app-icon';
+  d.innerHTML = `<svg viewBox="0 0 24 24">${a.i}</svg><div class="app-name">${a.n}</div>`;
+  d.onclick = () => openWeb(a.u, a.direct);
+  ag.appendChild(d);
 });
 
-// Populate Games
+const gl = document.getElementById('gl');
 GAMES.forEach(g => {
-  const el = document.createElement('div');
-  el.className = 'game-poster';
-  // Fallback for images since I can't guarantee hotlinks work forever
-  const fallbackColor = 'hsl(' + (Math.random()*360) + ', 40%, 20%)';
-  el.style.background = fallbackColor;
-  el.innerHTML = `
-    <img class="gp-img" src="${g.img}" onerror="this.style.display='none'">
-    <div class="gp-info">
-      <div class="gp-title">${g.n}</div>
-      <div class="gp-tag">${g.t}</div>
-    </div>`;
-  el.onclick = () => launch(g.u);
-  gGrid.appendChild(el);
+  const d = document.createElement('div');
+  d.className = 'game-card';
+  // Fallback color if image fails
+  d.style.background = `hsl(${Math.random()*360}, 15%, 15%)`;
+  d.innerHTML = `<img class="gc-img" src="${g.img}" onerror="this.style.opacity=0"><div class="gc-meta"><div class="gc-tit">${g.n}</div><div style="font-size:10px; color:#aaa">${g.t}</div></div>`;
+  d.onclick = () => openWeb(g.u);
+  gl.appendChild(d);
 });
 
-// Cursor Logic
-const cur = document.getElementById('cursor');
-const cRing = document.getElementById('c-ring');
-document.addEventListener('mousemove', e => {
-  cur.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-});
-// Hover effects
-document.querySelectorAll('a, button, .card, .dock-item, .game-poster, input').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('hover'));
-});
+// Update Clock
+setInterval(() => document.getElementById('clock').textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
 
-// Loading Sequence
-window.onload = () => {
-  const bar = document.getElementById('lp');
-  bar.style.width = '100%';
-  setTimeout(() => {
-    document.getElementById('loader').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-    }, 800);
-  }, 600);
-  initCanvas();
-};
+/* ─── WINDOW SYSTEM ─── */
+const win = document.getElementById('win-drag');
+const frame = document.getElementById('w-frame');
+const loader = document.getElementById('loader-ol');
+const wTit = document.getElementById('w-tit');
+let lastUrl = '';
 
-/* ─── NAVIGATION ─── */
-function sw(viewId, btn) {
-  // Switch Tabs
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(viewId).classList.add('active');
-  
-  // Switch Dock Active State
-  document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-}
+function openWeb(u, direct) {
+  // Activate Window
+  win.classList.add('open');
+  loader.style.opacity = 1;
+  wTit.innerText = u;
+  lastUrl = u;
 
-/* ─── PROXY LOGIC ─── */
-const frame = document.getElementById('web-frame');
-const urlIn = document.getElementById('url-input');
-const mainSearch = document.getElementById('main-search');
+  // Set Dock Active (Browser)
+  document.querySelectorAll('.dock-icon').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.dock-icon')[2].classList.add('active');
 
-// Register Service Worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/uv/service/' });
-}
-
-function launch(u) {
-  sw('v-browser');
-  document.querySelectorAll('.dock-item')[1].classList.add('active'); // highlight web tab
-  document.querySelectorAll('.dock-item')[0].classList.remove('active');
-  loadUrl(u);
-}
-
-function loadUrl(u) {
-  document.getElementById('placeholder-screen').style.display = 'none';
+  // URL Handling
   let target = u;
-  if (!u.includes('.')) {
-    target = 'https://search.brave.com/search?q=' + encodeURIComponent(u);
-  } else if (!u.startsWith('http')) {
-    target = 'https://' + u;
+  if (!direct && !u.includes('nowgg.fun')) { // If not embed and not nowgg, try proxy
+    try {
+      if(window.__uv$config) target = __uv$config.prefix + __uv$config.encodeUrl(u);
+    } catch(e) { console.log('Proxy Error, using direct'); }
   }
   
-  urlIn.value = target;
-  
-  // Use UV Proxy if available, otherwise direct
-  try {
-    if(window.__uv$config) {
-      frame.src = __uv$config.prefix + __uv$config.encodeUrl(target);
-    } else {
-      frame.src = target;
-    }
-  } catch(e) {
-    frame.src = target;
-  }
+  // Load Frame
+  frame.src = target;
+  frame.onload = () => loader.style.opacity = 0;
 }
 
-function goUrl() { loadUrl(urlIn.value); }
-function bn(act) {
-  try {
-    if(act==='back') frame.contentWindow.history.back();
-    else if(act==='reload') frame.contentWindow.location.reload();
-  } catch(e){}
+function winClose() {
+  win.classList.remove('open');
+  frame.src = 'about:blank';
+  document.querySelectorAll('.dock-icon')[2].classList.remove('active');
+}
+function winMax() { win.classList.toggle('max'); }
+function winReload() { frame.contentWindow.location.reload(); }
+function winPop() { window.open(lastUrl, '_blank'); }
+
+function swView(id, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.dock-icon').forEach(d => d.classList.remove('active'));
+  if(el) el.classList.add('active');
+  // Close window when switching main views
+  if(win.classList.contains('open')) win.classList.remove('open');
 }
 
-mainSearch.addEventListener('keydown', e => { if(e.key === 'Enter') launch(mainSearch.value); });
-urlIn.addEventListener('keydown', e => { if(e.key === 'Enter') goUrl(); });
+/* ─── DRAG LOGIC ─── */
+const handle = document.getElementById('drag-handle');
+let isDrag = false, startX, startY, initX, initY;
 
-/* ─── BACKGROUND ANIMATION ─── */
-function initCanvas() {
-  const cv = document.getElementById('canvas-bg');
-  const ctx = cv.getContext('2d');
-  
-  let w, h;
-  const stars = [];
-  
-  const resize = () => {
-    w = cv.width = window.innerWidth;
-    h = cv.height = window.innerHeight;
-  };
-  window.addEventListener('resize', resize);
-  resize();
+handle.addEventListener('mousedown', e => {
+  if(win.classList.contains('max')) return;
+  isDrag = true;
+  startX = e.clientX; startY = e.clientY;
+  initX = win.offsetLeft; initY = win.offsetTop;
+  document.body.style.cursor = 'grabbing';
+});
+document.addEventListener('mousemove', e => {
+  if(!isDrag) return;
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  win.style.left = `${initX + dx}px`;
+  win.style.top = `${initY + dy}px`;
+});
+document.addEventListener('mouseup', () => { isDrag = false; document.body.style.cursor = 'default'; });
 
-  // Create stars
-  for(let i=0; i<150; i++) {
-    stars.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 1.5,
-      a: Math.random(),
-      s: 0.05 + Math.random() * 0.2
-    });
+/* ─── SEARCH ─── */
+document.getElementById('search').addEventListener('keydown', e => {
+  if(e.key === 'Enter') {
+    const v = e.target.value;
+    const u = v.includes('.') ? (v.startsWith('http') ? v : 'https://'+v) : 'https://search.brave.com/search?q='+encodeURIComponent(v);
+    openWeb(u);
   }
+});
 
-  function anim() {
-    ctx.clearRect(0,0,w,h);
-    ctx.fillStyle = "#fff";
+/* ─── CANVAS VISUALS ─── */
+const cv = document.getElementById('canvas-bg'), ctx = cv.getContext('2d');
+let w, h;
+const orbs = [];
+
+window.addEventListener('resize', () => { w=cv.width=innerWidth; h=cv.height=innerHeight; });
+w=cv.width=innerWidth; h=cv.height=innerHeight;
+
+for(let i=0; i<4; i++) orbs.push({x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-.5)*0.5, vy:(Math.random()-.5)*0.5, r:200+Math.random()*200});
+
+function anim() {
+  ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+  
+  orbs.forEach(o => {
+    o.x += o.vx; o.y += o.vy;
+    if(o.x<0 || o.x>w) o.vx*=-1;
+    if(o.y<0 || o.y>h) o.vy*=-1;
     
-    stars.forEach(st => {
-      st.y -= st.s;
-      st.a += (Math.random() - 0.5) * 0.02;
-      if(st.a < 0) st.a = 0; if(st.a > 1) st.a = 1;
-      
-      if(st.y < 0) {
-        st.y = h;
-        st.x = Math.random() * w;
-      }
-      
-      ctx.globalAlpha = st.a * 0.6;
-      ctx.beginPath();
-      ctx.arc(st.x, st.y, st.r, 0, Math.PI*2);
-      ctx.fill();
-    });
-    
-    requestAnimationFrame(anim);
-  }
-  anim();
+    const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+    g.addColorStop(0, 'rgba(30, 80, 255, 0.15)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill();
+  });
+  requestAnimationFrame(anim);
 }
+anim();
 </script>
 </body>
 </html>

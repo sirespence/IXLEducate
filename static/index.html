@@ -1,30 +1,26 @@
 <!-- 
-  ATOM OS // OBSIDIAN EDITION (Build 4.0)
-  Changelog:
-  - Switched game provider to nowgg.fun
-  - Added Draggable Windows
-  - Fixed Spotify/YouTube Embedding
-  - Added specific requested titles (COD, Melon, etc.)
+  ATOM OS // VOID EDITION (v5.0)
+  Provider: nowgg.fun (Strict)
+  Mode: Immersive Fullscreen
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#000000">
 <title>Atom OS</title>
-<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #000000;
-  --glass: rgba(28, 28, 28, 0.75);
-  --glass-b: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.1);
-  --acc: #0a84ff;
-  --text: #ffffff;
-  --text-m: #a1a1a6;
-  --dock-bg: rgba(20, 20, 20, 0.6);
-  --ease: cubic-bezier(0.25, 1, 0.5, 1);
-  --shadow: 0 20px 50px rgba(0,0,0,0.6);
+  --surface: #0a0a0a;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-h: rgba(255, 255, 255, 0.2);
+  --text: #ededed;
+  --text-dim: #666666;
+  --accent: #ffffff;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; -webkit-user-drag: none; cursor: default; }
@@ -32,395 +28,293 @@
 body {
   width: 100vw; height: 100vh; overflow: hidden;
   background: var(--bg);
-  font-family: 'SF Pro Display', -apple-system, sans-serif;
+  font-family: 'Inter', sans-serif;
   color: var(--text);
 }
 
-/* ─── FLUID BACKDROP ─── */
-#canvas-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.6; }
-#noise {
-  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.03;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+/* ─── AMBIENT BACKGROUND ─── */
+#void-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background: radial-gradient(circle at 50% 120%, #1a1a1a 0%, #000 70%);
+  opacity: 1; transition: opacity 0.8s var(--ease);
 }
+#particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.4; }
 
 /* ─── UI LAYER ─── */
-#os { position: fixed; inset: 0; z-index: 10; padding-top: 32px; padding-bottom: 90px; }
-
-/* ─── STATUS BAR ─── */
-#status-bar {
-  position: fixed; top: 0; left: 0; right: 0; height: 32px; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 20px; font-size: 13px; font-weight: 500;
-  background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.sb-left { display: flex; gap: 18px; }
-.sb-item { opacity: 0.8; transition: 0.2s; cursor: pointer; }
-.sb-item:hover { opacity: 1; color: #fff; }
-
-/* ─── HOME VIEW ─── */
-.view {
-  position: absolute; inset: 32px 0 90px 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transform: scale(1.1);
-  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
-}
-.view.active { opacity: 1; pointer-events: all; transform: scale(1); }
-
-#v-home h1 {
-  font-size: 80px; font-weight: 700; letter-spacing: -3px; margin-bottom: 30px;
-  background: linear-gradient(135deg, #fff 0%, #777 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 30px rgba(255,255,255,0.1));
-}
-
-.search-wrap {
-  position: relative; width: 400px; margin-bottom: 50px;
-  background: var(--glass-b); border: 1px solid var(--border);
-  border-radius: 12px; transition: 0.3s var(--ease);
-}
-.search-wrap:hover { background: rgba(255,255,255,0.12); width: 420px; }
-.search-input {
-  width: 100%; padding: 14px 18px; background: transparent; border: none;
-  color: #fff; font-size: 15px; text-align: center; cursor: text;
-}
-.search-input::placeholder { color: rgba(255,255,255,0.4); }
-
-/* ─── APPS GRID ─── */
-.app-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; }
-.app-icon {
-  width: 68px; height: 68px; border-radius: 18px;
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  position: relative; cursor: pointer; transition: 0.3s var(--ease);
-}
-.app-icon:hover { transform: translateY(-8px) scale(1.05); background: rgba(255,255,255,0.15); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-.app-icon svg, .app-icon img { width: 34px; height: 34px; border-radius: 8px; fill: white; object-fit: cover; pointer-events: none; }
-.app-name {
-  position: absolute; bottom: -22px; font-size: 11px; color: var(--text-m);
-  opacity: 0; transition: 0.2s; pointer-events: none;
-}
-.app-icon:hover .app-name { opacity: 1; transform: translateY(4px); }
-
-/* ─── WINDOW (Browser) ─── */
-#win-drag {
-  position: fixed; top: 100px; left: 15%; width: 70%; height: 70%;
-  background: #101010; border-radius: 14px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+#interface {
+  position: fixed; inset: 0; z-index: 10;
   display: flex; flex-direction: column;
-  opacity: 0; pointer-events: none; transform: scale(0.95);
-  transition: opacity 0.3s, transform 0.3s, width 0.3s, height 0.3s, top 0.3s, left 0.3s;
-  overflow: hidden; z-index: 50;
+  transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
 }
-#win-drag.open { opacity: 1; pointer-events: all; transform: scale(1); }
-#win-drag.max { top: 32px!important; left: 0!important; width: 100%!important; height: calc(100% - 110px)!important; border-radius: 0; }
+
+/* ─── TOP BAR ─── */
+#status {
+  height: 40px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; font-size: 12px; font-weight: 500; letter-spacing: 0.5px;
+  color: var(--text-dim); z-index: 20;
+}
+.st-group { display: flex; gap: 20px; }
+.st-item { transition: 0.2s; cursor: pointer; }
+.st-item:hover { color: var(--text); }
+
+/* ─── MAIN VIEW ─── */
+#home {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  opacity: 1; transform: scale(1); transition: 0.5s var(--ease);
+}
+.hidden { opacity: 0!important; pointer-events: none; transform: scale(0.95)!important; }
+
+/* ─── HERO SECTION ─── */
+h1 {
+  font-family: 'Inter'; font-weight: 600; font-size: 64px; letter-spacing: -3px;
+  margin-bottom: 40px; color: #fff;
+}
+.search-container {
+  position: relative; width: 420px; margin-bottom: 60px;
+}
+.search-in {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  padding: 16px 20px; border-radius: 12px;
+  color: #fff; font-family: 'Inter'; font-size: 14px; text-align: center;
+  transition: 0.3s var(--ease);
+}
+.search-in:focus { border-color: var(--border-h); width: 440px; margin-left: -10px; }
+.search-in::placeholder { color: #333; }
+
+/* ─── APP GRID ─── */
+.grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;
+  padding: 20px; perspective: 1000px;
+}
+.icon {
+  width: 72px; height: 72px; border-radius: 18px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: 0.4s var(--ease);
+}
+.icon:hover {
+  background: #151515; border-color: var(--border-h);
+  transform: translateY(-8px) translateZ(20px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+  z-index: 10;
+}
+.icon svg, .icon img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
+.icon-lbl {
+  position: absolute; bottom: -24px; font-size: 10px; color: #555; font-weight: 500;
+  opacity: 0; transition: 0.2s; pointer-events: none; white-space: nowrap;
+}
+.icon:hover .icon-lbl { opacity: 1; transform: translateY(5px); }
+
+/* ─── FULLSCREEN APP WINDOW ─── */
+#app-window {
+  position: fixed; inset: 0; z-index: 50;
+  background: #000;
+  transform: translateY(100vh); transition: transform 0.6s var(--ease);
+  display: flex; flex-direction: column;
+}
+#app-window.active { transform: translateY(0); }
 
 .win-bar {
-  height: 38px; background: #1a1a1a; border-bottom: 1px solid #333;
-  display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
-  cursor: grab;
+  height: 40px; background: #000; border-bottom: 1px solid #151515;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; z-index: 2;
 }
-.win-bar:active { cursor: grabbing; }
+.win-title { font-family: 'JetBrains Mono'; font-size: 11px; color: #444; text-transform: uppercase; }
 .win-ctrls { display: flex; gap: 8px; }
-.trf { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; }
-.trf.cl { background: #ff5f56; } .trf.mn { background: #ffbd2e; } .trf.mx { background: #27c93f; }
-.win-title { color: #666; font-size: 12px; font-family: 'SF Pro Display'; pointer-events: none; }
-.win-acts { display: flex; gap: 10px; }
-.btn-act {
-  background: #333; border: none; color: #ccc; font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer;
-}
-.btn-act:hover { background: #555; color: #fff; }
-
-#win-content { flex: 1; position: relative; background: #000; }
-iframe { width: 100%; height: 100%; border: none; background: #fff; }
-#loader-ol {
-  position: absolute; inset: 0; background: #000; display: flex; align-items: center; justify-content: center;
-  z-index: 2; transition: opacity 0.4s; pointer-events: none;
-}
-
-/* ─── GAMES LIST ─── */
-.games-wall {
-  width: 100%; height: 100%; overflow-y: auto; padding: 40px 10%;
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px;
-}
-.game-card {
-  aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; position: relative;
-  background: #111; border: 1px solid var(--border); cursor: pointer;
-  transition: 0.3s;
-}
-.game-card:hover { transform: scale(1.06); z-index: 10; border-color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.gc-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.3s; }
-.game-card:hover .gc-img { opacity: 1; }
-.gc-meta {
-  position: absolute; bottom: 0; left: 0; right: 0; padding: 10px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.9));
-  opacity: 0; transition: 0.3s;
-}
-.game-card:hover .gc-meta { opacity: 1; }
-.gc-tit { font-size: 13px; font-weight: 600; color: #fff; }
-
-/* ─── DOCK ─── */
-#dock-wrap {
-  position: fixed; bottom: 15px; left: 0; right: 0;
-  display: flex; justify-content: center; z-index: 1000;
-}
-#dock {
-  background: var(--dock-bg); backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px; padding: 10px;
-  display: flex; gap: 8px; align-items: flex-end;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-}
-.dock-icon {
-  width: 48px; height: 48px; border-radius: 12px;
-  background: rgba(255,255,255,0.06);
+.ctrl {
+  width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-  position: relative; cursor: pointer; transition: 0.2s var(--ease);
+  color: #666; cursor: pointer; transition: 0.2s;
 }
-.dock-icon:hover { transform: translateY(-8px) scale(1.1); background: rgba(255,255,255,0.15); margin: 0 4px; }
-.dock-icon svg { width: 24px; height: 24px; stroke: #fff; stroke-width: 2; fill: none; }
-.dock-dot {
-  position: absolute; bottom: -6px; width: 4px; height: 4px; border-radius: 50%;
-  background: #fff; opacity: 0; transition: 0.2s;
-}
-.dock-icon.active .dock-dot { opacity: 1; bottom: -4px; }
+.ctrl:hover { border-color: #fff; color: #fff; background: #111; }
 
-/* ─── CUSTOM SCROLL ─── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #555; }
+#app-content { flex: 1; position: relative; }
+iframe { width: 100%; height: 100%; border: none; background: #000; }
+#loader {
+  position: absolute; inset: 0; background: #000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 5; transition: opacity 0.5s; pointer-events: none;
+}
+.load-bar {
+  width: 150px; height: 2px; background: #111; margin-top: 20px;
+  overflow: hidden; position: relative;
+}
+.load-fill {
+  position: absolute; top: 0; left: 0; height: 100%; width: 50%; background: #fff;
+  animation: load 1.5s infinite ease-in-out;
+}
+@keyframes load { 0% { left: -50%; } 100% { left: 100%; } }
+
+/* ─── CUSTOM CURSOR ─── */
+#cursor {
+  position: fixed; top: 0; left: 0; width: 12px; height: 12px;
+  border: 1px solid rgba(255,255,255,0.8); border-radius: 50%;
+  transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+  mix-blend-mode: difference; transition: width 0.3s, height 0.3s;
+}
+body.hover #cursor { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-color: transparent; }
 </style>
 </head>
 <body>
 
-<canvas id="canvas-bg"></canvas>
-<div id="noise"></div>
+<!-- BACKGROUND -->
+<div id="void-bg"></div>
+<canvas id="particles"></canvas>
+<div id="cursor"></div>
 
-<!-- STATUS BAR -->
-<div id="status-bar">
-  <div class="sb-left">
-    <span class="sb-item" style="font-weight:700">Atom</span>
-    <span class="sb-item">File</span>
-    <span class="sb-item">Window</span>
-    <span class="sb-item">Help</span>
-  </div>
-  <div class="sb-item" id="clock">12:00</div>
-</div>
-
-<!-- VIEWS -->
-<div id="os">
-  
-  <!-- HOME -->
-  <div class="view active" id="v-home">
-    <h1>Atom</h1>
-    <div class="search-wrap">
-      <input type="text" class="search-input" id="search" placeholder="Search web or enter URL..." autocomplete="off">
+<!-- MAIN UI -->
+<div id="interface">
+  <div id="status">
+    <div class="st-group">
+      <span class="st-item" style="color:#fff; font-weight:700">ATOM</span>
+      <span class="st-item">Apps</span>
+      <span class="st-item">Cloud</span>
     </div>
-    <div class="app-grid" id="ag"></div>
+    <div class="st-item" id="time">12:00</div>
   </div>
 
-  <!-- GAMES LIBRARY -->
-  <div class="view" id="v-games">
-    <div class="games-wall" id="gl"></div>
+  <div id="home">
+    <h1>Atom Void</h1>
+    <div class="search-container">
+      <input type="text" class="search-in" id="search" placeholder="Search or Type URL" autocomplete="off">
+    </div>
+    
+    <div class="grid" id="icon-grid">
+      <!-- Generated via JS -->
+    </div>
   </div>
-
 </div>
 
-<!-- DRAGGABLE BROWSER WINDOW -->
-<div id="win-drag">
-  <div class="win-bar" id="drag-handle">
+<!-- APP WINDOW -->
+<div id="app-window">
+  <div class="win-bar">
+    <div class="ctrl" onclick="closeApp()">✕</div>
+    <div class="win-title" id="win-tit">APPLICATION</div>
     <div class="win-ctrls">
-      <div class="trf cl" onclick="winClose()"></div>
-      <div class="trf mn" onclick="winClose()"></div>
-      <div class="trf mx" onclick="winMax()"></div>
-    </div>
-    <div class="win-title" id="w-tit">Browser</div>
-    <div class="win-acts">
-      <button class="btn-act" onclick="winReload()">↻</button>
-      <button class="btn-act" onclick="winPop()">↗ Full</button>
+      <div class="ctrl" onclick="reloadApp()">↻</div>
+      <div class="ctrl" onclick="popApp()">↗</div>
     </div>
   </div>
-  <div id="win-content">
-    <div id="loader-ol"><div style="color:#444; font-family:'JetBrains Mono'">LOADING RESOURCES...</div></div>
-    <iframe id="w-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"></iframe>
-  </div>
-</div>
-
-<!-- DOCK -->
-<div id="dock-wrap">
-  <div id="dock">
-    <div class="dock-icon active" onclick="swView('v-home', this)">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-      <div class="dock-dot"></div>
-    </div>
-    <div class="dock-icon" onclick="swView('v-games', this)">
-      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      <div class="dock-dot"></div>
-    </div>
-    <div class="dock-icon" onclick="openWeb('about:blank')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <div class="dock-dot"></div>
-    </div>
-    <div class="dock-icon" onclick="openWeb('https://discord.com/app')">
-      <svg viewBox="0 0 24 24"><path d="M18.9 5.3a16 16 0 0 0-4-1.2c0 .1 0 .1-.1.2-1.7-.7-3.6-.7-5.3 0-.1-.1-.1-.1-.1-.2a16 16 0 0 0-4 1.2c-.1 0-.1.1-.1.1-2.5 3.8-3.2 7.4-2.8 11 .5 1.7 2.2 3 4.2 4.2 1-.8 1.9-1.7 2.6-2.6-1.1-.4-2.1-.9-3-1.6.2-.2.5-.3.7-.5 4.3 2 8.9 2 13.2 0 .2.2.5.3.7.5-.9.7-1.9 1.2-3 1.6.7.9 1.5 1.8 2.6 2.6 2-1.1 3.7-2.5 4.2-4.2.5-3.6-.2-7.2-2.8-11 0 0-.1-.1-.1-.1zM9.5 14.3c-1.2 0-2.2-1.1-2.2-2.4 0-1.3 1-2.4 2.2-2.4 1.2 0 2.2 1.1 2.2 2.4 0 1.3-1 2.4-2.2 2.4zm5 0c-1.2 0-2.2-1.1-2.2-2.4 0-1.3 1-2.4 2.2-2.4 1.2 0 2.2 1.1 2.2 2.4 0 1.3-1 2.4-2.2 2.4z"/></svg>
-      <div class="dock-dot"></div>
-    </div>
+  <div id="app-content">
+    <div id="loader"><div style="font-family:'JetBrains Mono'; font-size:12px; letter-spacing:2px">CONNECTING_SECURE_TUNNEL</div><div class="load-bar"><div class="load-fill"></div></div></div>
+    <iframe id="frame" allow="fullscreen; camera; microphone; payment"></iframe>
   </div>
 </div>
 
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
 <script>
-/* ─── APP DATA (FIXED EMBEDS) ─── */
+/* ─── CONFIGURATION ─── */
+// All links now STRICTLY use nowgg.fun or embed/proxy compatible URLs
 const APPS = [
+  // SOCIAL & MEDIA
+  { n: 'Discord', u: 'https://discord.com/app', i: '<path d="M18.9 5.3a16 16 0 0 0-4-1.2c0 .1 0 .1-.1.2-1.7-.7-3.6-.7-5.3 0-.1-.1-.1-.1-.1-.2a16 16 0 0 0-4 1.2c-.1 0-.1.1-.1.1-2.5 3.8-3.2 7.4-2.8 11 .5 1.7 2.2 3 4.2 4.2 1-.8 1.9-1.7 2.6-2.6-1.1-.4-2.1-.9-3-1.6.2-.2.5-.3.7-.5 4.3 2 8.9 2 13.2 0 .2.2.5.3.7.5-.9.7-1.9 1.2-3 1.6.7.9 1.5 1.8 2.6 2.6 2-1.1 3.7-2.5 4.2-4.2.5-3.6-.2-7.2-2.8-11 0 0-.1-.1-.1-.1z"/>' },
   { n: 'YouTube', u: 'https://www.youtube.com/embed/?autoplay=1', i: '<path d="M22.5 6.2c-.3-1-.9-1.8-1.9-2C18.9 3.5 12 3.5 12 3.5s-6.9 0-8.6.7c-1 .3-1.8 1-2 2C.5 8.1.5 12 .5 12s0 3.9.9 5.8c.3 1 1 1.9 2 2 1.7.7 8.6.7 8.6.7s6.9 0 8.6-.7c1-.3 1.8-1 1.9-2 .9-1.9.9-5.8.9-5.8s0-3.9-.9-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/>', direct: true },
   { n: 'Spotify', u: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M', i: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.6 14.4a.6.6 0 0 1-.9.2c-2.4-1.4-5.3-1.8-8.8-1a.6.6 0 0 1-.3-1.2c3.8-.9 7.2-.5 9.8 1a.6.6 0 0 1 .2.9zm1.2-2.7a.8.8 0 0 1-1.1.3c-2.7-1.7-6.9-2.1-10-1.2a.8.8 0 0 1-.5-1.5c3.7-1.1 8.3-.6 11.3 1.3a.8.8 0 0 1 .3 1.1zm.1-2.8a1 1 0 0 1-1.3.3c-3.2-1.9-8.3-2.3-11.3-1.3a.9.9 0 0 1-1.2-1.3c3.6-1.2 9.3-.8 12.9 1.4a1 1 0 0 1 .9.9z"/>', direct: true },
-  { n: 'Discord', u: 'https://discord.com/app', i: '<path d="M18.9 5.3a16 16 0 0 0-4-1.2c0 .1 0 .1-.1.2-1.7-.7-3.6-.7-5.3 0-.1-.1-.1-.1-.1-.2a16 16 0 0 0-4 1.2c-.1 0-.1.1-.1.1-2.5 3.8-3.2 7.4-2.8 11 .5 1.7 2.2 3 4.2 4.2 1-.8 1.9-1.7 2.6-2.6-1.1-.4-2.1-.9-3-1.6.2-.2.5-.3.7-.5 4.3 2 8.9 2 13.2 0 .2.2.5.3.7.5-.9.7-1.9 1.2-3 1.6.7.9 1.5 1.8 2.6 2.6 2-1.1 3.7-2.5 4.2-4.2.5-3.6-.2-7.2-2.8-11 0 0-.1-.1-.1-.1z"/>' },
   { n: 'TikTok', u: 'https://www.tiktok.com', i: '<path d="M19.6 6.7a4.8 4.8 0 0 1-3.8-4.3V2h-3.4v13.7a2.9 2.9 0 0 1-5.2 1.7 2.9 2.9 0 0 1 2.3-4.6 2.9 2.9 0 0 1 .9.1V9.4a6.8 6.8 0 0 0-1 0 6.3 6.3 0 0 0-4.2 10.8 6.3 6.3 0 0 0 10.9-4.4v-7a8.2 8.2 0 0 0 4.8 1.5v-3.4a4.9 4.9 0 0 1-1-.1z"/>' },
-  { n: 'VS Code', u: 'https://vscode.dev', i: '<path d="M23.2 2.6l-2.7-1.5a1.9 1.9 0 0 0-1.9 0L2.8 11.7a1.9 1.9 0 0 0 0 3.2l15.8 10.6a1.9 1.9 0 0 0 1.9 0l2.7-1.5a1.9 1.9 0 0 0 .9-1.6V4.2a1.9 1.9 0 0 0-.9-1.6zM15.9 19.4L4.7 13.6v-2.1l11.2-5.9v13.8z"/>' },
-  { n: 'Twitch', u: 'https://player.twitch.tv/?channel=kaicenat&parent='+location.hostname, i: '<path d="M21 2H3v18h6v3h3l3-3h3l3-3V2zm-3 15h-4l-3 3v-3H6V5h12v12z"/>', direct: true }
+  
+  // NOWGG.FUN CLOUD GAMES
+  { n: 'Roblox', u: 'https://nowgg.fun/play/roblox-corporation/5349/roblox', i: '<path d="M18.5 5.5L5.5 10L10 23L23 18.5L18.5 5.5ZM13.5 16C12.1 16 11 14.9 11 13.5C11 12.1 12.1 11 13.5 11C14.9 11 16 12.1 16 13.5C16 14.9 14.9 16 13.5 16Z"/>' },
+  { n: 'Android', u: 'https://nowgg.fun/play/now-gg/8454/app-launcher', i: '<path d="M17.5 2C17.2 2 17 2.2 16.9 2.5L16 4.6l-1-2.1c-.1-.3-.4-.5-.7-.5s-.6.2-.7.5L12.5 4.6l-1-2.1c-.1-.3-.4-.5-.7-.5s-.6.2-.7.5L9 4.6 8.1 2.5c-.1-.3-.4-.5-.7-.5s-.6.2-.7.5L5.8 4.6l-.9-2.1C4.7 2.2 4.5 2 4.2 2c-.4 0-.7.3-.7.7 0 .1 0 .3.1.4l1.4 3.2C2.1 7.6 0 10.6 0 14c0 3.9 3.1 7 7 7h10c3.9 0 7-3.1 7-7 0-3.4-2.1-6.4-5.1-7.7l1.4-3.2c.1-.1.1-.3.1-.4 0-.4-.3-.7-.7-.7zM8 15c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm8 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/>' },
+  { n: 'Geo Dash', u: 'https://nowgg.fun/play/robtop-games/5690/geometry-dash', i: '<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/>' },
+  { n: 'Call of Duty', u: 'https://nowgg.fun/play/activision-publishing-inc/2165/call-of-duty-mobile', i: '<path d="M2 12l2-2 8 8 8-8 2 2-10 10L2 12z"/>' },
+  { n: 'Cookie Run', u: 'https://nowgg.fun/play/devsisters-corporation/5874/cookie-run-kingdom', i: '<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="2"/><circle cx="15" cy="10" r="2"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/>' },
+  { n: 'Melon Box', u: 'https://nowgg.fun/play/playducky/4146/melon-playground', i: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 8h2v2H8zm6 6h2v2h-2z"/>' },
+  { n: 'Stumble Guys', u: 'https://nowgg.fun/play/scopely/2767/stumble-guys', i: '<circle cx="12" cy="7" r="4"/><path d="M5 21v-8l3-3 4 4 4-4 3 3v8h-2v-6l-2-2-3 3-3-3-2 2v6H5z"/>' },
+  { n: '1v1.lol', u: 'https://1v1.lol', i: '<path d="M12 2L2 22h20L12 2zm0 4l6 12H6l6-12z"/>' },
+  { n: 'Fortnite', u: 'https://nowgg.fun/play/epic-games/fortnite', i: '<path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2-1-2-1-2 1 2 1zm0 2l-10-5v9l10 5 10-5v-9l-10 5z"/>' },
+  { n: 'Slope', u: 'https://slope-game.github.io', i: '<path d="M22 22L2 22L12 2L22 22ZM12 6L7 16H17L12 6Z"/>', direct: true },
+  { n: 'Subway Surf', u: 'https://poki.com/en/g/subway-surfers', i: '<path d="M12 2a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4 4 4 0 0 0 4-4V6a4 4 0 0 0-4-4zm0 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm2-8H10V6h4v2z"/>', direct: true }
 ];
 
-/* ─── GAMES DATA (UPDATED TO nowgg.fun) ─── */
-const GAMES = [
-  { n: 'Roblox', t: 'MMO', u: 'https://nowgg.fun/play/roblox-corporation/5349/roblox', img: 'https://play-lh.googleusercontent.com/WNWZ42LBGl_lsZqkV_N_GsKwbED1V_nDS1c5F9F60pM-fE90eL0C6Y5t3sE0f_0w_0w=w400' },
-  { n: 'Geometry Dash', t: 'Arcade', u: 'https://nowgg.fun/play/robtop-games/5690/geometry-dash', img: 'https://play-lh.googleusercontent.com/2o9r4hJ91d3yY2q9e8b_y9a3r5d0f1g2h3i4j5k6l7m8n9o0=w400' },
-  { n: 'Call of Duty', t: 'Shooter', u: 'https://nowgg.fun/play/activision-publishing-inc/2165/call-of-duty-mobile', img: 'https://play-lh.googleusercontent.com/os245A4_tX8_C6Q7_W8_Y9a0b1c2d3e4f5g6h7i8j9k0l1=w400' },
-  { n: 'Fortnite', t: 'Battle Royale', u: 'https://nowgg.fun/play/epic-games/fortnite', img: 'https://play-lh.googleusercontent.com/coXW3Y_rZgHjX9y4F3d2E5A6B7C8D9E0F1G2H3I4J5K6L7M8N9O0=w400' },
-  { n: 'Stumble Guys', t: 'Party', u: 'https://nowgg.fun/play/scopely/2767/stumble-guys', img: 'https://play-lh.googleusercontent.com/5a4b3c2d1e0f9g8h7i6j5k4l3m2n1o0p9q8r7s6t5u=w400' },
-  { n: 'Cookie Run', t: 'RPG', u: 'https://nowgg.fun/play/devsisters-corporation/5874/cookie-run-kingdom', img: 'https://play-lh.googleusercontent.com/6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u=w400' },
-  { n: 'Melon Sandbox', t: 'Sim', u: 'https://nowgg.fun/play/playducky/4146/melon-playground', img: 'https://play-lh.googleusercontent.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t=w400' },
-  { n: 'Android Launcher', t: 'System', u: 'https://nowgg.fun/apps/now-gg/8454/app-launcher.html', img: 'https://play-lh.googleusercontent.com/8454/icon.png' },
-  { n: 'Subway Surfers', t: 'Runner', u: 'https://poki.com/en/g/subway-surfers', img: 'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/b8a213500201217e2962372f69466549.png' },
-  { n: '1v1.lol', t: 'Shooter', u: 'https://1v1.lol', img: 'https://play-lh.googleusercontent.com/L8r3fH8iC_1d3-Qj1k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4k_M3F4KkXQ4=w400' }
-];
+/* ─── SYSTEM LOGIC ─── */
+const grid = document.getElementById('icon-grid');
+const win = document.getElementById('app-window');
+const home = document.getElementById('home');
+const frame = document.getElementById('frame');
+const loader = document.getElementById('loader');
+const wTit = document.getElementById('win-tit');
+let activeUrl = '';
 
-/* ─── INITIALIZE ─── */
-const ag = document.getElementById('ag');
-APPS.forEach(a => {
-  const d = document.createElement('div');
-  d.className = 'app-icon';
-  d.innerHTML = `<svg viewBox="0 0 24 24">${a.i}</svg><div class="app-name">${a.n}</div>`;
-  d.onclick = () => openWeb(a.u, a.direct);
-  ag.appendChild(d);
+// Generate Icons
+APPS.forEach(app => {
+  const el = document.createElement('div');
+  el.className = 'icon';
+  el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor">${app.i}</svg><div class="icon-lbl">${app.n}</div>`;
+  el.onclick = () => openApp(app);
+  grid.appendChild(el);
 });
 
-const gl = document.getElementById('gl');
-GAMES.forEach(g => {
-  const d = document.createElement('div');
-  d.className = 'game-card';
-  // Fallback color if image fails
-  d.style.background = `hsl(${Math.random()*360}, 15%, 15%)`;
-  d.innerHTML = `<img class="gc-img" src="${g.img}" onerror="this.style.opacity=0"><div class="gc-meta"><div class="gc-tit">${g.n}</div><div style="font-size:10px; color:#aaa">${g.t}</div></div>`;
-  d.onclick = () => openWeb(g.u);
-  gl.appendChild(d);
-});
-
-// Update Clock
-setInterval(() => document.getElementById('clock').textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
-
-/* ─── WINDOW SYSTEM ─── */
-const win = document.getElementById('win-drag');
-const frame = document.getElementById('w-frame');
-const loader = document.getElementById('loader-ol');
-const wTit = document.getElementById('w-tit');
-let lastUrl = '';
-
-function openWeb(u, direct) {
-  // Activate Window
-  win.classList.add('open');
-  loader.style.opacity = 1;
-  wTit.innerText = u;
-  lastUrl = u;
-
-  // Set Dock Active (Browser)
-  document.querySelectorAll('.dock-icon').forEach(d => d.classList.remove('active'));
-  document.querySelectorAll('.dock-icon')[2].classList.add('active');
+function openApp(app) {
+  // Transition
+  home.classList.add('hidden');
+  win.classList.add('active');
+  loader.style.opacity = '1';
+  wTit.innerText = app.n.toUpperCase();
+  activeUrl = app.u;
 
   // URL Handling
-  let target = u;
-  if (!direct && !u.includes('nowgg.fun')) { // If not embed and not nowgg, try proxy
-    try {
-      if(window.__uv$config) target = __uv$config.prefix + __uv$config.encodeUrl(u);
-    } catch(e) { console.log('Proxy Error, using direct'); }
-  }
-  
-  // Load Frame
-  frame.src = target;
-  frame.onload = () => loader.style.opacity = 0;
+  setTimeout(() => {
+    // If embedding is active, use UV Proxy unless marked direct
+    let target = app.u;
+    if (!app.direct) {
+      try {
+        if(window.__uv$config) target = __uv$config.prefix + __uv$config.encodeUrl(app.u);
+      } catch(e) { console.warn('Proxy Config Missing'); }
+    }
+    frame.src = target;
+    
+    // Hide loader after a bit
+    frame.onload = () => loader.style.opacity = '0';
+    // Fallback timer for loader
+    setTimeout(() => loader.style.opacity = '0', 3000);
+  }, 600);
 }
 
-function winClose() {
-  win.classList.remove('open');
-  frame.src = 'about:blank';
-  document.querySelectorAll('.dock-icon')[2].classList.remove('active');
-}
-function winMax() { win.classList.toggle('max'); }
-function winReload() { frame.contentWindow.location.reload(); }
-function winPop() { window.open(lastUrl, '_blank'); }
-
-function swView(id, el) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.dock-icon').forEach(d => d.classList.remove('active'));
-  if(el) el.classList.add('active');
-  // Close window when switching main views
-  if(win.classList.contains('open')) win.classList.remove('open');
+function closeApp() {
+  win.classList.remove('active');
+  home.classList.remove('hidden');
+  setTimeout(() => { frame.src = 'about:blank'; }, 600);
 }
 
-/* ─── DRAG LOGIC ─── */
-const handle = document.getElementById('drag-handle');
-let isDrag = false, startX, startY, initX, initY;
+function reloadApp() { frame.contentWindow.location.reload(); }
+function popApp() { window.open(activeUrl, '_blank'); }
 
-handle.addEventListener('mousedown', e => {
-  if(win.classList.contains('max')) return;
-  isDrag = true;
-  startX = e.clientX; startY = e.clientY;
-  initX = win.offsetLeft; initY = win.offsetTop;
-  document.body.style.cursor = 'grabbing';
-});
-document.addEventListener('mousemove', e => {
-  if(!isDrag) return;
-  const dx = e.clientX - startX;
-  const dy = e.clientY - startY;
-  win.style.left = `${initX + dx}px`;
-  win.style.top = `${initY + dy}px`;
-});
-document.addEventListener('mouseup', () => { isDrag = false; document.body.style.cursor = 'default'; });
-
-/* ─── SEARCH ─── */
+// Search
 document.getElementById('search').addEventListener('keydown', e => {
   if(e.key === 'Enter') {
-    const v = e.target.value;
-    const u = v.includes('.') ? (v.startsWith('http') ? v : 'https://'+v) : 'https://search.brave.com/search?q='+encodeURIComponent(v);
-    openWeb(u);
+    const val = e.target.value;
+    const url = val.includes('.') ? (val.startsWith('http') ? val : 'https://'+val) : 'https://search.brave.com/search?q='+encodeURIComponent(val);
+    openApp({ n: 'Browser', u: url, direct: false });
   }
 });
 
-/* ─── CANVAS VISUALS ─── */
-const cv = document.getElementById('canvas-bg'), ctx = cv.getContext('2d');
-let w, h;
-const orbs = [];
+// Cursor & Clock
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => { cur.style.top = e.clientY+'px'; cur.style.left = e.clientX+'px'; });
+document.querySelectorAll('.icon, .ctrl, .st-item, input').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('hover'));
+});
+setInterval(() => document.getElementById('time').innerText = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
 
-window.addEventListener('resize', () => { w=cv.width=innerWidth; h=cv.height=innerHeight; });
-w=cv.width=innerWidth; h=cv.height=innerHeight;
+/* ─── PARTICLES ─── */
+const cv = document.getElementById('particles'), ctx = cv.getContext('2d');
+let w, h, p = [];
+const resize = () => { w=cv.width=innerWidth; h=cv.height=innerHeight; };
+window.addEventListener('resize', resize); resize();
 
-for(let i=0; i<4; i++) orbs.push({x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-.5)*0.5, vy:(Math.random()-.5)*0.5, r:200+Math.random()*200});
+for(let i=0; i<60; i++) p.push({x:Math.random()*w, y:Math.random()*h, s:Math.random()*2, vx:(Math.random()-.5)*0.5, vy:(Math.random()-.5)*0.5});
 
 function anim() {
-  ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
-  
-  orbs.forEach(o => {
-    o.x += o.vx; o.y += o.vy;
-    if(o.x<0 || o.x>w) o.vx*=-1;
-    if(o.y<0 || o.y>h) o.vy*=-1;
-    
-    const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-    g.addColorStop(0, 'rgba(30, 80, 255, 0.15)');
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill();
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#fff';
+  p.forEach(pt => {
+    pt.x += pt.vx; pt.y += pt.vy;
+    if(pt.x<0) pt.x=w; if(pt.x>w) pt.x=0;
+    if(pt.y<0) pt.y=h; if(pt.y>h) pt.y=0;
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.s, 0, Math.PI*2); ctx.fill();
   });
   requestAnimationFrame(anim);
 }

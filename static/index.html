@@ -1,7 +1,7 @@
 <!-- 
-  ATOM OS // VOID FINAL
-  Protocol: STRICT (https://nowgg.fun)
-  Visuals: Cinematic / Fullscreen / Fluid
+  ATOM OS // AERO EDITION
+  Visuals: Glassmorphism / Mesh Gradient / Desktop UI
+  Link Policy: STRICT (nowgg.fun)
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -9,313 +9,371 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Atom OS</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #000000;
-  --surface: #0a0a0a;
-  --border: rgba(255, 255, 255, 0.06);
-  --text: #ffffff;
-  --text-dim: #555555;
-  --ease: cubic-bezier(0.19, 1, 0.22, 1);
-  --trans-dur: 0.8s;
+  --bg-1: #0f172a;
+  --bg-2: #334155;
+  --glass: rgba(255, 255, 255, 0.1);
+  --glass-high: rgba(255, 255, 255, 0.25);
+  --border: rgba(255, 255, 255, 0.15);
+  --dock: rgba(0, 0, 0, 0.3);
+  --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --text: #f8fafc;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; cursor: none; }
+* { box-sizing: border-box; user-select: none; -webkit-user-drag: none; cursor: default; }
 
 body {
-  width: 100vw; height: 100vh; overflow: hidden;
-  background: var(--bg);
-  font-family: 'Manrope', sans-serif;
-  color: var(--text);
-}
-
-/* ─── FLUID BACKDROP ─── */
-#canvas {
-  position: fixed; inset: 0; z-index: 0; opacity: 0.5;
-  transition: opacity 1s;
-}
-#vignette {
-  position: fixed; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, transparent 20%, #000 100%);
-}
-
-/* ─── UI LAYER ─── */
-#ui {
-  position: fixed; inset: 0; z-index: 10;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  transition: transform var(--trans-dur) var(--ease), opacity 0.5s;
-}
-#ui.zoom-out { transform: scale(1.1); opacity: 0; pointer-events: none; }
-
-/* ─── HEADER ─── */
-.header {
-  position: absolute; top: 40px; text-align: center;
-  mix-blend-mode: difference;
-}
-h1 {
-  font-weight: 300; font-size: 14px; letter-spacing: 8px; text-transform: uppercase;
-  margin-bottom: 10px; color: #888;
-}
-.clock { font-family: 'JetBrains Mono'; font-size: 10px; color: #444; }
-
-/* ─── SEARCH ─── */
-.search-box {
-  position: relative; margin-bottom: 60px; width: 300px;
-  border-bottom: 1px solid #222; transition: width 0.5s var(--ease), border-color 0.3s;
-}
-.search-box:focus-within { width: 400px; border-color: #fff; }
-.search-in {
-  width: 100%; background: transparent; border: none; padding: 15px 0;
-  color: #fff; font-size: 18px; text-align: center; font-family: 'Manrope';
-}
-.search-in::placeholder { color: #333; transition: color 0.3s; }
-.search-box:focus-within .search-in::placeholder { color: transparent; }
-
-/* ─── GRID ─── */
-.grid {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 40px;
-  perspective: 1000px;
-}
-.app {
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  cursor: pointer; group;
-}
-.icon {
-  width: 64px; height: 64px; border-radius: 18px;
-  background: #050505; border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  transition: 0.4s var(--ease); position: relative; overflow: hidden;
-}
-.icon::before {
-  content:''; position: absolute; inset: 0; 
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
-  opacity: 0; transition: 0.4s;
-}
-.app:hover .icon {
-  transform: translateY(-10px) scale(1.05);
-  border-color: rgba(255,255,255,0.4);
-  box-shadow: 0 20px 50px rgba(255,255,255,0.05);
-}
-.app:hover .icon::before { opacity: 1; }
-
-.app svg, .app img { width: 28px; height: 28px; fill: #fff; object-fit: cover; z-index: 2; }
-.label {
-  font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #444; text-transform: uppercase;
-  transition: 0.3s; transform: translateY(5px); opacity: 0;
-}
-.app:hover .label { color: #fff; opacity: 1; transform: translateY(0); }
-
-/* ─── FULLSCREEN APP ─── */
-#app-view {
-  position: fixed; inset: 0; z-index: 50;
+  margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden;
+  font-family: 'Inter', sans-serif; color: var(--text);
   background: #000;
-  transform: translateY(100vh); transition: transform var(--trans-dur) var(--ease);
-  display: flex; flex-direction: column;
 }
-#app-view.active { transform: translateY(0); }
 
-.bar {
-  height: 40px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 20px; background: rgba(0,0,0,0.8); z-index: 2;
-  border-bottom: 1px solid #111;
+/* ─── ANIMATED WALLPAPER ─── */
+#wallpaper {
+  position: fixed; inset: 0; z-index: 0;
+  background: 
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+  background-size: 150% 150%;
+  animation: mesh 20s ease infinite alternate;
 }
-.bar-title { font-family: 'JetBrains Mono'; font-size: 10px; color: #444; letter-spacing: 2px; }
-.actions { display: flex; gap: 15px; }
-.act {
-  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
-  font-size: 14px; color: #666; cursor: pointer; transition: 0.2s;
+@keyframes mesh { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+#noise {
+  position: fixed; inset: 0; z-index: 1; opacity: 0.04; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
 }
-.act:hover { color: #fff; }
+
+/* ─── DESKTOP UI ─── */
+#desktop { position: relative; z-index: 10; width: 100%; height: 100%; }
+
+/* Status Bar */
+#bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 32px;
+  background: rgba(0,0,0,0.2); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; font-size: 12px; font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.bar-grp { display: flex; gap: 16px; }
+
+/* Desktop Grid */
+#app-grid {
+  padding: 60px 40px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  grid-auto-rows: 100px; gap: 10px; width: 100%; max-width: 600px;
+}
+.d-icon {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 10px; border-radius: 12px; transition: 0.2s; cursor: pointer;
+}
+.d-icon:hover { background: rgba(255,255,255,0.1); }
+.d-img {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; transition: 0.3s var(--ease);
+}
+.d-icon:hover .d-img { transform: translateY(-5px) scale(1.1); border-color: rgba(255,255,255,0.4); }
+.d-lbl { font-size: 11px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); letter-spacing: 0.3px; text-align: center; }
+
+/* ─── WINDOW ─── */
+#win {
+  position: absolute; top: 10%; left: 15%; width: 70%; height: 75%;
+  background: rgba(20, 20, 25, 0.85); backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 16px; border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none; transform: scale(0.95);
+  transition: opacity 0.3s, transform 0.3s;
+  overflow: hidden;
+}
+#win.active { opacity: 1; pointer-events: all; transform: scale(1); }
+#win.min { opacity: 0; transform: scale(0.8) translateY(200px); pointer-events: none; }
+
+.win-head {
+  height: 44px; display: flex; align-items: center; justify-content: center;
+  position: relative; border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.03); cursor: grab;
+}
+.win-head:active { cursor: grabbing; }
+.win-ctrls {
+  position: absolute; left: 16px; display: flex; gap: 8px;
+}
+.traffic { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; }
+.traffic:hover { filter: brightness(1.2); }
+.cl { background: #ff5f57; } .mn { background: #febc2e; } .mx { background: #28c840; }
+
+.win-tit { font-family: 'Inter'; font-size: 13px; color: rgba(255,255,255,0.6); pointer-events: none; }
+.win-acts { position: absolute; right: 16px; display: flex; gap: 10px; }
+.act-btn {
+  background: rgba(255,255,255,0.1); border: none; border-radius: 6px;
+  color: #ccc; padding: 4px 10px; font-size: 11px; cursor: pointer; transition: 0.2s;
+}
+.act-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
 #content { flex: 1; position: relative; background: #000; }
-iframe { width: 100%; height: 100%; border: none; opacity: 0; transition: opacity 1s; }
-iframe.vis { opacity: 1; }
-
+iframe { width: 100%; height: 100%; border: none; background: #000; }
 #loader {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  pointer-events: none; opacity: 1; transition: opacity 0.5s;
+  position: absolute; inset: 0; background: #000; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.5s; pointer-events: none;
 }
-.line { width: 100px; height: 1px; background: #222; overflow: hidden; }
-.prog { width: 50%; height: 100%; background: #fff; animation: load 1s infinite ease-in-out; }
-@keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+.spinner {
+  width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── CURSOR ─── */
-#cursor {
-  position: fixed; top: 0; left: 0; width: 8px; height: 8px; background: #fff;
-  border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
-  mix-blend-mode: exclusion; transition: transform 0.1s;
+/* ─── DOCK ─── */
+#dock-wrap {
+  position: absolute; bottom: 20px; left: 0; right: 0;
+  display: flex; justify-content: center; z-index: 100;
 }
-body.hover #cursor { transform: translate(-50%, -50%) scale(4); background: transparent; border: 1px solid #fff; }
+#dock {
+  background: var(--dock); backdrop-filter: blur(20px);
+  border: 1px solid var(--border); border-radius: 24px;
+  padding: 10px; display: flex; gap: 12px; align-items: flex-end;
+  box-shadow: var(--shadow); transition: 0.3s;
+}
+.dock-item {
+  width: 50px; height: 50px; border-radius: 14px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+}
+.dock-item:hover { transform: translateY(-10px) scale(1.15); margin: 0 8px; background: rgba(255,255,255,0.2); }
+.dock-item svg { width: 24px; height: 24px; fill: #fff; }
+.dot {
+  position: absolute; bottom: -6px; width: 4px; height: 4px; border-radius: 50%;
+  background: #fff; opacity: 0; transition: 0.2s;
+}
+.dock-item.running .dot { opacity: 1; bottom: -5px; }
+
+/* ─── SEARCH WIDGET ─── */
+#center-widget {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  text-align: center; width: 400px;
+}
+.wid-time { font-size: 64px; font-weight: 200; letter-spacing: -2px; margin-bottom: 20px; }
+.search-bar {
+  width: 100%; background: var(--glass); border: 1px solid var(--border);
+  border-radius: 100px; padding: 14px 24px; backdrop-filter: blur(10px);
+  display: flex; align-items: center; transition: 0.3s;
+}
+.search-bar:hover, .search-bar:focus-within { background: var(--glass-high); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.sb-in {
+  width: 100%; background: transparent; border: none; color: #fff;
+  font-size: 15px; font-family: 'Inter'; text-align: center;
+}
+.sb-in::placeholder { color: rgba(255,255,255,0.5); }
 
 </style>
 </head>
 <body>
 
-<canvas id="canvas"></canvas>
-<div id="vignette"></div>
-<div id="cursor"></div>
+<div id="wallpaper"></div>
+<div id="noise"></div>
 
-<div id="ui">
-  <div class="header">
-    <h1>Atom Void</h1>
-    <div class="clock" id="clock">00:00</div>
-  </div>
-
-  <div class="search-box">
-    <input type="text" class="search-in" id="search" placeholder="Search" autocomplete="off">
-  </div>
-
-  <div class="grid" id="app-grid">
-    <!-- GENERATED JS -->
-  </div>
-</div>
-
-<div id="app-view">
-  <div class="bar">
-    <div class="act" onclick="closeApp()">✕</div>
-    <div class="bar-title" id="app-title">APPLICATION</div>
-    <div class="actions">
-      <div class="act" onclick="reload()">R</div>
-      <div class="act" onclick="pop()">↗</div>
+<div id="desktop">
+  
+  <div id="bar">
+    <div class="bar-grp">
+      <span style="font-weight:700">Atom</span>
+      <span>File</span>
+      <span>View</span>
+    </div>
+    <div class="bar-grp">
+      <span id="top-clock">12:00</span>
     </div>
   </div>
-  <div id="content">
-    <div id="loader"><div class="line"><div class="prog"></div></div></div>
-    <iframe id="frame" allow="fullscreen; autoplay; encrypted-media; camera; microphone"></iframe>
+
+  <div id="center-widget">
+    <div class="wid-time" id="big-clock">12:00</div>
+    <div class="search-bar">
+      <input type="text" class="sb-in" id="search" placeholder="Search the web..." autocomplete="off">
+    </div>
   </div>
+
+  <!-- DESKTOP ICONS -->
+  <div id="app-grid">
+    <!-- Generated by JS -->
+  </div>
+
+  <!-- WINDOW -->
+  <div id="win">
+    <div class="win-head" id="drag-area">
+      <div class="win-ctrls">
+        <div class="traffic cl" onclick="winClose()"></div>
+        <div class="traffic mn" onclick="winMin()"></div>
+        <div class="traffic mx" onclick="winMax()"></div>
+      </div>
+      <div class="win-tit" id="win-title">Browser</div>
+      <div class="win-acts">
+        <button class="act-btn" onclick="winReload()">↻</button>
+        <button class="act-btn" onclick="winPop()">Open Tab ↗</button>
+      </div>
+    </div>
+    <div id="content">
+      <div id="loader"><div class="spinner"></div></div>
+      <iframe id="frame" allow="fullscreen; autoplay; encrypted-media; camera; microphone; payment"></iframe>
+    </div>
+  </div>
+
+  <!-- DOCK -->
+  <div id="dock-wrap">
+    <div id="dock">
+      <div class="dock-item" onclick="openApp(APPS[0])">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+        <div class="dot"></div>
+      </div>
+      <div class="dock-item" onclick="openApp({n:'Google', u:'https://google.com'})">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" fill="currentColor"/></svg>
+        <div class="dot"></div>
+      </div>
+      <div class="dock-item" onclick="openApp({n:'Discord', u:'https://discord.com/app'})">
+        <svg viewBox="0 0 24 24"><path d="M19 4a16 16 0 0 0-4-1 16 16 0 0 0-5 2 16 16 0 0 0-1-2 16 16 0 0 0-5 1 16 16 0 0 0-4 12 11 11 0 0 0 1-2 8 8 0 0 1-1-1c.2-.2.4-.3.7-.5a12 12 0 0 0 10 0 8 8 0 0 1-1 1 11 11 0 0 0 1 2 16 16 0 0 0 5-3c.4-4-.7-8-3-11z" fill="currentColor"/></svg>
+        <div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
+<!-- PROXY -->
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
+
 <script>
-/* ─── LINKS (STRICT: nowgg.fun) ─── */
-const TARGET = 'https://nowgg.fun';
+/* ─── APP CONFIGURATION ─── */
+// STRICT REQUIREMENT: Cloud Games = https://nowgg.fun (No extra paths)
+const CLOUD_URL = 'https://nowgg.fun';
 
 const APPS = [
-  // CLOUD GAMING (All point to main portal)
-  { n: 'Roblox',    u: TARGET, i: '<path d="M18.9 5.5L5.5 10L10 23L23 18.5L18.9 5.5ZM13.5 16C12.1 16 11 14.9 11 13.5C11 12.1 12.1 11 13.5 11C14.9 11 16 12.1 16 13.5C16 14.9 14.9 16 13.5 16Z"/>' },
-  { n: 'Fortnite',  u: TARGET, i: '<path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2-1-2-1-2 1 2 1zm0 2l-10-5v9l10 5 10-5v-9l-10 5z"/>' },
-  { n: 'COD Mobile',u: TARGET, i: '<path d="M2 12l2-2 8 8 8-8 2 2-10 10L2 12z"/>' },
-  { n: 'Geo Dash',  u: TARGET, i: '<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/>' },
-  { n: 'Stumble',   u: TARGET, i: '<circle cx="12" cy="7" r="4"/><path d="M5 21v-8l3-3 4 4 4-4 3 3v8h-2v-6l-2-2-3 3-3-3-2 2v6H5z"/>' },
-  { n: 'Cookie Run',u: TARGET, i: '<circle cx="12" cy="12" r="8"/><path d="M15 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>' },
-  { n: 'Melon Box', u: TARGET, i: '<path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/>' },
-  { n: 'Launcher',  u: TARGET, i: '<path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm0 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>' },
-
-  // WEB APPS
-  { n: 'Discord',   u: 'https://discord.com/app', i: '<path d="M19 4a16 16 0 0 0-4-1 16 16 0 0 0-5 2 16 16 0 0 0-1-2 16 16 0 0 0-5 1 16 16 0 0 0-4 12 11 11 0 0 0 1-2 8 8 0 0 1-1-1c.2-.2.4-.3.7-.5a12 12 0 0 0 10 0 8 8 0 0 1-1 1 11 11 0 0 0 1 2 16 16 0 0 0 5-3c.4-4-.7-8-3-11z"/>' },
-  { n: 'YouTube',   u: 'https://www.youtube.com/embed/?autoplay=1', i: '<path d="M22.5 6c-.3-1-1-1.8-2-2C19 3.5 12 3.5 12 3.5s-7 0-8.6.7c-1 .2-1.8 1-2 2C.5 8 .5 12 .5 12s0 4 .9 6c.2 1 1 1.8 2 2 1.6.7 8.6.7 8.6.7s7 0 8.6-.7c1-.2 1.8-1 2-2 .9-2 .9-6 .9-6s0-4-.9-6zM9.5 15.5V8.5l6.5 3.5-6.5 3.5z"/>', direct: true },
-  { n: 'Spotify',   u: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M', i: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.6 14.4c-.2.4-.7.5-1 .2-2.5-1.5-5.6-1.8-9.3-1-.4-.1-.7-.5-.6-1 .1-.4.5-.7 1-.6 4.1.9 7.6 1.3 10.5-.5.4-.2.9 0 1 .3.3.5.2 1-.2 1.3z"/>', direct: true },
-  { n: 'Google',    u: 'https://www.google.com', i: '<path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>' },
-  { n: '1v1.lol',   u: 'https://1v1.lol', i: '<path d="M4 4h16v16H4z"/>' },
-  { n: 'Subway',    u: 'https://poki.com/en/g/subway-surfers', i: '<path d="M7 2v16h2V2H7zm8 0v16h2V2h-2z"/>', direct: true },
-  { n: 'Slope',     u: 'https://slope-game.github.io', i: '<path d="M22 22L2 22L12 2L22 22ZM12 6L7 16H17L12 6Z"/>', direct: true }
+  // Cloud Games (Strict URL)
+  { n: 'Roblox',     u: CLOUD_URL, c: '#00A2FF', i: 'R' },
+  { n: 'Fortnite',   u: CLOUD_URL, c: '#F5D300', i: 'F' },
+  { n: 'Launcher',   u: CLOUD_URL, c: '#28C840', i: 'A' },
+  { n: 'Stumble',    u: CLOUD_URL, c: '#FF5F57', i: 'S' },
+  { n: 'Cookie Run', u: CLOUD_URL, c: '#FEBC2E', i: 'C' },
+  { n: 'Melon Box',  u: CLOUD_URL, c: '#8E8E93', i: 'M' },
+  { n: 'Geo Dash',   u: CLOUD_URL, c: '#007AFF', i: 'G' },
+  
+  // Media (Direct/Embed)
+  { n: 'YouTube',    u: 'https://www.youtube.com/embed/?autoplay=1', c: '#FF0000', i: '▶', direct: true },
+  { n: 'Spotify',    u: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M', c: '#1DB954', i: '♫', direct: true },
+  
+  // Web
+  { n: '1v1.lol',    u: 'https://1v1.lol', c: '#FF2D55', i: '1' },
+  { n: 'Subway',     u: 'https://poki.com/en/g/subway-surfers', c: '#5856D6', i: '∞', direct: true }
 ];
 
-/* ─── BUILDER ─── */
+/* ─── BUILD DESKTOP ─── */
 const grid = document.getElementById('app-grid');
 APPS.forEach(app => {
   const el = document.createElement('div');
-  el.className = 'app';
-  el.innerHTML = `<div class="icon"><svg viewBox="0 0 24 24" fill="currentColor">${app.i}</svg></div><div class="label">${app.n}</div>`;
-  el.onclick = () => open(app);
+  el.className = 'd-icon';
+  // Dynamic colorful icons based on data
+  el.innerHTML = `
+    <div class="d-img" style="color:${app.c}; box-shadow:0 0 15px ${app.c}40">
+      <div style="font-weight:700">${app.i}</div>
+    </div>
+    <div class="d-lbl">${app.n}</div>
+  `;
+  el.onclick = () => openApp(app);
   grid.appendChild(el);
 });
 
-/* ─── CORE LOGIC ─── */
-const ui = document.getElementById('ui');
-const win = document.getElementById('app-view');
+/* ─── WINDOW LOGIC ─── */
+const win = document.getElementById('win');
 const frm = document.getElementById('frame');
+const tit = document.getElementById('win-title');
 const load = document.getElementById('loader');
-const title = document.getElementById('app-title');
-let current = '';
+const center = document.getElementById('center-widget');
+let activeUrl = '';
 
-function open(app) {
-  // ANIMATION
-  ui.classList.add('zoom-out');
+function openApp(app) {
+  // UX State
+  win.classList.remove('min');
   win.classList.add('active');
+  center.style.opacity = '0';
   load.style.opacity = '1';
-  frm.classList.remove('vis');
-  title.innerText = app.n.toUpperCase();
-  current = app.u;
+  tit.innerText = app.n;
+  activeUrl = app.u;
 
-  // LINK HANDLING
-  // If strict 'direct' is true, use raw URL (for embeds)
-  // Else if URL is strict nowgg.fun, use raw URL (proxy sites break if wrapped in another proxy)
-  // Else try UV Proxy
-  
+  // Link Handling
   let dest = app.u;
-  
-  if (!app.direct && !app.u.includes('nowgg.fun')) {
+  // If not direct and not cloud, proxy it
+  if (!app.direct && app.u !== CLOUD_URL) {
     try {
       if(window.__uv$config) dest = __uv$config.prefix + __uv$config.encodeUrl(app.u);
     } catch(e) {}
   }
   
   frm.src = dest;
-  frm.onload = () => {
-    load.style.opacity = '0';
-    frm.classList.add('vis');
+  frm.onload = () => load.style.opacity = '0';
+  
+  // Dock active state
+  document.querySelectorAll('.dock-item').forEach(d => d.classList.add('running'));
+}
+
+function winClose() {
+  win.classList.remove('active');
+  center.style.opacity = '1';
+  setTimeout(() => frm.src = 'about:blank', 300);
+  document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('running'));
+}
+
+function winMin() { win.classList.add('min'); center.style.opacity = '1'; }
+function winMax() {
+  if(win.style.width === '100%') {
+    win.style.width = '70%'; win.style.height = '75%'; win.style.top = '10%'; win.style.left = '15%'; win.style.borderRadius = '16px';
+  } else {
+    win.style.width = '100%'; win.style.height = 'calc(100% - 32px)'; win.style.top = '32px'; win.style.left = '0'; win.style.borderRadius = '0';
   }
 }
+function winReload() { frm.contentWindow.location.reload(); }
+function winPop() { window.open(activeUrl, '_blank'); }
 
-function closeApp() {
-  win.classList.remove('active');
-  ui.classList.remove('zoom-out');
-  setTimeout(() => { frm.src = 'about:blank'; }, 800);
-}
+/* ─── DRAG LOGIC ─── */
+const drag = document.getElementById('drag-area');
+let isDrag = false, startX, startY, initX, initY;
 
-function reload() { frm.contentWindow.location.reload(); }
-function pop() { window.open(current, '_blank'); }
+drag.addEventListener('mousedown', e => {
+  if(win.style.width === '100%') return; // No drag if maxed
+  isDrag = true;
+  startX = e.clientX; startY = e.clientY;
+  initX = win.offsetLeft; initY = win.offsetTop;
+});
+window.addEventListener('mousemove', e => {
+  if(!isDrag) return;
+  win.style.left = (initX + (e.clientX - startX)) + 'px';
+  win.style.top = (initY + (e.clientY - startY)) + 'px';
+});
+window.addEventListener('mouseup', () => isDrag = false);
 
-/* ─── SEARCH ─── */
+/* ─── CLOCK & SEARCH ─── */
+const updateTime = () => {
+  const d = new Date();
+  const t = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('top-clock').innerText = t;
+  document.getElementById('big-clock').innerText = t;
+};
+setInterval(updateTime, 1000); updateTime();
+
 document.getElementById('search').addEventListener('keydown', e => {
   if(e.key === 'Enter') {
-    const val = e.target.value;
-    const url = val.includes('.') ? (val.startsWith('http') ? val : 'https://'+val) : 'https://search.brave.com/search?q='+encodeURIComponent(val);
-    open({ n: 'BROWSER', u: url, direct: false });
+    const v = e.target.value;
+    const u = v.includes('.') ? (v.startsWith('http') ? v : 'https://'+v) : 'https://search.brave.com/search?q='+encodeURIComponent(v);
+    openApp({n:'Browser', u: u});
   }
 });
-
-/* ─── FLUID FX ─── */
-const cv = document.getElementById('canvas'), ctx = cv.getContext('2d');
-let w, h;
-const resize = () => { w=cv.width=innerWidth; h=cv.height=innerHeight; };
-window.addEventListener('resize', resize); resize();
-
-const smoke = Array.from({length:30}, () => ({
-  x: Math.random()*w, y: Math.random()*h,
-  vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
-  r: Math.random()*200 + 100
-}));
-
-function anim() {
-  ctx.clearRect(0,0,w,h);
-  smoke.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    if(p.x < -p.r) p.x = w+p.r; if(p.x > w+p.r) p.x = -p.r;
-    if(p.y < -p.r) p.y = h+p.r; if(p.y > h+p.r) p.y = -p.r;
-    
-    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-    g.addColorStop(0, 'rgba(255,255,255,0.06)');
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-  });
-  requestAnimationFrame(anim);
-}
-anim();
-
-// UTILS
-const cur = document.getElementById('cursor');
-document.addEventListener('mousemove', e => { cur.style.top = e.clientY+'px'; cur.style.left = e.clientX+'px'; });
-document.querySelectorAll('.app, .act, input').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('hover'));
-});
-setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
-
 </script>
 </body>
 </html>

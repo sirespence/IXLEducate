@@ -1,324 +1,321 @@
 <!-- 
-  ATOM OS // VOID EDITION (v5.0)
-  Provider: nowgg.fun (Strict)
-  Mode: Immersive Fullscreen
+  ATOM OS // VOID FINAL
+  Protocol: STRICT (https://nowgg.fun)
+  Visuals: Cinematic / Fullscreen / Fluid
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#000000">
 <title>Atom OS</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #000000;
   --surface: #0a0a0a;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-h: rgba(255, 255, 255, 0.2);
-  --text: #ededed;
-  --text-dim: #666666;
-  --accent: #ffffff;
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --border: rgba(255, 255, 255, 0.06);
+  --text: #ffffff;
+  --text-dim: #555555;
+  --ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --trans-dur: 0.8s;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; -webkit-user-drag: none; cursor: default; }
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; cursor: none; }
 
 body {
   width: 100vw; height: 100vh; overflow: hidden;
   background: var(--bg);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Manrope', sans-serif;
   color: var(--text);
 }
 
-/* ─── AMBIENT BACKGROUND ─── */
-#void-bg {
-  position: fixed; inset: 0; z-index: 0;
-  background: radial-gradient(circle at 50% 120%, #1a1a1a 0%, #000 70%);
-  opacity: 1; transition: opacity 0.8s var(--ease);
+/* ─── FLUID BACKDROP ─── */
+#canvas {
+  position: fixed; inset: 0; z-index: 0; opacity: 0.5;
+  transition: opacity 1s;
 }
-#particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.4; }
+#vignette {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 20%, #000 100%);
+}
 
 /* ─── UI LAYER ─── */
-#interface {
+#ui {
   position: fixed; inset: 0; z-index: 10;
-  display: flex; flex-direction: column;
-  transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: transform var(--trans-dur) var(--ease), opacity 0.5s;
 }
+#ui.zoom-out { transform: scale(1.1); opacity: 0; pointer-events: none; }
 
-/* ─── TOP BAR ─── */
-#status {
-  height: 40px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; font-size: 12px; font-weight: 500; letter-spacing: 0.5px;
-  color: var(--text-dim); z-index: 20;
+/* ─── HEADER ─── */
+.header {
+  position: absolute; top: 40px; text-align: center;
+  mix-blend-mode: difference;
 }
-.st-group { display: flex; gap: 20px; }
-.st-item { transition: 0.2s; cursor: pointer; }
-.st-item:hover { color: var(--text); }
-
-/* ─── MAIN VIEW ─── */
-#home {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  opacity: 1; transform: scale(1); transition: 0.5s var(--ease);
-}
-.hidden { opacity: 0!important; pointer-events: none; transform: scale(0.95)!important; }
-
-/* ─── HERO SECTION ─── */
 h1 {
-  font-family: 'Inter'; font-weight: 600; font-size: 64px; letter-spacing: -3px;
-  margin-bottom: 40px; color: #fff;
+  font-weight: 300; font-size: 14px; letter-spacing: 8px; text-transform: uppercase;
+  margin-bottom: 10px; color: #888;
 }
-.search-container {
-  position: relative; width: 420px; margin-bottom: 60px;
-}
-.search-in {
-  width: 100%; background: var(--surface); border: 1px solid var(--border);
-  padding: 16px 20px; border-radius: 12px;
-  color: #fff; font-family: 'Inter'; font-size: 14px; text-align: center;
-  transition: 0.3s var(--ease);
-}
-.search-in:focus { border-color: var(--border-h); width: 440px; margin-left: -10px; }
-.search-in::placeholder { color: #333; }
+.clock { font-family: 'JetBrains Mono'; font-size: 10px; color: #444; }
 
-/* ─── APP GRID ─── */
+/* ─── SEARCH ─── */
+.search-box {
+  position: relative; margin-bottom: 60px; width: 300px;
+  border-bottom: 1px solid #222; transition: width 0.5s var(--ease), border-color 0.3s;
+}
+.search-box:focus-within { width: 400px; border-color: #fff; }
+.search-in {
+  width: 100%; background: transparent; border: none; padding: 15px 0;
+  color: #fff; font-size: 18px; text-align: center; font-family: 'Manrope';
+}
+.search-in::placeholder { color: #333; transition: color 0.3s; }
+.search-box:focus-within .search-in::placeholder { color: transparent; }
+
+/* ─── GRID ─── */
 .grid {
-  display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;
-  padding: 20px; perspective: 1000px;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 40px;
+  perspective: 1000px;
+}
+.app {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  cursor: pointer; group;
 }
 .icon {
-  width: 72px; height: 72px; border-radius: 18px;
-  background: var(--surface); border: 1px solid var(--border);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  cursor: pointer; position: relative;
-  transition: 0.4s var(--ease);
+  width: 64px; height: 64px; border-radius: 18px;
+  background: #050505; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: 0.4s var(--ease); position: relative; overflow: hidden;
 }
-.icon:hover {
-  background: #151515; border-color: var(--border-h);
-  transform: translateY(-8px) translateZ(20px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-  z-index: 10;
+.icon::before {
+  content:''; position: absolute; inset: 0; 
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  opacity: 0; transition: 0.4s;
 }
-.icon svg, .icon img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
-.icon-lbl {
-  position: absolute; bottom: -24px; font-size: 10px; color: #555; font-weight: 500;
-  opacity: 0; transition: 0.2s; pointer-events: none; white-space: nowrap;
+.app:hover .icon {
+  transform: translateY(-10px) scale(1.05);
+  border-color: rgba(255,255,255,0.4);
+  box-shadow: 0 20px 50px rgba(255,255,255,0.05);
 }
-.icon:hover .icon-lbl { opacity: 1; transform: translateY(5px); }
+.app:hover .icon::before { opacity: 1; }
 
-/* ─── FULLSCREEN APP WINDOW ─── */
-#app-window {
+.app svg, .app img { width: 28px; height: 28px; fill: #fff; object-fit: cover; z-index: 2; }
+.label {
+  font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #444; text-transform: uppercase;
+  transition: 0.3s; transform: translateY(5px); opacity: 0;
+}
+.app:hover .label { color: #fff; opacity: 1; transform: translateY(0); }
+
+/* ─── FULLSCREEN APP ─── */
+#app-view {
   position: fixed; inset: 0; z-index: 50;
   background: #000;
-  transform: translateY(100vh); transition: transform 0.6s var(--ease);
+  transform: translateY(100vh); transition: transform var(--trans-dur) var(--ease);
   display: flex; flex-direction: column;
 }
-#app-window.active { transform: translateY(0); }
+#app-view.active { transform: translateY(0); }
 
-.win-bar {
-  height: 40px; background: #000; border-bottom: 1px solid #151515;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 16px; z-index: 2;
+.bar {
+  height: 40px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; background: rgba(0,0,0,0.8); z-index: 2;
+  border-bottom: 1px solid #111;
 }
-.win-title { font-family: 'JetBrains Mono'; font-size: 11px; color: #444; text-transform: uppercase; }
-.win-ctrls { display: flex; gap: 8px; }
-.ctrl {
-  width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  color: #666; cursor: pointer; transition: 0.2s;
+.bar-title { font-family: 'JetBrains Mono'; font-size: 10px; color: #444; letter-spacing: 2px; }
+.actions { display: flex; gap: 15px; }
+.act {
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #666; cursor: pointer; transition: 0.2s;
 }
-.ctrl:hover { border-color: #fff; color: #fff; background: #111; }
+.act:hover { color: #fff; }
 
-#app-content { flex: 1; position: relative; }
-iframe { width: 100%; height: 100%; border: none; background: #000; }
+#content { flex: 1; position: relative; background: #000; }
+iframe { width: 100%; height: 100%; border: none; opacity: 0; transition: opacity 1s; }
+iframe.vis { opacity: 1; }
+
 #loader {
-  position: absolute; inset: 0; background: #000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 5; transition: opacity 0.5s; pointer-events: none;
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 1; transition: opacity 0.5s;
 }
-.load-bar {
-  width: 150px; height: 2px; background: #111; margin-top: 20px;
-  overflow: hidden; position: relative;
-}
-.load-fill {
-  position: absolute; top: 0; left: 0; height: 100%; width: 50%; background: #fff;
-  animation: load 1.5s infinite ease-in-out;
-}
-@keyframes load { 0% { left: -50%; } 100% { left: 100%; } }
+.line { width: 100px; height: 1px; background: #222; overflow: hidden; }
+.prog { width: 50%; height: 100%; background: #fff; animation: load 1s infinite ease-in-out; }
+@keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
 
-/* ─── CUSTOM CURSOR ─── */
+/* ─── CURSOR ─── */
 #cursor {
-  position: fixed; top: 0; left: 0; width: 12px; height: 12px;
-  border: 1px solid rgba(255,255,255,0.8); border-radius: 50%;
-  transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
-  mix-blend-mode: difference; transition: width 0.3s, height 0.3s;
+  position: fixed; top: 0; left: 0; width: 8px; height: 8px; background: #fff;
+  border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+  mix-blend-mode: exclusion; transition: transform 0.1s;
 }
-body.hover #cursor { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-color: transparent; }
+body.hover #cursor { transform: translate(-50%, -50%) scale(4); background: transparent; border: 1px solid #fff; }
+
 </style>
 </head>
 <body>
 
-<!-- BACKGROUND -->
-<div id="void-bg"></div>
-<canvas id="particles"></canvas>
+<canvas id="canvas"></canvas>
+<div id="vignette"></div>
 <div id="cursor"></div>
 
-<!-- MAIN UI -->
-<div id="interface">
-  <div id="status">
-    <div class="st-group">
-      <span class="st-item" style="color:#fff; font-weight:700">ATOM</span>
-      <span class="st-item">Apps</span>
-      <span class="st-item">Cloud</span>
-    </div>
-    <div class="st-item" id="time">12:00</div>
+<div id="ui">
+  <div class="header">
+    <h1>Atom Void</h1>
+    <div class="clock" id="clock">00:00</div>
   </div>
 
-  <div id="home">
-    <h1>Atom Void</h1>
-    <div class="search-container">
-      <input type="text" class="search-in" id="search" placeholder="Search or Type URL" autocomplete="off">
-    </div>
-    
-    <div class="grid" id="icon-grid">
-      <!-- Generated via JS -->
-    </div>
+  <div class="search-box">
+    <input type="text" class="search-in" id="search" placeholder="Search" autocomplete="off">
+  </div>
+
+  <div class="grid" id="app-grid">
+    <!-- GENERATED JS -->
   </div>
 </div>
 
-<!-- APP WINDOW -->
-<div id="app-window">
-  <div class="win-bar">
-    <div class="ctrl" onclick="closeApp()">✕</div>
-    <div class="win-title" id="win-tit">APPLICATION</div>
-    <div class="win-ctrls">
-      <div class="ctrl" onclick="reloadApp()">↻</div>
-      <div class="ctrl" onclick="popApp()">↗</div>
+<div id="app-view">
+  <div class="bar">
+    <div class="act" onclick="closeApp()">✕</div>
+    <div class="bar-title" id="app-title">APPLICATION</div>
+    <div class="actions">
+      <div class="act" onclick="reload()">R</div>
+      <div class="act" onclick="pop()">↗</div>
     </div>
   </div>
-  <div id="app-content">
-    <div id="loader"><div style="font-family:'JetBrains Mono'; font-size:12px; letter-spacing:2px">CONNECTING_SECURE_TUNNEL</div><div class="load-bar"><div class="load-fill"></div></div></div>
-    <iframe id="frame" allow="fullscreen; camera; microphone; payment"></iframe>
+  <div id="content">
+    <div id="loader"><div class="line"><div class="prog"></div></div></div>
+    <iframe id="frame" allow="fullscreen; autoplay; encrypted-media; camera; microphone"></iframe>
   </div>
 </div>
 
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
 <script>
-/* ─── CONFIGURATION ─── */
-// All links now STRICTLY use nowgg.fun or embed/proxy compatible URLs
+/* ─── LINKS (STRICT: nowgg.fun) ─── */
+const TARGET = 'https://nowgg.fun';
+
 const APPS = [
-  // SOCIAL & MEDIA
-  { n: 'Discord', u: 'https://discord.com/app', i: '<path d="M18.9 5.3a16 16 0 0 0-4-1.2c0 .1 0 .1-.1.2-1.7-.7-3.6-.7-5.3 0-.1-.1-.1-.1-.1-.2a16 16 0 0 0-4 1.2c-.1 0-.1.1-.1.1-2.5 3.8-3.2 7.4-2.8 11 .5 1.7 2.2 3 4.2 4.2 1-.8 1.9-1.7 2.6-2.6-1.1-.4-2.1-.9-3-1.6.2-.2.5-.3.7-.5 4.3 2 8.9 2 13.2 0 .2.2.5.3.7.5-.9.7-1.9 1.2-3 1.6.7.9 1.5 1.8 2.6 2.6 2-1.1 3.7-2.5 4.2-4.2.5-3.6-.2-7.2-2.8-11 0 0-.1-.1-.1-.1z"/>' },
-  { n: 'YouTube', u: 'https://www.youtube.com/embed/?autoplay=1', i: '<path d="M22.5 6.2c-.3-1-.9-1.8-1.9-2C18.9 3.5 12 3.5 12 3.5s-6.9 0-8.6.7c-1 .3-1.8 1-2 2C.5 8.1.5 12 .5 12s0 3.9.9 5.8c.3 1 1 1.9 2 2 1.7.7 8.6.7 8.6.7s6.9 0 8.6-.7c1-.3 1.8-1 1.9-2 .9-1.9.9-5.8.9-5.8s0-3.9-.9-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/>', direct: true },
-  { n: 'Spotify', u: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M', i: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.6 14.4a.6.6 0 0 1-.9.2c-2.4-1.4-5.3-1.8-8.8-1a.6.6 0 0 1-.3-1.2c3.8-.9 7.2-.5 9.8 1a.6.6 0 0 1 .2.9zm1.2-2.7a.8.8 0 0 1-1.1.3c-2.7-1.7-6.9-2.1-10-1.2a.8.8 0 0 1-.5-1.5c3.7-1.1 8.3-.6 11.3 1.3a.8.8 0 0 1 .3 1.1zm.1-2.8a1 1 0 0 1-1.3.3c-3.2-1.9-8.3-2.3-11.3-1.3a.9.9 0 0 1-1.2-1.3c3.6-1.2 9.3-.8 12.9 1.4a1 1 0 0 1 .9.9z"/>', direct: true },
-  { n: 'TikTok', u: 'https://www.tiktok.com', i: '<path d="M19.6 6.7a4.8 4.8 0 0 1-3.8-4.3V2h-3.4v13.7a2.9 2.9 0 0 1-5.2 1.7 2.9 2.9 0 0 1 2.3-4.6 2.9 2.9 0 0 1 .9.1V9.4a6.8 6.8 0 0 0-1 0 6.3 6.3 0 0 0-4.2 10.8 6.3 6.3 0 0 0 10.9-4.4v-7a8.2 8.2 0 0 0 4.8 1.5v-3.4a4.9 4.9 0 0 1-1-.1z"/>' },
-  
-  // NOWGG.FUN CLOUD GAMES
-  { n: 'Roblox', u: 'https://nowgg.fun/play/roblox-corporation/5349/roblox', i: '<path d="M18.5 5.5L5.5 10L10 23L23 18.5L18.5 5.5ZM13.5 16C12.1 16 11 14.9 11 13.5C11 12.1 12.1 11 13.5 11C14.9 11 16 12.1 16 13.5C16 14.9 14.9 16 13.5 16Z"/>' },
-  { n: 'Android', u: 'https://nowgg.fun/play/now-gg/8454/app-launcher', i: '<path d="M17.5 2C17.2 2 17 2.2 16.9 2.5L16 4.6l-1-2.1c-.1-.3-.4-.5-.7-.5s-.6.2-.7.5L12.5 4.6l-1-2.1c-.1-.3-.4-.5-.7-.5s-.6.2-.7.5L9 4.6 8.1 2.5c-.1-.3-.4-.5-.7-.5s-.6.2-.7.5L5.8 4.6l-.9-2.1C4.7 2.2 4.5 2 4.2 2c-.4 0-.7.3-.7.7 0 .1 0 .3.1.4l1.4 3.2C2.1 7.6 0 10.6 0 14c0 3.9 3.1 7 7 7h10c3.9 0 7-3.1 7-7 0-3.4-2.1-6.4-5.1-7.7l1.4-3.2c.1-.1.1-.3.1-.4 0-.4-.3-.7-.7-.7zM8 15c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm8 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/>' },
-  { n: 'Geo Dash', u: 'https://nowgg.fun/play/robtop-games/5690/geometry-dash', i: '<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/>' },
-  { n: 'Call of Duty', u: 'https://nowgg.fun/play/activision-publishing-inc/2165/call-of-duty-mobile', i: '<path d="M2 12l2-2 8 8 8-8 2 2-10 10L2 12z"/>' },
-  { n: 'Cookie Run', u: 'https://nowgg.fun/play/devsisters-corporation/5874/cookie-run-kingdom', i: '<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="2"/><circle cx="15" cy="10" r="2"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/>' },
-  { n: 'Melon Box', u: 'https://nowgg.fun/play/playducky/4146/melon-playground', i: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 8h2v2H8zm6 6h2v2h-2z"/>' },
-  { n: 'Stumble Guys', u: 'https://nowgg.fun/play/scopely/2767/stumble-guys', i: '<circle cx="12" cy="7" r="4"/><path d="M5 21v-8l3-3 4 4 4-4 3 3v8h-2v-6l-2-2-3 3-3-3-2 2v6H5z"/>' },
-  { n: '1v1.lol', u: 'https://1v1.lol', i: '<path d="M12 2L2 22h20L12 2zm0 4l6 12H6l6-12z"/>' },
-  { n: 'Fortnite', u: 'https://nowgg.fun/play/epic-games/fortnite', i: '<path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2-1-2-1-2 1 2 1zm0 2l-10-5v9l10 5 10-5v-9l-10 5z"/>' },
-  { n: 'Slope', u: 'https://slope-game.github.io', i: '<path d="M22 22L2 22L12 2L22 22ZM12 6L7 16H17L12 6Z"/>', direct: true },
-  { n: 'Subway Surf', u: 'https://poki.com/en/g/subway-surfers', i: '<path d="M12 2a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4 4 4 0 0 0 4-4V6a4 4 0 0 0-4-4zm0 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm2-8H10V6h4v2z"/>', direct: true }
+  // CLOUD GAMING (All point to main portal)
+  { n: 'Roblox',    u: TARGET, i: '<path d="M18.9 5.5L5.5 10L10 23L23 18.5L18.9 5.5ZM13.5 16C12.1 16 11 14.9 11 13.5C11 12.1 12.1 11 13.5 11C14.9 11 16 12.1 16 13.5C16 14.9 14.9 16 13.5 16Z"/>' },
+  { n: 'Fortnite',  u: TARGET, i: '<path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2-1-2-1-2 1 2 1zm0 2l-10-5v9l10 5 10-5v-9l-10 5z"/>' },
+  { n: 'COD Mobile',u: TARGET, i: '<path d="M2 12l2-2 8 8 8-8 2 2-10 10L2 12z"/>' },
+  { n: 'Geo Dash',  u: TARGET, i: '<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/>' },
+  { n: 'Stumble',   u: TARGET, i: '<circle cx="12" cy="7" r="4"/><path d="M5 21v-8l3-3 4 4 4-4 3 3v8h-2v-6l-2-2-3 3-3-3-2 2v6H5z"/>' },
+  { n: 'Cookie Run',u: TARGET, i: '<circle cx="12" cy="12" r="8"/><path d="M15 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>' },
+  { n: 'Melon Box', u: TARGET, i: '<path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/>' },
+  { n: 'Launcher',  u: TARGET, i: '<path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm0 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>' },
+
+  // WEB APPS
+  { n: 'Discord',   u: 'https://discord.com/app', i: '<path d="M19 4a16 16 0 0 0-4-1 16 16 0 0 0-5 2 16 16 0 0 0-1-2 16 16 0 0 0-5 1 16 16 0 0 0-4 12 11 11 0 0 0 1-2 8 8 0 0 1-1-1c.2-.2.4-.3.7-.5a12 12 0 0 0 10 0 8 8 0 0 1-1 1 11 11 0 0 0 1 2 16 16 0 0 0 5-3c.4-4-.7-8-3-11z"/>' },
+  { n: 'YouTube',   u: 'https://www.youtube.com/embed/?autoplay=1', i: '<path d="M22.5 6c-.3-1-1-1.8-2-2C19 3.5 12 3.5 12 3.5s-7 0-8.6.7c-1 .2-1.8 1-2 2C.5 8 .5 12 .5 12s0 4 .9 6c.2 1 1 1.8 2 2 1.6.7 8.6.7 8.6.7s7 0 8.6-.7c1-.2 1.8-1 2-2 .9-2 .9-6 .9-6s0-4-.9-6zM9.5 15.5V8.5l6.5 3.5-6.5 3.5z"/>', direct: true },
+  { n: 'Spotify',   u: 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M', i: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.6 14.4c-.2.4-.7.5-1 .2-2.5-1.5-5.6-1.8-9.3-1-.4-.1-.7-.5-.6-1 .1-.4.5-.7 1-.6 4.1.9 7.6 1.3 10.5-.5.4-.2.9 0 1 .3.3.5.2 1-.2 1.3z"/>', direct: true },
+  { n: 'Google',    u: 'https://www.google.com', i: '<path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>' },
+  { n: '1v1.lol',   u: 'https://1v1.lol', i: '<path d="M4 4h16v16H4z"/>' },
+  { n: 'Subway',    u: 'https://poki.com/en/g/subway-surfers', i: '<path d="M7 2v16h2V2H7zm8 0v16h2V2h-2z"/>', direct: true },
+  { n: 'Slope',     u: 'https://slope-game.github.io', i: '<path d="M22 22L2 22L12 2L22 22ZM12 6L7 16H17L12 6Z"/>', direct: true }
 ];
 
-/* ─── SYSTEM LOGIC ─── */
-const grid = document.getElementById('icon-grid');
-const win = document.getElementById('app-window');
-const home = document.getElementById('home');
-const frame = document.getElementById('frame');
-const loader = document.getElementById('loader');
-const wTit = document.getElementById('win-tit');
-let activeUrl = '';
-
-// Generate Icons
+/* ─── BUILDER ─── */
+const grid = document.getElementById('app-grid');
 APPS.forEach(app => {
   const el = document.createElement('div');
-  el.className = 'icon';
-  el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor">${app.i}</svg><div class="icon-lbl">${app.n}</div>`;
-  el.onclick = () => openApp(app);
+  el.className = 'app';
+  el.innerHTML = `<div class="icon"><svg viewBox="0 0 24 24" fill="currentColor">${app.i}</svg></div><div class="label">${app.n}</div>`;
+  el.onclick = () => open(app);
   grid.appendChild(el);
 });
 
-function openApp(app) {
-  // Transition
-  home.classList.add('hidden');
-  win.classList.add('active');
-  loader.style.opacity = '1';
-  wTit.innerText = app.n.toUpperCase();
-  activeUrl = app.u;
+/* ─── CORE LOGIC ─── */
+const ui = document.getElementById('ui');
+const win = document.getElementById('app-view');
+const frm = document.getElementById('frame');
+const load = document.getElementById('loader');
+const title = document.getElementById('app-title');
+let current = '';
 
-  // URL Handling
-  setTimeout(() => {
-    // If embedding is active, use UV Proxy unless marked direct
-    let target = app.u;
-    if (!app.direct) {
-      try {
-        if(window.__uv$config) target = __uv$config.prefix + __uv$config.encodeUrl(app.u);
-      } catch(e) { console.warn('Proxy Config Missing'); }
-    }
-    frame.src = target;
-    
-    // Hide loader after a bit
-    frame.onload = () => loader.style.opacity = '0';
-    // Fallback timer for loader
-    setTimeout(() => loader.style.opacity = '0', 3000);
-  }, 600);
+function open(app) {
+  // ANIMATION
+  ui.classList.add('zoom-out');
+  win.classList.add('active');
+  load.style.opacity = '1';
+  frm.classList.remove('vis');
+  title.innerText = app.n.toUpperCase();
+  current = app.u;
+
+  // LINK HANDLING
+  // If strict 'direct' is true, use raw URL (for embeds)
+  // Else if URL is strict nowgg.fun, use raw URL (proxy sites break if wrapped in another proxy)
+  // Else try UV Proxy
+  
+  let dest = app.u;
+  
+  if (!app.direct && !app.u.includes('nowgg.fun')) {
+    try {
+      if(window.__uv$config) dest = __uv$config.prefix + __uv$config.encodeUrl(app.u);
+    } catch(e) {}
+  }
+  
+  frm.src = dest;
+  frm.onload = () => {
+    load.style.opacity = '0';
+    frm.classList.add('vis');
+  }
 }
 
 function closeApp() {
   win.classList.remove('active');
-  home.classList.remove('hidden');
-  setTimeout(() => { frame.src = 'about:blank'; }, 600);
+  ui.classList.remove('zoom-out');
+  setTimeout(() => { frm.src = 'about:blank'; }, 800);
 }
 
-function reloadApp() { frame.contentWindow.location.reload(); }
-function popApp() { window.open(activeUrl, '_blank'); }
+function reload() { frm.contentWindow.location.reload(); }
+function pop() { window.open(current, '_blank'); }
 
-// Search
+/* ─── SEARCH ─── */
 document.getElementById('search').addEventListener('keydown', e => {
   if(e.key === 'Enter') {
     const val = e.target.value;
     const url = val.includes('.') ? (val.startsWith('http') ? val : 'https://'+val) : 'https://search.brave.com/search?q='+encodeURIComponent(val);
-    openApp({ n: 'Browser', u: url, direct: false });
+    open({ n: 'BROWSER', u: url, direct: false });
   }
 });
 
-// Cursor & Clock
-const cur = document.getElementById('cursor');
-document.addEventListener('mousemove', e => { cur.style.top = e.clientY+'px'; cur.style.left = e.clientX+'px'; });
-document.querySelectorAll('.icon, .ctrl, .st-item, input').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('hover'));
-});
-setInterval(() => document.getElementById('time').innerText = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
-
-/* ─── PARTICLES ─── */
-const cv = document.getElementById('particles'), ctx = cv.getContext('2d');
-let w, h, p = [];
+/* ─── FLUID FX ─── */
+const cv = document.getElementById('canvas'), ctx = cv.getContext('2d');
+let w, h;
 const resize = () => { w=cv.width=innerWidth; h=cv.height=innerHeight; };
 window.addEventListener('resize', resize); resize();
 
-for(let i=0; i<60; i++) p.push({x:Math.random()*w, y:Math.random()*h, s:Math.random()*2, vx:(Math.random()-.5)*0.5, vy:(Math.random()-.5)*0.5});
+const smoke = Array.from({length:30}, () => ({
+  x: Math.random()*w, y: Math.random()*h,
+  vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
+  r: Math.random()*200 + 100
+}));
 
 function anim() {
   ctx.clearRect(0,0,w,h);
-  ctx.fillStyle = '#fff';
-  p.forEach(pt => {
-    pt.x += pt.vx; pt.y += pt.vy;
-    if(pt.x<0) pt.x=w; if(pt.x>w) pt.x=0;
-    if(pt.y<0) pt.y=h; if(pt.y>h) pt.y=0;
-    ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.s, 0, Math.PI*2); ctx.fill();
+  smoke.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x < -p.r) p.x = w+p.r; if(p.x > w+p.r) p.x = -p.r;
+    if(p.y < -p.r) p.y = h+p.r; if(p.y > h+p.r) p.y = -p.r;
+    
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+    g.addColorStop(0, 'rgba(255,255,255,0.06)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
   });
   requestAnimationFrame(anim);
 }
 anim();
+
+// UTILS
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => { cur.style.top = e.clientY+'px'; cur.style.left = e.clientX+'px'; });
+document.querySelectorAll('.app, .act, input').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('hover'));
+});
+setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
+
 </script>
 </body>
 </html>

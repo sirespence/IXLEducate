@@ -3,1358 +3,858 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Folio — Research Browser</title>
+<title>Sculptr</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════
-   FOLIO — Original UI Design Language
-   "The Research Browser"
-   
-   Design principles:
-   · Paper-warm backgrounds, not cold dark screens
-   · Tab system inspired by binder index cards
-   · Everything has intentional weight & serif dignity
-   · Subtle ruled-line textures like notebook paper
-   · Amber + Navy = ink on parchment
-   · Generous white space, editorial rhythm
-═══════════════════════════════════════════════ */
-
+/* ══════════════════════════════════════════════════════
+   SCULPTR — PLASTICINE BROWSER
+   Every surface is clay. Wobbly. Chunky. Handmade.
+══════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Folio Palette */
-  --paper:      #f5f0e8;
-  --paper-warm: #ede8dc;
-  --paper-deep: #e3ddd0;
-  --paper-rule: rgba(160,148,128,0.18);
-  --ink:        #1c1a16;
-  --ink-2:      rgba(28,26,22,0.62);
-  --ink-3:      rgba(28,26,22,0.38);
-  --ink-4:      rgba(28,26,22,0.16);
-  --ink-5:      rgba(28,26,22,0.07);
-  --navy:       #1e2d4a;
-  --navy-2:     #2a3d60;
-  --navy-3:     rgba(30,45,74,0.08);
-  --amber:      #c87800;
-  --amber-2:    #e89a20;
-  --amber-glow: rgba(200,120,0,0.12);
-  --amber-pale: rgba(200,120,0,0.06);
-  --red:        #b83030;
-  --green-soft: #2d6a4f;
-  --border:     rgba(160,148,128,0.28);
-  --border-hi:  rgba(160,148,128,0.45);
-  --shadow-ink: rgba(28,26,22,0.12);
-  --shadow-deep:rgba(28,26,22,0.22);
-  
-  /* Folio Spacing */
-  --chrome-h:   52px;
-  --tab-h:      36px;
-  --sidebar-w:  220px;
-  --r:          5px;
-  --r-sm:       3px;
-  --r-lg:       8px;
-  
-  /* Folio Motion */
-  --ease-book:  cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-snap:  cubic-bezier(0.16, 1, 0.3, 1);
+  /* Aardman / W&G plasticine palette */
+  --bg:       #d4b896;   /* clay workshop table — warm tan */
+  --bg2:      #c8a882;   /* darker table */
+  --cream:    #f5edd8;   /* lightest clay */
+  --offwhite: #ede0c4;   /* slightly off-white clay slab */
+
+  /* Bright plasticine colours */
+  --red:    #e83030;
+  --red2:   #a81818;
+  --orange: #f07820;
+  --orange2:#b85510;
+  --yellow: #f5d020;
+  --yellow2:#c8a800;
+  --green:  #48c050;
+  --green2: #289030;
+  --blue:   #3888e8;
+  --blue2:  #1858b8;
+  --purple: #9848e0;
+  --purple2:#6828b0;
+  --pink:   #f060a0;
+  --pink2:  #b83878;
+  --teal:   #20c8b8;
+  --teal2:  #089888;
+
+  --ink: #1a1008;        /* deep clay brown/black */
+  --ink2: rgba(26,16,8,.6);
+  --ink3: rgba(26,16,8,.35);
+
+  /* THE KEY: thick wobbly outlines */
+  --line: 3.5px;
+  --line-dark: #1a1008;
+
+  /* Clay extrusion shadow — hard, no blur */
+  --raise: 5px;
+  --raise-sm: 3px;
+  --raise-lg: 8px;
+
+  --ch: 66px; /* chrome height */
+  --font-display: 'Fredoka One', cursive;
+  --font-body: 'Nunito', sans-serif;
+  --bounce: cubic-bezier(0.34,1.7,0.64,1);
+  --snap: cubic-bezier(0.16,1,0.3,1);
 }
 
 html, body {
-  width: 100%; height: 100%; overflow: hidden;
-  background: var(--paper);
-  font-family: 'IBM Plex Sans', sans-serif;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: var(--font-body);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   cursor: none;
 }
 
-/* ── FOLIO CURSOR — quill-inspired ── */
-#folio-cursor { position: fixed; pointer-events: none; z-index: 99999; top: 0; left: 0; }
-#fc-nib {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--amber); transform: translate(-50%,-50%);
-  box-shadow: 0 0 0 2px rgba(200,120,0,0.2);
-  transition: transform .08s, width .16s var(--ease-snap), height .16s var(--ease-snap), background .16s;
-}
-#fc-shadow {
-  position: absolute; width: 24px; height: 24px; border-radius: 50%;
-  border: 1px solid rgba(200,120,0,0.25);
-  top: -12px; left: -12px;
-  transition: all .22s var(--ease-snap);
-}
-body.hov #fc-nib { width: 12px; height: 12px; background: var(--navy); box-shadow: 0 0 0 3px rgba(30,45,74,0.15); }
-body.hov #fc-shadow { width: 34px; height: 34px; top: -17px; left: -17px; border-color: rgba(30,45,74,0.2); }
-body.clk #fc-nib { transform: translate(-50%,-50%) scale(0.5); }
-body.txt #fc-nib { width: 2px; height: 18px; border-radius: 1px; background: var(--navy); box-shadow: none; }
-body.txt #fc-shadow { opacity: 0; }
-
-/* ═══════════════════════════════════
-   BOOT — Library-card style
-═══════════════════════════════════ */
-#boot {
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--paper);
-  display: flex; align-items: center; justify-content: center; flex-direction: column;
-  /* ruled-line bg */
-  background-image: repeating-linear-gradient(
-    transparent, transparent 27px,
-    var(--paper-rule) 27px, var(--paper-rule) 28px
-  );
-}
-/* top red margin line like notebook */
-#boot::before {
-  content: ''; position: absolute; left: 72px; top: 0; bottom: 0; width: 1px;
-  background: rgba(180,60,60,0.18);
-}
-#boot::after {
-  content: ''; position: absolute; left: 0; top: 0; right: 0; bottom: 0;
-  background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(245,240,232,0) 60%, rgba(200,186,165,0.35) 100%);
-  pointer-events: none;
-}
-
-.boot-card {
-  background: white;
-  border: 1px solid var(--border-hi);
-  border-radius: var(--r-lg);
-  padding: 44px 52px 38px;
-  width: 400px;
-  box-shadow: 0 2px 0 var(--border), 0 8px 32px var(--shadow-ink), 0 24px 64px rgba(28,26,22,0.06);
-  position: relative; z-index: 2;
-  /* card top ribbon */
-}
-.boot-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--navy) 0%, var(--amber) 100%);
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-}
-
-.boot-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-  color: var(--amber); margin-bottom: 10px; font-weight: 400;
-}
-.boot-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 42px; font-weight: 700; line-height: 1;
-  color: var(--navy); letter-spacing: -1px; margin-bottom: 4px;
-}
-.boot-name em { font-style: italic; color: var(--amber); }
-.boot-desc {
-  font-size: 12px; color: var(--ink-3); margin-bottom: 32px;
-  line-height: 1.5; font-weight: 300;
-}
-
-/* catalog card ruled lines */
-.boot-lines { margin-bottom: 24px; }
-.boot-line-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 7px 0; border-bottom: 1px solid var(--paper-rule);
-}
-.boot-line-label {
-  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
-  letter-spacing: 2px; text-transform: uppercase; color: var(--ink-3);
-  width: 60px; flex-shrink: 0;
-}
-.boot-line-val {
-  font-size: 11px; color: var(--ink-2); font-weight: 400; flex: 1;
-  font-family: 'IBM Plex Mono', monospace;
-}
-.boot-line-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--paper-deep); flex-shrink: 0;
-  transition: background .3s, box-shadow .3s;
-}
-.boot-line-dot.done { background: var(--green-soft); box-shadow: 0 0 6px rgba(45,106,79,0.4); }
-.boot-line-dot.active { background: var(--amber); box-shadow: 0 0 8px rgba(200,120,0,0.5); animation: dot-pulse 0.8s ease-in-out infinite; }
-@keyframes dot-pulse { 0%,100%{opacity:0.6;} 50%{opacity:1;} }
-
-/* progress bar styled like a ruler */
-.boot-progress-wrap { margin-bottom: 6px; position: relative; }
-.boot-progress-track {
-  height: 6px; background: var(--paper-deep);
-  border-radius: 3px; overflow: hidden;
-  border: 1px solid var(--border);
-}
-#boot-prog {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--navy), var(--amber));
-  border-radius: 3px;
-  transition: width 0.5s var(--ease-book);
-}
-/* ruler ticks */
-.boot-ruler {
-  display: flex; justify-content: space-between;
-  padding: 3px 1px 0; margin-bottom: 0;
-}
-.boot-ruler span {
-  font-family: 'IBM Plex Mono', monospace; font-size: 7px;
-  color: var(--ink-3); letter-spacing: 0;
-}
-
-.boot-msg {
-  font-size: 11px; color: var(--ink-3); margin-top: 10px;
-  font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.5px;
-  min-height: 16px; text-align: center;
-}
-
-/* boot exit */
-#boot.boot-exit { animation: boot-exit 0.6s var(--ease-book) forwards; }
-@keyframes boot-exit {
-  0% { opacity: 1; transform: scale(1); }
-  30% { opacity: 1; transform: scale(1.008); }
-  100% { opacity: 0; transform: scale(0.98); }
-}
-
-/* ═══════════════════════════════════
-   FOLIO CHROME — the browser shell
-═══════════════════════════════════ */
-#folio {
-  position: fixed; inset: 0;
-  display: flex; flex-direction: column;
-  background: var(--paper-warm);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.4s var(--ease-book);
-}
-#folio.visible { opacity: 1; pointer-events: all; }
-
-/* ── TOP CHROME ── */
-#chrome {
-  height: var(--chrome-h);
-  background: var(--paper);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 0;
-  flex-shrink: 0;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 2px 8px var(--shadow-ink);
-  position: relative; z-index: 100;
-  padding: 0 14px; gap: 10px;
-}
-
-/* Folio wordmark in chrome */
-.chrome-brand {
-  display: flex; align-items: center; gap: 8px;
-  padding-right: 14px;
-  border-right: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.chrome-brand-mark {
-  width: 26px; height: 26px;
-  background: var(--navy); border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 1px 3px var(--shadow-deep), inset 0 1px 0 rgba(255,255,255,0.08);
-}
-.chrome-brand-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 15px; font-weight: 700; color: var(--navy);
-  letter-spacing: -0.3px; line-height: 1;
-}
-.chrome-brand-name em { font-style: italic; color: var(--amber); }
-
-/* nav controls */
-.nav-group { display: flex; align-items: center; gap: 2px; }
-.nav-btn {
-  width: 30px; height: 30px; border-radius: var(--r-sm);
-  background: transparent; border: 1px solid transparent;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--ink-3);
-  transition: all .14s; flex-shrink: 0;
-}
-.nav-btn:hover { background: var(--paper-warm); border-color: var(--border); color: var(--ink); }
-.nav-btn:active { transform: scale(.88); }
-
-/* ── ADDRESS BAR — the star of Folio ── */
-.addr-wrap {
-  flex: 1; position: relative; display: flex; align-items: center;
-}
-.addr-bar {
-  width: 100%; display: flex; align-items: center;
-  background: white;
-  border: 1px solid var(--border-hi);
-  border-radius: var(--r);
-  box-shadow: inset 0 1px 3px var(--shadow-ink), 0 1px 0 rgba(255,255,255,0.9);
-  transition: border-color .18s, box-shadow .18s;
-  overflow: hidden;
-  height: 34px;
-}
-.addr-wrap:focus-within .addr-bar {
-  border-color: var(--amber);
-  box-shadow: inset 0 1px 3px var(--shadow-ink), 0 0 0 3px var(--amber-glow), 0 1px 0 rgba(255,255,255,0.9);
-}
-
-/* library subject label on addr bar */
-.addr-subject {
-  padding: 0 10px 0 11px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--ink-3); white-space: nowrap; flex-shrink: 0;
-  border-right: 1px solid var(--border);
-  height: 100%; display: flex; align-items: center;
-  background: var(--paper-warm);
-}
-.addr-input {
-  flex: 1; background: transparent; border: none; outline: none;
-  padding: 0 10px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 12.5px; font-weight: 400; color: var(--ink);
-  height: 100%;
-}
-.addr-input::placeholder { color: var(--ink-4); font-style: italic; }
-
-.addr-go {
-  height: 100%; padding: 0 16px; border: none; border-left: 1px solid var(--border);
-  background: var(--navy); color: white;
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
-  cursor: pointer; flex-shrink: 0;
-  transition: background .14s;
-}
-.addr-go:hover { background: var(--navy-2); }
-.addr-go:active { background: var(--amber); }
-
-/* ── SUBJECT TABS — index card style ── */
-#tab-strip {
-  height: var(--tab-h);
-  background: var(--paper-warm);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: flex-end; padding: 0 14px 0 14px;
-  flex-shrink: 0; gap: 2px; overflow-x: auto; overflow-y: hidden;
-  scrollbar-width: none;
-}
-#tab-strip::-webkit-scrollbar { display: none; }
-
-/* The signature Folio tab — cut-corner index card */
-.ftab {
-  height: 28px;
-  padding: 0 14px 0 12px;
-  display: flex; align-items: center; gap: 7px;
-  border-radius: var(--r-sm) var(--r-sm) 0 0;
-  cursor: pointer; flex-shrink: 0;
-  background: var(--paper-deep);
-  border: 1px solid var(--border); border-bottom: none;
-  position: relative; top: 1px;
-  transition: background .14s, border-color .14s;
-  max-width: 180px;
-  /* the notched corner — unique to Folio */
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
-}
-.ftab::after {
-  /* small fold shadow on the notch */
+/* CORK-BOARD TEXTURE — the workshop table */
+body::before {
   content: '';
-  position: absolute; top: 0; right: 0;
-  width: 10px; height: 10px;
-  background: linear-gradient(225deg, var(--border-hi) 0%, transparent 60%);
+  position: fixed; inset: 0; z-index: 0;
   pointer-events: none;
-}
-.ftab:hover { background: var(--paper-warm); }
-.ftab.active {
-  background: white;
-  border-color: var(--border);
-  box-shadow: 0 -1px 0 white, 2px 0 4px rgba(28,26,22,0.06), -2px 0 4px rgba(28,26,22,0.04);
-  z-index: 2;
-}
-.ftab.active::before {
-  content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
-  background: white;
-}
-/* colored left-edge accent on active tab — like a subject binder */
-.ftab.active .ftab-accent { opacity: 1; }
-.ftab-accent {
-  position: absolute; left: 0; top: 4px; bottom: 0; width: 3px;
-  border-radius: 2px 0 0 0;
-  background: var(--amber); opacity: 0.35;
-  transition: opacity .14s;
-}
-.ftab-icon { font-size: 11px; flex-shrink: 0; opacity: 0.7; }
-.ftab-title {
-  font-size: 11px; font-weight: 500; color: var(--ink-2);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
-  font-family: 'IBM Plex Sans', sans-serif;
-}
-.ftab.active .ftab-title { color: var(--ink); font-weight: 600; }
-.ftab-close {
-  width: 14px; height: 14px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 8px; color: var(--ink-3); flex-shrink: 0;
-  transition: all .1s;
-}
-.ftab-close:hover { background: var(--paper-deep); color: var(--red); }
-
-/* new tab button */
-.tab-new {
-  height: 24px; width: 24px; border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: 1px solid transparent;
-  cursor: pointer; color: var(--ink-3); font-size: 16px;
-  align-self: center; margin-left: 2px; margin-bottom: 2px;
-  transition: all .12s; flex-shrink: 0;
-}
-.tab-new:hover { background: var(--paper-deep); border-color: var(--border); color: var(--ink); }
-
-/* ── BODY — sidebar + viewport ── */
-#folio-body { flex: 1; display: flex; overflow: hidden; }
-
-/* ── SIDEBAR — table of contents panel ── */
-#sidebar {
-  width: var(--sidebar-w);
-  background: var(--paper);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  flex-shrink: 0;
-  box-shadow: 1px 0 0 rgba(255,255,255,0.6);
-  transition: width .28s var(--ease-book), opacity .28s;
-  overflow: hidden;
-}
-#sidebar.collapsed { width: 0; opacity: 0; pointer-events: none; }
-
-.sidebar-header {
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.sidebar-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
-  color: var(--ink-3); margin-bottom: 8px;
-}
-.sidebar-search {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--paper-warm); border: 1px solid var(--border);
-  border-radius: var(--r-sm); padding: 5px 9px; height: 28px;
-  transition: border-color .14s, box-shadow .14s;
-}
-.sidebar-search:focus-within { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-glow); }
-.sidebar-search svg { color: var(--ink-3); flex-shrink: 0; }
-.sidebar-search-inp {
-  flex: 1; background: transparent; border: none; outline: none;
-  font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; color: var(--ink);
-}
-.sidebar-search-inp::placeholder { color: var(--ink-4); }
-
-/* section divider */
-.sb-section { padding: 10px 14px 4px; }
-.sb-section-lbl {
-  font-family: 'IBM Plex Mono', monospace; font-size: 7.5px;
-  letter-spacing: 2.5px; text-transform: uppercase; color: var(--ink-3);
-  margin-bottom: 4px;
-}
-.sb-rule { height: 1px; background: var(--border); margin: 0 14px; }
-
-/* sidebar item */
-.sb-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 7px 14px; cursor: pointer;
-  transition: background .12s;
-  border-left: 2px solid transparent;
-}
-.sb-item:hover { background: var(--paper-warm); }
-.sb-item.active { background: var(--amber-pale); border-left-color: var(--amber); }
-.sb-item-icon { font-size: 13px; flex-shrink: 0; opacity: 0.75; }
-.sb-item-text { flex: 1; }
-.sb-item-name { font-size: 12px; font-weight: 500; color: var(--ink); line-height: 1.2; }
-.sb-item.active .sb-item-name { color: var(--amber); font-weight: 600; }
-.sb-item-sub { font-size: 9.5px; color: var(--ink-3); margin-top: 1px; }
-.sb-item-badge {
-  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
-  padding: 1px 5px; border-radius: 2px;
-  background: var(--navy-3); color: var(--navy);
-  font-weight: 500; flex-shrink: 0;
-}
-.sb-item.active .sb-item-badge { background: var(--amber-glow); color: var(--amber); }
-
-/* sidebar games grid */
-.sb-games { padding: 6px 10px 10px; display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; }
-.sb-game {
-  aspect-ratio: 1; border-radius: var(--r-sm); cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  border: 1px solid var(--border); background: var(--paper-warm);
-  transition: all .16s var(--ease-snap); position: relative; overflow: hidden;
-}
-.sb-game::before { content: ''; position: absolute; inset: 0; background: var(--paper-deep); opacity: 0; transition: opacity .14s; }
-.sb-game:hover::before { opacity: 1; }
-.sb-game:hover { border-color: var(--border-hi); transform: translateY(-1px); box-shadow: 0 2px 8px var(--shadow-ink); }
-.sb-game:active { transform: scale(.94); }
-.sb-game-ico { font-size: 18px; position: relative; z-index: 1; }
-.sb-game-name { font-size: 7.5px; font-weight: 600; color: var(--ink-2); text-align: center; position: relative; z-index: 1; line-height: 1.2; letter-spacing: 0.2px; }
-
-/* ── VIEWPORT ── */
-#viewport {
-  flex: 1; position: relative; overflow: hidden;
-  background: #faf9f6;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23t)' opacity='.35'/%3E%3C/svg%3E");
+  background-size: 120px;
+  opacity: .22;
+  mix-blend-mode: multiply;
 }
 
-/* new tab page — "Folio Start" */
-#new-tab {
-  position: absolute; inset: 0; overflow-y: auto;
-  background: var(--paper);
-  background-image: repeating-linear-gradient(
-    transparent, transparent 27px,
-    var(--paper-rule) 27px, var(--paper-rule) 28px
-  );
-  display: flex; flex-direction: column; align-items: center;
-  padding: 48px 32px 48px;
-  gap: 0;
-}
-/* vertical red margin line */
-#new-tab::before {
-  content: ''; position: fixed; left: var(--sidebar-w); margin-left: 72px;
-  top: 0; bottom: 0; width: 1px;
-  background: rgba(180,60,60,0.15);
-  pointer-events: none; z-index: 1;
-}
-
-.nt-masthead {
-  text-align: center; margin-bottom: 36px;
-  width: 100%; max-width: 560px;
-}
-.nt-time {
-  font-family: 'Playfair Display', serif;
-  font-size: 72px; font-weight: 400; color: var(--navy);
-  letter-spacing: -2px; line-height: 1; margin-bottom: 6px;
-}
-.nt-time em { font-style: italic; color: var(--amber); }
-.nt-date {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-  color: var(--ink-3); margin-bottom: 28px;
-}
-
-/* big search on new tab */
-.nt-search-wrap { width: 100%; max-width: 520px; margin-bottom: 36px; }
-.nt-search-label {
-  font-family: 'Playfair Display', serif;
-  font-size: 13px; font-style: italic; color: var(--ink-3);
-  margin-bottom: 8px; display: block;
-}
-.nt-search-bar {
-  display: flex; align-items: stretch;
-  background: white; border: 1px solid var(--border-hi);
-  border-radius: var(--r); overflow: hidden;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.9), 0 2px 12px var(--shadow-ink);
-  transition: border-color .18s, box-shadow .18s;
-}
-.nt-search-wrap:focus-within .nt-search-bar {
-  border-color: var(--amber);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.9), 0 0 0 3px var(--amber-glow), 0 2px 12px var(--shadow-ink);
-}
-.nt-subject-tag {
-  padding: 0 12px;
-  background: var(--paper-warm); border-right: 1px solid var(--border);
-  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-  letter-spacing: 2px; text-transform: uppercase; color: var(--ink-3);
-  display: flex; align-items: center; flex-shrink: 0;
-}
-.nt-inp {
-  flex: 1; background: transparent; border: none; outline: none;
-  padding: 14px 16px;
-  font-family: 'IBM Plex Sans', sans-serif; font-size: 14px;
-  color: var(--ink); font-weight: 300;
-}
-.nt-inp::placeholder { color: var(--ink-4); font-style: italic; }
-.nt-go {
-  padding: 0 22px; background: var(--navy); color: white; border: none;
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500;
-  letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-  transition: background .14s; flex-shrink: 0;
-}
-.nt-go:hover { background: var(--amber); }
-
-/* quick access cards */
-.nt-section { width: 100%; max-width: 560px; margin-bottom: 28px; }
-.nt-section-head {
-  display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;
-  padding-bottom: 6px; border-bottom: 1px solid var(--border);
-}
-.nt-section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 16px; font-weight: 600; color: var(--navy); letter-spacing: -0.3px;
-}
-.nt-section-sub {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-3);
-}
-.nt-section-all {
-  margin-left: auto; font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--amber); cursor: pointer; transition: opacity .12s;
-}
-.nt-section-all:hover { opacity: 0.7; }
-
-/* quick launch grid */
-.ql-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
-.ql-card {
-  border-radius: var(--r); overflow: hidden; cursor: pointer;
-  border: 1px solid var(--border); background: white;
-  transition: all .18s var(--ease-snap);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.9);
-}
-.ql-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px var(--shadow-ink), 0 1px 0 rgba(255,255,255,0.9); border-color: var(--border-hi); }
-.ql-card:active { transform: scale(.96); }
-.ql-thumb { height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.ql-info { padding: 6px 9px 8px; border-top: 1px solid var(--paper-rule); }
-.ql-name { font-size: 10px; font-weight: 600; color: var(--ink); letter-spacing: 0.2px; }
-.ql-url  { font-size: 8.5px; color: var(--ink-3); margin-top: 1px; font-family: 'IBM Plex Mono', monospace; }
-
-/* game grid on new tab */
-.game-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
-.game-card {
-  border-radius: var(--r); cursor: pointer; overflow: hidden;
-  border: 1px solid var(--border); background: white;
-  transition: all .18s var(--ease-snap);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.9);
+/* ══════════════════════════════════════════════════════
+   CLAY CURSOR
+══════════════════════════════════════════════════════ */
+#cur { position: fixed; pointer-events: none; z-index: 99999; top: 0; left: 0; }
+#cur-clay {
+  width: 18px; height: 18px;
+  background: var(--yellow);
+  border: var(--line) solid var(--line-dark);
+  border-radius: 55% 45% 50% 50% / 48% 52% 46% 54%;
+  transform: translate(-50%,-50%) rotate(-8deg);
+  box-shadow: var(--raise-sm) var(--raise-sm) 0 var(--line-dark);
+  transition: width .15s var(--bounce), height .15s var(--bounce),
+              background .12s, transform .1s, border-radius .2s;
   position: relative;
 }
-.game-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--shadow-ink), 0 1px 0 rgba(255,255,255,0.9); border-color: var(--amber); }
-.game-card:active { transform: scale(.95); }
-.game-thumb { height: 54px; display: flex; align-items: center; justify-content: center; font-size: 26px; position: relative; }
-.game-info { padding: 7px 9px 9px; border-top: 1px solid var(--paper-rule); }
-.game-name { font-size: 10.5px; font-weight: 600; color: var(--ink); letter-spacing: 0.2px; }
-.game-tag {
-  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
-  color: var(--ink-3); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px;
+#cur-clay::after {
+  content: '';
+  position: absolute; top: 3px; left: 4px;
+  width: 6px; height: 4px;
+  background: rgba(255,255,255,.5);
+  border-radius: 50%;
+  transform: rotate(-20deg);
 }
-.game-hot {
-  position: absolute; top: 5px; right: 5px;
-  background: var(--amber); color: white;
-  font-family: 'IBM Plex Mono', monospace; font-size: 6.5px; font-weight: 500;
-  letter-spacing: 1px; text-transform: uppercase; padding: 2px 4px; border-radius: 2px;
-  z-index: 2; box-shadow: 0 1px 4px rgba(200,120,0,0.4);
+#cur-shadow {
+  position: absolute; bottom: -8px; left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 6px;
+  background: rgba(26,16,8,.2);
+  border-radius: 50%;
+  filter: blur(2px);
+  transition: width .15s, opacity .15s;
+}
+body.hov #cur-clay {
+  width: 24px; height: 22px;
+  background: var(--orange);
+  border-radius: 48% 52% 55% 45% / 52% 46% 54% 48%;
+  transform: translate(-50%,-50%) rotate(6deg);
+  box-shadow: var(--raise) var(--raise) 0 var(--line-dark);
+}
+body.hov #cur-shadow { width: 28px; opacity: .35; }
+body.clk #cur-clay {
+  width: 14px; height: 13px;
+  transform: translate(-50%,-50%) rotate(15deg) scale(.8);
+  box-shadow: 1px 1px 0 var(--line-dark);
+}
+body.clk #cur-shadow { width: 12px; }
+body.txt #cur-clay {
+  width: 3px; height: 22px;
+  border-radius: 4px;
+  background: var(--ink);
+  box-shadow: 1px 2px 0 rgba(0,0,0,.3);
+  transform: translate(-50%,-50%);
+}
+body.txt #cur-shadow { opacity: 0; }
+
+/* ══════════════════════════════════════════════════════
+   TOP CHROME
+══════════════════════════════════════════════════════ */
+#chrome {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: var(--ch);
+  background: var(--cream);
+  border-bottom: var(--line) solid var(--line-dark);
+  box-shadow:
+    0 var(--raise-lg) 0 var(--line-dark),
+    0 calc(var(--raise-lg) + 2px) 8px rgba(26,16,8,.25);
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 20px;
+  background-image: radial-gradient(circle at 30% 40%, rgba(255,255,255,.25) 0%, transparent 60%);
 }
 
-/* the actual iframe */
-#main-frame {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  border: none; display: none;
+.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding-right: 18px; border-right: 3px solid rgba(26,16,8,.12); }
+.brand-eye {
+  width: 40px; height: 40px; background: var(--orange);
+  border: var(--line) solid var(--line-dark);
+  border-radius: 52% 48% 45% 55% / 50% 54% 46% 50%;
+  box-shadow: 4px 4px 0 var(--line-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+  animation: blob-wobble 5s ease-in-out infinite;
+  position: relative;
+}
+.brand-eye::after {
+  content: ''; position: absolute; top: 5px; left: 7px;
+  width: 10px; height: 6px; background: rgba(255,255,255,.45);
+  border-radius: 50%; transform: rotate(-25deg);
+}
+@keyframes blob-wobble {
+  0%,100% { border-radius: 52% 48% 45% 55% / 50% 54% 46% 50%; transform: rotate(-3deg); }
+  20%     { border-radius: 46% 54% 52% 48% / 54% 48% 52% 46%; transform: rotate(2deg);  }
+  40%     { border-radius: 54% 46% 48% 52% / 46% 52% 50% 54%; transform: rotate(4deg);  }
+  60%     { border-radius: 48% 52% 55% 45% / 52% 46% 54% 48%; transform: rotate(1deg);  }
+  80%     { border-radius: 50% 50% 46% 54% / 48% 56% 44% 52%; transform: rotate(-2deg); }
+}
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 26px; color: var(--ink);
+  text-shadow: 3px 3px 0 rgba(26,16,8,.18);
+  letter-spacing: .5px;
 }
 
-/* ── STATUS BAR ── */
-#status-bar {
-  height: 22px; background: var(--paper-warm);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; padding: 0 14px; gap: 16px;
-  flex-shrink: 0;
+.nav-btn {
+  width: 36px; height: 36px; background: var(--offwhite);
+  border: var(--line) solid var(--line-dark);
+  border-radius: 50% 48% 52% 46% / 48% 52% 46% 50%;
+  box-shadow: var(--raise-sm) var(--raise-sm) 0 var(--line-dark);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--ink); flex-shrink: 0;
+  transition: transform .13s var(--bounce), box-shadow .13s, background .1s;
 }
-.sb-stat {
-  display: flex; align-items: center; gap: 5px;
-  font-family: 'IBM Plex Mono', monospace; font-size: 8.5px;
-  letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3);
-}
-.sb-led { width: 5px; height: 5px; border-radius: 50%; }
-.sb-led.on  { background: var(--green-soft); box-shadow: 0 0 5px rgba(45,106,79,0.5); animation: led 3s ease-in-out infinite; }
-.sb-led.off { background: var(--ink-4); }
-@keyframes led { 0%,100%{opacity:.6;} 50%{opacity:1;} }
-.sb-divider { width: 1px; height: 12px; background: var(--border); }
-#sb-url-display { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; color: var(--ink-3); letter-spacing: 0.5px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-btn:hover { transform: translate(-1px,-2px) rotate(-3deg); box-shadow: var(--raise) var(--raise) 0 var(--line-dark); background: var(--yellow); }
+.nav-btn:active { transform: translate(var(--raise-sm),var(--raise-sm)) rotate(2deg) !important; box-shadow: 0 0 0 var(--line-dark) !important; }
 
-/* ── TOAST NOTIFICATIONS ── */
-#toasts { position: fixed; bottom: 30px; right: 20px; z-index: 9990; display: flex; flex-direction: column; gap: 6px; }
+.addr-wrap { flex: 1; }
+.addr-trough {
+  width: 100%; height: 40px; background: var(--offwhite);
+  border: var(--line) solid var(--line-dark);
+  border-radius: 22px 20px 22px 20px / 20px 22px 20px 22px;
+  box-shadow: inset 3px 3px 0 rgba(26,16,8,.1), var(--raise-sm) var(--raise-sm) 0 var(--line-dark);
+  display: flex; align-items: center; overflow: hidden;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.addr-wrap:focus-within .addr-trough {
+  background: #fffdf5; border-color: var(--blue2);
+  box-shadow: inset 3px 3px 0 rgba(26,16,8,.07), var(--raise-sm) var(--raise-sm) 0 var(--blue2), 0 0 0 3px rgba(56,136,232,.15);
+}
+.addr-badge {
+  margin: 5px 0 5px 6px; padding: 0 11px; height: 28px; line-height: 28px;
+  background: var(--green); border: 2px solid var(--line-dark);
+  border-radius: 14px 12px 14px 12px;
+  font-family: var(--font-display); font-size: 11px; color: white; white-space: nowrap;
+  box-shadow: 2px 2px 0 var(--line-dark); flex-shrink: 0;
+}
+.addr-inp {
+  flex: 1; background: transparent; border: none; outline: none; padding: 0 12px;
+  font-family: var(--font-body); font-size: 13.5px; font-weight: 700; color: var(--ink);
+}
+.addr-inp::placeholder { color: var(--ink3); font-weight: 600; }
+.addr-go-btn {
+  margin: 4px 5px 4px 0; height: 30px; padding: 0 18px;
+  background: var(--blue); border: 2.5px solid var(--line-dark);
+  border-radius: 16px 14px 16px 14px;
+  font-family: var(--font-display); font-size: 13px; color: white;
+  cursor: pointer; flex-shrink: 0; box-shadow: 3px 3px 0 var(--blue2), 4px 4px 0 var(--line-dark);
+  transition: transform .13s var(--bounce), box-shadow .13s; letter-spacing: .3px;
+}
+.addr-go-btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--blue2), 5px 5px 0 var(--line-dark); }
+.addr-go-btn:active { transform: translate(4px,4px); box-shadow: 0 0 0 var(--line-dark) !important; }
+
+.chrome-r { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-left: 16px; border-left: 3px solid rgba(26,16,8,.12); }
+.status-pill {
+  display: flex; align-items: center; gap: 6px; background: var(--green);
+  border: var(--line) solid var(--line-dark); border-radius: 20px 18px 20px 18px; padding: 5px 13px;
+  box-shadow: 3px 3px 0 var(--green2), 4px 4px 0 var(--line-dark);
+  font-family: var(--font-display); font-size: 13px; color: white; white-space: nowrap;
+  animation: pill-float 3.5s ease-in-out infinite;
+}
+@keyframes pill-float { 0%,100%{transform:translateY(0) rotate(-1deg);} 50%{transform:translateY(-3px) rotate(1deg);} }
+.status-dot {
+  width: 8px; height: 8px; background: white; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,.5); animation: dot-blink 2.2s ease-in-out infinite;
+}
+@keyframes dot-blink { 0%,100%{transform:scale(1);} 50%{transform:scale(1.5);} }
+.clock-chip {
+  background: var(--offwhite); border: var(--line) solid var(--line-dark);
+  border-radius: 10px 8px 10px 8px; padding: 5px 12px;
+  font-family: var(--font-display); font-size: 14px; color: var(--ink);
+  box-shadow: 3px 3px 0 var(--line-dark);
+}
+
+/* ══════════════════════════════════════════════════════
+   SHELL
+══════════════════════════════════════════════════════ */
+#shell {
+  position: fixed; top: calc(var(--ch) + 8px); left: 0; right: 0; bottom: 0; z-index: 1;
+}
+#bview {
+  position: absolute; inset: 0; z-index: 100; display: none;
+  border-top: 3px solid var(--line-dark);
+}
+#bview.on { display: block; }
+#bframe { width: 100%; height: 100%; border: none; background: #fff; }
+
+#dash {
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+  padding: 26px 28px 56px; scroll-behavior: smooth;
+}
+#dash::-webkit-scrollbar { width: 10px; }
+#dash::-webkit-scrollbar-track { background: transparent; }
+#dash::-webkit-scrollbar-thumb {
+  background: var(--orange); border-radius: 8px;
+  border: 2px solid var(--line-dark); box-shadow: 2px 0 0 var(--line-dark);
+}
+
+/* ══════════════════════════════════════════════════════
+   HERO / CARDS
+══════════════════════════════════════════════════════ */
+#hero {
+  border: 4px solid var(--line-dark);
+  border-radius: 28px 22px 26px 24px / 24px 28px 22px 26px;
+  box-shadow: var(--raise-lg) var(--raise-lg) 0 var(--line-dark);
+  overflow: hidden; margin-bottom: 28px; min-height: 210px; position: relative;
+  background: var(--blue); background-image: radial-gradient(circle at 75% 30%, rgba(255,255,255,.12) 0%, transparent 50%);
+}
+.hblob { position: absolute; border: 3px solid rgba(255,255,255,.25); pointer-events: none; border-radius: 50%; }
+.hb1 { width:180px;height:180px;background:var(--teal);opacity:.3;top:-60px;right:-30px;border-radius:54%46%50%50%/48%52%46%54%;animation:hfloat 7s ease-in-out infinite; }
+.hb2 { width:110px;height:110px;background:var(--yellow);opacity:.28;top:10px;right:110px;border-radius:46%54%52%48%/52%46%54%48%;animation:hfloat 9s ease-in-out infinite reverse; }
+.hb3 { width:75px;height:75px;background:var(--pink);opacity:.25;bottom:15px;right:60px;border-radius:50%50%46%54%/54%46%50%50%;animation:hfloat 6s ease-in-out infinite 1.5s; }
+.hb4 { width:50px;height:50px;background:var(--green);opacity:.3;top:20px;right:260px;border-radius:48%52%55%45%/50%48%52%50%;animation:hfloat 8s ease-in-out infinite .8s; }
+@keyframes hfloat {
+  0%,100%{transform:translate(0,0) scale(1) rotate(0deg);}
+  33%{transform:translate(12px,-18px) scale(1.06) rotate(4deg);}
+  66%{transform:translate(-8px,10px) scale(.95) rotate(-3deg);}
+}
+.hero-inner { position: relative; z-index: 2; padding: 30px 34px; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 6px; background: var(--yellow);
+  border: 2.5px solid var(--line-dark); border-radius: 16px 14px 16px 14px; padding: 4px 13px;
+  box-shadow: 3px 3px 0 var(--line-dark); font-family: var(--font-display); font-size: 12px; color: var(--ink); margin-bottom: 12px;
+}
+.hero-title {
+  font-family: var(--font-display); font-size: 56px; color: white; line-height: .95; letter-spacing: 1px;
+  text-shadow: 5px 5px 0 rgba(0,0,0,.22), 6px 6px 0 rgba(0,0,0,.08); margin-bottom: 10px;
+}
+.hero-sub { font-size: 15px; font-weight: 700; color: rgba(255,255,255,.78); margin-bottom: 20px; max-width: 420px; }
+.hero-acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.hbtn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 11px 24px;
+  font-family: var(--font-display); font-size: 15px; border: 3px solid var(--line-dark); border-radius: 20px 16px 20px 16px;
+  cursor: pointer; transition: transform .15s var(--bounce), box-shadow .15s;
+}
+.hbtn:hover  { transform: translate(-2px,-3px) rotate(-1deg); }
+.hbtn:active { transform: translate(var(--raise),var(--raise)) rotate(1deg) !important; box-shadow: 0 0 0 var(--line-dark) !important; }
+.hbtn-w { background: white; color: var(--ink); box-shadow: 4px 4px 0 rgba(0,0,0,.22), 5px 5px 0 var(--line-dark); }
+.hbtn-w:hover { box-shadow: 6px 6px 0 rgba(0,0,0,.22), 7px 7px 0 var(--line-dark); }
+.hbtn-g { background: var(--green); color: white; box-shadow: 4px 4px 0 var(--green2), 5px 5px 0 var(--line-dark); }
+.hbtn-g:hover { box-shadow: 6px 6px 0 var(--green2), 7px 7px 0 var(--line-dark); }
+.hbtn-p { background: var(--purple); color: white; box-shadow: 4px 4px 0 var(--purple2), 5px 5px 0 var(--line-dark); }
+.hbtn-p:hover { box-shadow: 6px 6px 0 var(--purple2), 7px 7px 0 var(--line-dark); }
+
+.section { margin-bottom: 28px; }
+.sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 0 2px; }
+.sec-stamp {
+  display: inline-flex; align-items: center; gap: 6px; background: var(--offwhite);
+  border: 3px solid var(--line-dark); border-radius: 14px 10px 14px 10px; padding: 5px 14px;
+  box-shadow: 4px 4px 0 var(--line-dark); font-family: var(--font-display); font-size: 17px; color: var(--ink);
+  transform: rotate(-0.8deg); position: relative;
+}
+.sec-stamp::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; border-radius: 10px 10px 0 0; }
+.sec-count {
+  font-family: var(--font-display); font-size: 12px; color: var(--ink2); background: rgba(26,16,8,.08);
+  border: 2px solid rgba(26,16,8,.15); border-radius: 99px; padding: 1px 10px;
+}
+
+.row-track { display: flex; gap: 14px; overflow-x: auto; overflow-y: visible; padding: 8px 4px 16px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.row-track::-webkit-scrollbar { display: none; }
+
+.gtile {
+  flex-shrink: 0; width: 148px; cursor: pointer; position: relative;
+  border: 3.5px solid var(--line-dark); border-radius: 20px 16px 18px 20px / 18px 20px 16px 20px;
+  box-shadow: 6px 6px 0 var(--line-dark); overflow: visible; background: var(--cream);
+  animation: tile-idle 6s ease-in-out infinite; transition: transform .2s var(--bounce), box-shadow .2s, border-radius .3s;
+}
+.gtile:nth-child(2n) { animation-delay: -1.5s; }
+.gtile:nth-child(3n) { animation-delay: -3s;   }
+.gtile:nth-child(4n) { animation-delay: -4.2s; }
+.gtile:nth-child(5n) { animation-delay: -0.8s; }
+@keyframes tile-idle { 0%,100% { transform: rotate(-0.6deg); } 50% { transform: rotate(0.4deg); } }
+.gtile:hover {
+  transform: translate(-4px,-8px) rotate(-2.5deg) scale(1.06) !important; box-shadow: 10px 14px 0 var(--line-dark);
+  border-radius: 22px 18px 20px 22px / 20px 22px 18px 20px; z-index: 5;
+}
+.gtile:active { transform: translate(6px,6px) rotate(1deg) scale(.97) !important; box-shadow: 0 0 0 var(--line-dark) !important; }
+.gtile-top {
+  height: 44px; border-bottom: 3px solid var(--line-dark); border-radius: 17px 13px 0 0 / 15px 17px 0 0;
+  display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; font-size: 22px;
+}
+.gtile-top::after {
+  content: ''; position: absolute; top: 4px; left: 8px; width: 22px; height: 10px;
+  background: rgba(255,255,255,.35); border-radius: 50%; transform: rotate(-18deg); pointer-events: none;
+}
+.gtile-art { height: 90px; display: flex; align-items: center; justify-content: center; font-size: 50px; background: rgba(255,255,255,.4); border-bottom: 3px solid var(--line-dark); position: relative; }
+.gtile-art::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 55% 45%, rgba(255,255,255,.3) 0%, transparent 65%); pointer-events: none; }
+.gtile-body { padding: 8px 10px 10px; }
+.gtile-name { font-family: var(--font-display); font-size: 13px; color: var(--ink); line-height: 1.2; margin-bottom: 6px; }
+.gtile-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.gtag { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--ink2); background: rgba(26,16,8,.07); border: 1.5px solid rgba(26,16,8,.18); border-radius: 8px 6px 8px 6px; padding: 1px 7px; }
+.ghot { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; background: var(--red); color: white; border: 2px solid var(--line-dark); border-radius: 8px 6px 8px 6px; padding: 1px 7px; box-shadow: 2px 2px 0 var(--red2), 3px 3px 0 var(--line-dark); }
+.gtile-hero { width: 196px; }
+.gtile-hero .gtile-top { height: 52px; }
+.gtile-hero .gtile-art { height: 120px; font-size: 68px; }
+.gtile-hero .gtile-name { font-size: 16px; }
+
+.qtile {
+  flex-shrink: 0; width: 180px; height: 82px; border: 3.5px solid var(--line-dark);
+  border-radius: 18px 14px 18px 14px / 14px 18px 14px 18px; cursor: pointer; position: relative;
+  display: flex; align-items: center; gap: 12px; padding: 0 16px; box-shadow: 5px 5px 0 var(--line-dark); overflow: hidden;
+  animation: tile-idle 5s ease-in-out infinite; transition: transform .2s var(--bounce), box-shadow .2s;
+}
+.qtile:nth-child(2n) { animation-delay: -2.1s; }
+.qtile:nth-child(3n) { animation-delay: -3.8s; }
+.qtile:hover { transform: translate(-3px,-6px) rotate(-2deg) !important; box-shadow: 8px 11px 0 var(--line-dark) !important; z-index: 5; }
+.qtile:active { transform: translate(5px,5px) rotate(1deg) !important; box-shadow: 0 0 0 var(--line-dark) !important; }
+.qtile::after { content: ''; position: absolute; top: 5px; right: 10px; width: 16px; height: 8px; background: rgba(255,255,255,.4); border-radius: 50%; transform: rotate(-18deg); pointer-events: none; }
+.qt-icon { font-size: 30px; flex-shrink: 0; }
+.qt-name { font-family: var(--font-display); font-size: 16px; color: var(--ink); }
+.qt-host { font-size: 10px; font-weight: 700; color: var(--ink2); margin-top: 1px; }
+
+#nstack { position: fixed; bottom: 24px; right: 20px; z-index: 9990; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 .toast {
-  display: flex; align-items: flex-start; gap: 10px;
-  background: var(--navy); color: white;
-  border-radius: var(--r); padding: 11px 14px;
-  box-shadow: 0 4px 20px var(--shadow-deep);
-  animation: toast-in .28s var(--ease-snap) both;
-  width: 268px; border-left: 3px solid var(--amber);
-  font-size: 12px;
+  width: 260px; pointer-events: all; background: var(--cream); border: 3px solid var(--line-dark);
+  border-radius: 16px 12px 16px 12px; box-shadow: 5px 5px 0 var(--line-dark);
+  padding: 11px 14px; display: flex; gap: 10px; align-items: flex-start;
+  animation: t-in .3s var(--bounce) both; position: relative;
 }
-.toast.out { animation: toast-out .2s var(--ease-book) both; }
-@keyframes toast-in  { from{opacity:0;transform:translateX(12px);} to{opacity:1;transform:none;} }
-@keyframes toast-out { to{opacity:0;transform:translateX(12px);} }
-.toast-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-.toast-title { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
-.toast-msg { font-size: 10px; opacity: 0.65; margin-top: 2px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.3px; }
+.toast.out { animation: t-out .18s ease-in both; }
+@keyframes t-in  { from { opacity:0; transform:translateX(18px) rotate(3deg) scale(.88); } to { opacity:1; transform:rotate(-0.5deg); } }
+@keyframes t-out { to   { opacity:0; transform:translateX(18px) scale(.9); } }
+.toast-stripe { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; border-radius: 14px 0 0 14px; }
+.toast-ico { font-size: 20px; flex-shrink: 0; }
+.toast-t { font-family: var(--font-display); font-size: 14px; color: var(--ink); }
+.toast-m { font-size: 11px; font-weight: 700; color: var(--ink3); margin-top: 2px; }
 
-/* ── LOADER OVERLAY ── */
+/* ══════════════════════════════════════════════════════
+   LOADER — CLAY FACTORY / ASSEMBLY LINE
+══════════════════════════════════════════════════════ */
 #loader {
   position: fixed; inset: 0; z-index: 9000;
-  background: rgba(245,240,232,0.82); backdrop-filter: blur(8px);
+  background: rgba(212,184,150,.82); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none; transition: opacity .2s;
 }
-#loader.vis { opacity: 1; pointer-events: all; }
-.loader-card {
-  background: white; border: 1px solid var(--border-hi); border-radius: var(--r-lg);
-  padding: 28px 32px 24px; width: 280px; text-align: center;
-  box-shadow: 0 8px 32px var(--shadow-ink);
-  position: relative; overflow: hidden;
-}
-.loader-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--navy),var(--amber)); }
-.loader-spinner { width: 36px; height: 36px; margin: 0 auto 16px; position: relative; }
-.ls-ring {
-  position: absolute; border-radius: 50%; border: 1.5px solid transparent;
-  top: 50%; left: 50%;
-}
-.ls-1 { width:36px;height:36px;margin:-18px 0 0 -18px;border-top-color:var(--navy);animation:spin 1.2s linear infinite; }
-.ls-2 { width:22px;height:22px;margin:-11px 0 0 -11px;border-top-color:var(--amber);animation:spin 1.8s linear infinite reverse; }
-.ls-dot { width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--amber);border:none;border-radius:50%;animation:lpulse 1s ease-in-out infinite; }
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
-@keyframes lpulse{0%,100%{opacity:.4;transform:translate(-50%,-50%) scale(.8);}50%{opacity:1;transform:translate(-50%,-50%) scale(1);}}
-.loader-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:var(--navy); margin-bottom:4px; }
-.loader-sub { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-3); margin-bottom:14px; min-height:14px; letter-spacing:.5px; text-transform:uppercase; }
-.loader-bar-bg { height:2px; background:var(--paper-deep); border-radius:2px; overflow:hidden; margin-bottom:6px; }
-#lbar { height:100%;width:0%;background:linear-gradient(90deg,var(--navy),var(--amber));transition:width .4s var(--ease-book); }
-.loader-status { font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-3);min-height:12px;margin-bottom:14px; }
-.loader-cancel { background:var(--paper-warm);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 18px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);cursor:pointer;transition:all .12s; }
-.loader-cancel:hover { background:var(--paper-deep);color:var(--ink); }
+#loader.on { opacity: 1; pointer-events: all; }
 
-/* scrollbar */
-::-webkit-scrollbar { width:4px; height:4px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--border-hi); border-radius:2px; }
-::-webkit-scrollbar-thumb:hover { background:var(--ink-3); }
+.lslab {
+  width: 320px; background: var(--cream);
+  border: 4px solid var(--line-dark);
+  border-radius: 26px 20px 26px 20px / 20px 26px 20px 26px;
+  box-shadow: var(--raise-lg) var(--raise-lg) 0 var(--line-dark);
+  padding: 30px 26px 24px; text-align: center; position: relative;
+}
+/* Rainbow rim */
+.lslab::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 7px;
+  background: linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--blue),var(--purple));
+  border-radius: 22px 16px 0 0;
+}
 
-/* hover helpers */
-[data-hov] { transition: background .12s, color .12s; }
+/* Machine Container */
+.m-wrap {
+  width: 140px; height: 130px; margin: 0 auto 16px; position: relative;
+  /* Top is strictly clipped so the shaft looks like it drops from the ceiling! */
+  clip-path: polygon(-100% 0, 200% 0, 200% 200%, -100% 200%);
+}
+.m-wrap::after {
+  content: ''; position: absolute; bottom: -6px; left: 50%; width: 110px; height: 14px;
+  margin-left: -55px; background: rgba(26,16,8,0.15); border-radius: 50%; z-index: -2; filter: blur(2px);
+}
+
+/* Ceiling Mount */
+.m-roof {
+  position: absolute; top: 0; left: 50%; width: 30px; height: 12px; margin-left: -15px;
+  background: var(--line-dark); border-radius: 0 0 6px 6px; z-index: 12;
+}
+
+/* Spinning Gears */
+.m-gear-wrap { position: absolute; filter: drop-shadow(4px 4px 0 var(--line-dark)); }
+.mw1 { bottom: 25px; left: 50%; width: 60px; height: 60px; margin-left: -30px; z-index: 1; }
+.mw2 { bottom: 8px; left: 50%; width: 44px; height: 44px; margin-left: 18px; z-index: 2; }
+
+.m-gear {
+  width: 100%; height: 100%; position: relative;
+  background: inherit; border: 3.5px solid var(--line-dark); border-radius: 50%;
+}
+.mg1 { background: var(--teal); animation: m-gear-spin 4s linear infinite; }
+.mg2 { background: var(--yellow); animation: m-gear-spin 2.5s linear infinite reverse; }
+
+/* The wobbly gear teeth */
+.m-gear::before, .m-gear::after {
+  content: ''; position: absolute; top: -3.5px; left: -3.5px; right: -3.5px; bottom: -3.5px;
+  background: inherit; border: 3.5px solid var(--line-dark); border-radius: 30%; z-index: -1;
+}
+.m-gear::before { transform: rotate(30deg); }
+.m-gear::after { transform: rotate(60deg); }
+
+/* Axle Holes */
+.m-gear-hole {
+  position: absolute; top: 50%; left: 50%;
+  background: var(--bg); border: 3.5px solid var(--line-dark); border-radius: 50%;
+}
+.mg1 .m-gear-hole { width: 14px; height: 14px; margin: -7px 0 0 -7px; }
+.mg2 .m-gear-hole { width: 10px; height: 10px; margin: -5px 0 0 -5px; }
+
+@keyframes m-gear-spin { to { transform: rotate(360deg); } }
+
+/* Conveyor Belt Anvil */
+.m-anvil {
+  position: absolute; bottom: 10px; left: 50%; width: 100px; height: 30px; margin-left: -50px;
+  background: var(--bg2); border: 3.5px solid var(--line-dark); border-radius: 10px;
+  box-shadow: 4px 4px 0 var(--line-dark); z-index: 5; overflow: hidden;
+}
+.m-anvil::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: -36px; right: 0;
+  background-image: repeating-linear-gradient(90deg, transparent 0, transparent 14px, rgba(26,16,8,0.15) 14px, rgba(26,16,8,0.15) 18px);
+  animation: m-belt-roll 0.8s linear infinite;
+}
+@keyframes m-belt-roll { to { transform: translateX(36px); } }
+
+/* The Animated Lump of Clay */
+.m-clay {
+  position: absolute; background: var(--orange); border: 3px solid var(--line-dark);
+  box-shadow: 2px 2px 0 var(--line-dark), inset 4px -4px 0 rgba(0,0,0,0.15); z-index: 8;
+  animation: m-clay-anim 2s infinite;
+}
+@keyframes m-clay-anim {
+  0% {
+    transform: translateX(-70px) rotate(-15deg); width: 32px; height: 32px;
+    margin-left: -16px; bottom: 40px; border-radius: 50% 45% 55% 48%; opacity: 0;
+  }
+  10% { opacity: 1; }
+  20%, 28% { /* Rolls in, arrives at center */
+    transform: translateX(0) rotate(5deg); width: 32px; height: 32px;
+    margin-left: -16px; bottom: 40px; border-radius: 48% 52% 45% 55%; opacity: 1;
+  }
+  30% { /* Gets violently squashed */
+    transform: translateX(0) rotate(0deg); width: 52px; height: 16px;
+    margin-left: -26px; bottom: 40px; border-radius: 14px 12px 14px 12px; opacity: 1;
+  }
+  50% { /* Stays squashed under press */
+    transform: translateX(0) rotate(0deg); width: 52px; height: 16px;
+    margin-left: -26px; bottom: 40px; opacity: 1; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  85% { /* Slides out off-screen */
+    transform: translateX(75px) rotate(0deg); width: 52px; height: 16px;
+    margin-left: -26px; bottom: 40px; opacity: 1;
+  }
+  95%, 100% {
+    transform: translateX(95px) rotate(0deg); width: 52px; height: 16px;
+    margin-left: -26px; bottom: 40px; opacity: 0;
+  }
+}
+
+/* The Heavy Press */
+.m-press {
+  position: absolute; top: 0px; left: 50%; width: 48px; height: 44px; margin-left: -24px;
+  background: var(--purple); border: 3.5px solid var(--line-dark); border-radius: 12px 12px 6px 6px;
+  box-shadow: 4px 4px 0 var(--line-dark), inset 4px -4px 0 rgba(0,0,0,0.15); z-index: 10;
+  animation: m-press-anim 2s infinite;
+}
+.m-shaft {
+  position: absolute; bottom: 100%; left: 50%; width: 18px; height: 50px; margin-left: -9px; margin-bottom: 3.5px;
+  background: var(--cream); border: 3.5px solid var(--line-dark); border-bottom: none; border-radius: 6px 6px 0 0; z-index: -1;
+}
+@keyframes m-press-anim {
+  0%, 22% { transform: translateY(0); animation-timing-function: cubic-bezier(0.7,0,1,1); } /* Wait up high */
+  30% { transform: translateY(30px); animation-timing-function: linear; } /* Slam down perfectly onto the 16px tall clay */
+  50% { transform: translateY(30px); animation-timing-function: cubic-bezier(0.2,1,0.3,1); } /* Hold hit slightly */
+  65%, 100% { transform: translateY(0); } /* Retract */
+}
+
+/* Loader Text & Bars */
+.l-h { font-family: var(--font-display); font-size: 24px; color: var(--ink); margin-bottom: 4px; animation: pulse-text 2s ease-in-out infinite; }
+@keyframes pulse-text { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03) rotate(-1deg); } }
+.l-m { font-size: 12px; font-weight: 700; color: var(--ink3); margin-bottom: 14px; min-height: 16px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* The animated progress bar */
+.l-track {
+  height: 18px; background: var(--offwhite); border: 3px solid var(--line-dark);
+  border-radius: 12px; overflow: hidden; margin-bottom: 6px; position: relative;
+  box-shadow: inset 3px 3px 0 rgba(0,0,0,.1);
+}
+#lbar {
+  height: 100%; width: 0%; border-radius: 8px;
+  background: repeating-linear-gradient(45deg, var(--blue), var(--blue) 12px, var(--blue2) 12px, var(--blue2) 24px);
+  background-size: 34px 34px; animation: lbar-flow 1s linear infinite;
+  transition: width .4s var(--bounce); box-shadow: 0 4px 0 rgba(0,0,0,0.15) inset;
+}
+@keyframes lbar-flow { to { background-position: 34px 0; } }
+
+.l-stat { font-size: 10px; font-weight: 700; color: var(--ink3); min-height: 14px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; }
+
+.l-cancelbtn {
+  background: var(--offwhite); border: 3px solid var(--line-dark); border-radius: 18px 14px 18px 14px;
+  padding: 9px 26px; font-family: var(--font-display); font-size: 14px; color: var(--ink);
+  cursor: pointer; box-shadow: 4px 4px 0 var(--line-dark); transition: transform .13s var(--bounce), box-shadow .13s;
+}
+.l-cancelbtn:hover { transform: translate(-1px,-2px); box-shadow: 5px 6px 0 var(--line-dark); }
+.l-cancelbtn:active { transform: translate(4px,4px); box-shadow: 0 0 0 var(--line-dark); }
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════
-     BOOT SCREEN — runs immediately
-════════════════════════════════ -->
-<div id="boot">
-  <div class="boot-card">
-    <div class="boot-eyebrow">Research Browser · v2.0</div>
-    <div class="boot-name">Fo<em>li</em>o</div>
-    <div class="boot-desc">Your intelligent research companion.<br>Explore, study, and discover freely.</div>
+<!-- UV proxy scripts — async, zero blocking -->
+<script>
+(function(){['uv.bundle.js','uv.config.js'].forEach(function(f){
+    var s=document.createElement('script');s.src='/uv/'+f;s.async=true;document.head.appendChild(s);
+  });
+  navigator.serviceWorker&&navigator.serviceWorker.register('/uv/uv.sw.js',{scope:'/'}).catch(function(){});
+})();
+</script>
 
-    <div class="boot-lines" id="boot-lines">
-      <div class="boot-line-row">
-        <span class="boot-line-label">Engine</span>
-        <span class="boot-line-val">Ultraviolet Proxy</span>
-        <span class="boot-line-dot" id="bdot-0"></span>
-      </div>
-      <div class="boot-line-row">
-        <span class="boot-line-label">Tunnel</span>
-        <span class="boot-line-val">Establishing secure route</span>
-        <span class="boot-line-dot" id="bdot-1"></span>
-      </div>
-      <div class="boot-line-row">
-        <span class="boot-line-label">Stealth</span>
-        <span class="boot-line-val">Content filter bypass</span>
-        <span class="boot-line-dot" id="bdot-2"></span>
-      </div>
-      <div class="boot-line-row">
-        <span class="boot-line-label">Search</span>
-        <span class="boot-line-val">Index ready</span>
-        <span class="boot-line-dot" id="bdot-3"></span>
-      </div>
-    </div>
+<!-- CURSOR -->
+<div id="cur"><div id="cur-shadow"></div><div id="cur-clay"></div></div>
 
-    <div class="boot-progress-wrap">
-      <div class="boot-progress-track"><div id="boot-prog"></div></div>
-      <div class="boot-ruler">
-        <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
-      </div>
+<!-- ══════════ CHROME ══════════ -->
+<div id="chrome">
+  <div class="brand">
+    <div class="brand-eye">🎨</div>
+    <div class="brand-name">Sculptr</div>
+  </div>
+
+  <div style="display:flex;gap:6px;flex-shrink:0;">
+    <button class="nav-btn" id="nb" title="Back">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L3 6L8 10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nav-btn" id="nf" title="Forward">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L9 6L4 10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nav-btn" id="nr" title="Reload">
+      <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2 6A4 4 0 0 1 10 3.5M10 2v2H8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nav-btn" id="nd" title="Home">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7L7 2L12 7V12H9V9H5V12H2V7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="addr-wrap">
+    <div class="addr-trough">
+      <div class="addr-badge">sculptr</div>
+      <input class="addr-inp" id="addr" type="text" placeholder="Where to? Type a site or search…" autocomplete="off" spellcheck="false">
+      <button class="addr-go-btn" id="ago">Go!</button>
     </div>
-    <div class="boot-msg" id="boot-msg">Initializing…</div>
+  </div>
+
+  <div class="chrome-r">
+    <div class="status-pill"><div class="status-dot"></div>Proxy On</div>
+    <div class="clock-chip" id="clk"></div>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     MAIN FOLIO BROWSER
-════════════════════════════════ -->
-<div id="folio">
+<!-- ══════════ SHELL ══════════ -->
+<div id="shell">
+  <div id="bview"><iframe id="bframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" allowfullscreen></iframe></div>
 
-  <!-- TOP CHROME -->
-  <div id="chrome">
-    <div class="chrome-brand">
-      <div class="chrome-brand-mark">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-          <path d="M2 4h12M2 8h8M2 12h10" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="chrome-brand-name">Fo<em>li</em>o</div>
-    </div>
-
-    <!-- sidebar toggle -->
-    <button class="nav-btn" id="sidebar-toggle" title="Toggle sidebar">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <rect x="1" y="2" width="5" height="12" rx="1" stroke="currentColor" stroke-width="1.3"/>
-        <path d="M9 5h5M9 8h5M9 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-      </svg>
-    </button>
-
-    <div class="nav-group">
-      <button class="nav-btn" id="btn-back">
-        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M8 2L3 6L8 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="nav-btn" id="btn-fwd">
-        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M4 2L9 6L4 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="nav-btn" id="btn-reload">
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6A4 4 0 0 1 10 3.5M10 2v2H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="nav-btn" id="btn-home">
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M1 5.5L6 1.5L11 5.5V10.5H8V7.5H4V10.5H1V5.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <!-- ADDRESS BAR -->
-    <div class="addr-wrap">
-      <div class="addr-bar">
-        <div class="addr-subject">RESEARCH</div>
-        <input class="addr-input" id="addr-input" type="text" placeholder="Search or enter a URL to explore…" autocomplete="off" spellcheck="false">
-        <button class="addr-go" id="addr-go">Go</button>
+  <!-- DASHBOARD -->
+  <div id="dash">
+    <div id="hero">
+      <div class="hblob hb1"></div>
+      <div class="hblob hb2"></div>
+      <div class="hblob hb3"></div>
+      <div class="hblob hb4"></div>
+      <div class="hero-inner">
+        <div class="hero-tag">🎨 Welcome!</div>
+        <div class="hero-title">Sculptr</div>
+        <div class="hero-sub">Your hand-crafted browser. Games, sites, everything — all in one place.</div>
+        <div class="hero-acts">
+          <button class="hbtn hbtn-w" onclick="Nav.focus()">🔍 Search</button>
+          <button class="hbtn hbtn-g" onclick="Nav.go('https://www.youtube.com')">▶ YouTube</button>
+          <button class="hbtn hbtn-p" onclick="Nav.go('https://discord.com/app')">◉ Discord</button>
+        </div>
       </div>
     </div>
-
-    <div class="nav-group">
-      <button class="nav-btn" id="btn-new-tab" title="New tab">
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </button>
-    </div>
+    <div id="rows"></div>
   </div>
-
-  <!-- TAB STRIP -->
-  <div id="tab-strip"></div>
-
-  <!-- BODY -->
-  <div id="folio-body">
-
-    <!-- SIDEBAR -->
-    <div id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-label">Contents</div>
-        <div class="sidebar-search">
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.3"/><line x1="8.5" y1="8.5" x2="11" y2="11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          <input class="sidebar-search-inp" placeholder="Quick search…" id="sb-search" autocomplete="off">
-        </div>
-      </div>
-
-      <div style="flex:1;overflow-y:auto;">
-        <div class="sb-section"><div class="sb-section-lbl">Bookmarks</div></div>
-        <div class="sb-item active" onclick="Nav.go('https://www.wikipedia.org')">
-          <span class="sb-item-icon">📖</span>
-          <div class="sb-item-text"><div class="sb-item-name">Wikipedia</div><div class="sb-item-sub">Free encyclopedia</div></div>
-          <span class="sb-item-badge">REF</span>
-        </div>
-        <div class="sb-item" onclick="Nav.go('https://www.khanacademy.org')">
-          <span class="sb-item-icon">🎓</span>
-          <div class="sb-item-text"><div class="sb-item-name">Khan Academy</div><div class="sb-item-sub">Free lessons & practice</div></div>
-          <span class="sb-item-badge">EDU</span>
-        </div>
-        <div class="sb-item" onclick="Nav.go('https://www.youtube.com')">
-          <span class="sb-item-icon">▶</span>
-          <div class="sb-item-text"><div class="sb-item-name">YouTube</div><div class="sb-item-sub">Video library</div></div>
-          <span class="sb-item-badge">VID</span>
-        </div>
-        <div class="sb-item" onclick="Nav.go('https://open.spotify.com')">
-          <span class="sb-item-icon">♪</span>
-          <div class="sb-item-text"><div class="sb-item-name">Spotify</div><div class="sb-item-sub">Music & podcasts</div></div>
-          <span class="sb-item-badge">MUS</span>
-        </div>
-        <div class="sb-item" onclick="Nav.go('https://discord.com/app')">
-          <span class="sb-item-icon">◉</span>
-          <div class="sb-item-text"><div class="sb-item-name">Discord</div><div class="sb-item-sub">Study groups & chat</div></div>
-          <span class="sb-item-badge">COM</span>
-        </div>
-        <div class="sb-item" onclick="Nav.go('https://scratch.mit.edu')">
-          <span class="sb-item-icon">◈</span>
-          <div class="sb-item-text"><div class="sb-item-name">Scratch</div><div class="sb-item-sub">Creative coding</div></div>
-          <span class="sb-item-badge">CS</span>
-        </div>
-
-        <div class="sb-rule"></div>
-        <div class="sb-section"><div class="sb-section-lbl">Games Library</div></div>
-        <div class="sb-games" id="sb-games"></div>
-      </div>
-    </div>
-
-    <!-- VIEWPORT -->
-    <div id="viewport">
-      <div id="new-tab"></div>
-      <iframe id="main-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" allowfullscreen></iframe>
-    </div>
-  </div>
-
-  <!-- STATUS BAR -->
-  <div id="status-bar">
-    <div class="sb-stat"><div class="sb-led on"></div>Proxy Active</div>
-    <div class="sb-divider"></div>
-    <div class="sb-stat"><div class="sb-led on"></div>Stealth On</div>
-    <div class="sb-divider"></div>
-    <div id="sb-url-display">folio://newtab</div>
-    <div style="margin-left:auto;" class="sb-stat" id="sb-time-stat"></div>
-  </div>
-
 </div>
 
 <!-- LOADER -->
 <div id="loader">
-  <div class="loader-card">
-    <div class="loader-spinner">
-      <div class="ls-ring ls-dot"></div>
-      <div class="ls-ring ls-2"></div>
-      <div class="ls-ring ls-1"></div>
+  <div class="lslab">
+    <div class="m-wrap">
+      <div class="m-roof"></div>
+      <div class="m-gear-wrap mw1"><div class="m-gear mg1"><div class="m-gear-hole"></div></div></div>
+      <div class="m-gear-wrap mw2"><div class="m-gear mg2"><div class="m-gear-hole"></div></div></div>
+      <div class="m-anvil"></div>
+      <div class="m-clay"></div>
+      <div class="m-press"><div class="m-shaft"></div></div>
     </div>
-    <div class="loader-title">Folio</div>
-    <div class="loader-sub" id="l-sub">connecting</div>
-    <div class="loader-bar-bg"><div id="lbar"></div></div>
-    <div class="loader-status" id="l-status"></div>
-    <button class="loader-cancel" id="l-cancel">Cancel</button>
+    <div class="l-h">Sculpting…</div>
+    <div class="l-m" id="lm">mixing clay</div>
+    <div class="l-track"><div id="lbar"></div></div>
+    <div class="l-stat" id="lst"></div>
+    <button class="l-cancelbtn" id="lcan">🚫 Cancel</button>
   </div>
 </div>
+<div id="nstack"></div>
 
-<div id="toasts"></div>
-<div id="folio-cursor"><div id="fc-shadow"></div><div id="fc-nib"></div></div>
-
-<!-- UV — async, non-blocking -->
-<script>
-['uv.bundle.js','uv.config.js'].forEach(s=>{
-  const el=document.createElement('script');
-  el.src='/uv/'+s; el.async=true; document.head.appendChild(el);
-});
-</script>
-
+<!-- ══════════ SCRIPTS ══════════ -->
 <script>
 'use strict';
 
-/* ── CONFIG ── */
-const CFG = { search: 'brave' };
-const SEARCHES = {
-  brave:  q => 'https://search.brave.com/search?q=' + encodeURIComponent(q),
-  ddg:    q => 'https://duckduckgo.com/?q=' + encodeURIComponent(q),
-  google: q => 'https://www.google.com/search?q=' + encodeURIComponent(q),
+/* ── SEARCH ── */
+const SRCH = {
+  brave:  q=>'https://search.brave.com/search?q='+encodeURIComponent(q),
+  ddg:    q=>'https://duckduckgo.com/?q='+encodeURIComponent(q),
+  google: q=>'https://www.google.com/search?q='+encodeURIComponent(q),
 };
 function toURL(v) {
-  v = v.trim(); if (!v) return null;
-  if (v.includes('.') && !v.includes(' ')) return v.startsWith('http') ? v : 'https://' + v;
-  return SEARCHES[CFG.search](v);
+  v=v.trim(); if(!v) return null;
+  if(v.includes('.')&&!v.includes(' ')) return v.startsWith('http')?v:'https://'+v;
+  return SRCH.brave(v);
 }
 
-/* ── GAMES ── */
-const GAMES = [
-  { n:'Shell Shockers',   u:'https://shellshock.io/',                     t:'Shooter',   ic:'🥚', hot:true,  bg:'#fff5f5' },
-  { n:'Krunker.io',       u:'https://krunker.io/',                        t:'FPS',       ic:'🎯', hot:true,  bg:'#fff8f0' },
-  { n:'1v1.LOL',          u:'https://1v1.lol/',                           t:'Battle',    ic:'⚔',  hot:true,  bg:'#fff5f5' },
-  { n:'Smash Karts',      u:'https://smashkarts.io/',                     t:'Racing',    ic:'🏎', hot:true,  bg:'#f0f5ff' },
-  { n:'Bloxd.io',         u:'https://bloxd.io/',                          t:'Sandbox',   ic:'⬡',  hot:true,  bg:'#f0fff5' },
-  { n:'Infinite Craft',   u:'https://neal.fun/infinite-craft/',           t:'Crafting',  ic:'✨', hot:true,  bg:'#fffff0' },
-  { n:'Pokémon Showdown', u:'https://pokemonshowdown.com/',               t:'Strategy',  ic:'⚡', hot:true,  bg:'#f8f0ff' },
-  { n:'Slither.io',       u:'https://slither.io/',                        t:'Arcade',    ic:'🐍', hot:false, bg:'#f0fff8' },
-  { n:'Agar.io',          u:'https://agar.io/',                           t:'Strategy',  ic:'⬤',  hot:false, bg:'#f5f0ff' },
-  { n:'Skribbl.io',       u:'https://skribbl.io/',                        t:'Drawing',   ic:'✏',  hot:false, bg:'#fff8f0' },
-  { n:'2048',             u:'https://play2048.co/',                       t:'Puzzle',    ic:'🔢', hot:false, bg:'#fffbf0' },
-  { n:'Wordle',           u:'https://wordleunlimited.org/',               t:'Word',      ic:'📝', hot:false, bg:'#f0fff5' },
-  { n:'Minesweeper',      u:'https://minesweeper.online/',                t:'Classic',   ic:'💣', hot:false, bg:'#f0f5ff' },
-  { n:'Chess.com',        u:'https://www.chess.com/play/computer',        t:'Strategy',  ic:'♟',  hot:false, bg:'#fdf8f0' },
-  { n:'Cookie Clicker',   u:'https://orteil.dashnet.org/cookieclicker/', t:'Idle',      ic:'🍪', hot:false, bg:'#fff5e0' },
-  { n:'Pac-Man',          u:'https://freepacman.org/',                    t:'Classic',   ic:'👾', hot:false, bg:'#fffde0' },
-  { n:'Tetris',           u:'https://tetris.com/play-tetris',             t:'Classic',   ic:'⬛', hot:false, bg:'#f0f5ff' },
-  { n:'Slope',            u:'https://slope-game.github.io/',              t:'Endless',   ic:'⬡',  hot:false, bg:'#f0fffc' },
-  { n:'Flappy Bird',      u:'https://flappybird.io/',                     t:'Endless',   ic:'🐦', hot:false, bg:'#f0f8ff' },
-  { n:'Crossy Road',      u:'https://poki.com/en/g/crossy-road',         t:'Arcade',    ic:'🐔', hot:false, bg:'#f0fff0' },
-  { n:'Subway Surfers',   u:'https://poki.com/en/g/subway-surfers',      t:'Runner',    ic:'🏃', hot:false, bg:'#f8f0ff' },
-  { n:'Geoguessr',        u:'https://www.geoguessr.com/',                 t:'Geography', ic:'🌍', hot:false, bg:'#f0fff5' },
-  { n:'Splix.io',         u:'https://splix.io/',                         t:'Territory', ic:'◼',  hot:false, bg:'#f0f5ff' },
-  { n:'Stack',            u:'https://poki.com/en/g/stack',               t:'Casual',    ic:'📦', hot:false, bg:'#f5f0ff' },
+/* ── DATA ── */
+const HOT=[
+  {n:'Shell Shockers',u:'https://shellshock.io/',        t:'Shooter',  e:'🥚',c:['#e83030','#a81818']},
+  {n:'Krunker.io',    u:'https://krunker.io/',           t:'FPS',      e:'🎯',c:['#f07820','#b85510']},
+  {n:'1v1.LOL',       u:'https://1v1.lol/',              t:'Battle',   e:'⚔️', c:['#9848e0','#6828b0']},
+  {n:'Smash Karts',   u:'https://smashkarts.io/',        t:'Racing',   e:'🏎️', c:['#3888e8','#1858b8']},
+  {n:'Bloxd.io',      u:'https://bloxd.io/',             t:'Sandbox',  e:'🟩',c:['#48c050','#289030']},
+  {n:'Pokémon Showdown',u:'https://pokemonshowdown.com/',t:'Strategy', e:'⚡',c:['#f5d020','#c8a800']},
+  {n:'Infinite Craft',u:'https://neal.fun/infinite-craft/',t:'Crafting',e:'✨',c:['#20c8b8','#089888']},
 ];
-
-const QUICK_LINKS = [
-  { n:'YouTube',   u:'https://www.youtube.com',   ic:'▶', bg:'#fff5f5', col:'#cc0000' },
-  { n:'Spotify',   u:'https://open.spotify.com',  ic:'♪', bg:'#f0fff5', col:'#1db954' },
-  { n:'Discord',   u:'https://discord.com/app',   ic:'◉', bg:'#f5f5ff', col:'#5865f2' },
-  { n:'Scratch',   u:'https://scratch.mit.edu',   ic:'◈', bg:'#fff8f0', col:'#e6821e' },
+const ARCADE=[
+  {n:'Pac-Man',       u:'https://freepacman.org/',       t:'Classic',  e:'👾',c:['#f5d020','#c8a800']},
+  {n:'Tetris',        u:'https://tetris.com/play-tetris',t:'Classic',  e:'⬛',c:['#3888e8','#1858b8']},
+  {n:'2048',          u:'https://play2048.co/',          t:'Puzzle',   e:'🔢',c:['#f07820','#b85510']},
+  {n:'Slope',         u:'https://slope-game.github.io/', t:'Endless',  e:'🔺',c:['#48c050','#289030']},
+  {n:'Flappy Bird',   u:'https://flappybird.io/',        t:'Endless',  e:'🐦',c:['#20c8b8','#089888']},
+  {n:'Cookie Clicker',u:'https://orteil.dashnet.org/cookieclicker/',t:'Idle',e:'🍪',c:['#f07820','#b85510']},
+  {n:'Minesweeper',   u:'https://minesweeper.online/',   t:'Puzzle',   e:'💣',c:['#9848e0','#6828b0']},
+  {n:'Chess',         u:'https://www.chess.com/play/computer',t:'Strategy',e:'♟️',c:['#c8a882','#9a6838']},
+];
+const MULTI=[
+  {n:'Slither.io',    u:'https://slither.io/',           t:'Multiplayer',e:'🐍',c:['#48c050','#289030']},
+  {n:'Agar.io',       u:'https://agar.io/',              t:'Multiplayer',e:'🔴',c:['#e83030','#a81818']},
+  {n:'Skribbl.io',    u:'https://skribbl.io/',           t:'Drawing',  e:'✏️', c:['#f07820','#b85510']},
+  {n:'Wordle',        u:'https://wordleunlimited.org/',  t:'Word',     e:'📝',c:['#48c050','#289030']},
+  {n:'GeoGuessr',     u:'https://www.geoguessr.com/',    t:'Geography',e:'🌍',c:['#3888e8','#1858b8']},
+  {n:'Crossy Road',   u:'https://poki.com/en/g/crossy-road',t:'Arcade',e:'🐔',c:['#f5d020','#c8a800']},
+  {n:'Subway Surfers',u:'https://poki.com/en/g/subway-surfers',t:'Runner',e:'🏃',c:['#9848e0','#6828b0']},
+  {n:'Splix.io',      u:'https://splix.io/',             t:'Territory',e:'◼',c:['#20c8b8','#089888']},
+];
+const QUICK=[
+  {n:'YouTube',  u:'https://www.youtube.com',   e:'▶',bg:'#ffd8d8',bc:'#e83030',bs:'#a81818'},
+  {n:'Spotify',  u:'https://open.spotify.com',  e:'♪',bg:'#d8f0dc',bc:'#48c050',bs:'#289030'},
+  {n:'Discord',  u:'https://discord.com/app',   e:'💬',bg:'#dddcf8',bc:'#5865f2',bs:'#3a44c0'},
+  {n:'Scratch',  u:'https://scratch.mit.edu',   e:'🐱',bg:'#fce4c0',bc:'#f07820',bs:'#b85510'},
+  {n:'Roblox',   u:'https://www.roblox.com',    e:'⬡',bg:'#ffd8d8',bc:'#e83030',bs:'#a81818'},
+  {n:'Wikipedia',u:'https://www.wikipedia.org', e:'📖',bg:'#ece8e0',bc:'#9a8870',bs:'#6a5840'},
 ];
 
 /* ── CURSOR ── */
-const curEl = document.getElementById('folio-cursor');
-document.addEventListener('mousemove', e => { curEl.style.left = e.clientX + 'px'; curEl.style.top = e.clientY + 'px'; });
-document.addEventListener('mousedown', () => document.body.classList.add('clk'));
-document.addEventListener('mouseup',   () => document.body.classList.remove('clk'));
-function addH(el) {
-  if (el._h) return; el._h = 1;
-  el.addEventListener('mouseenter', () => document.body.classList.add('hov'));
-  el.addEventListener('mouseleave', () => { document.body.classList.remove('hov'); document.body.classList.remove('txt'); });
-}
-function addT(el) {
-  el.addEventListener('mouseenter', () => document.body.classList.add('txt'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('txt'));
-}
-document.querySelectorAll('button, .sb-item, .ftab, .ql-card, .game-card, .sb-game, .nav-btn, .toggle, .radio-row, .g-cat, .tab-new').forEach(addH);
-document.querySelectorAll('input').forEach(addT);
+const curEl=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{curEl.style.left=e.clientX+'px';curEl.style.top=e.clientY+'px';});
+document.addEventListener('mousedown',()=>document.body.classList.add('clk'));
+document.addEventListener('mouseup',()=>document.body.classList.remove('clk'));
+function H(el){if(el._h)return;el._h=1;el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'));}
+function T(el){el.addEventListener('mouseenter',()=>document.body.classList.add('txt'));el.addEventListener('mouseleave',()=>document.body.classList.remove('txt'));}
 
 /* ── CLOCK ── */
-function tick() {
-  const n = new Date();
-  const t = n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const d = n.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-  document.querySelectorAll('.nt-time-val').forEach(el => el.textContent = t);
-  document.querySelectorAll('.nt-date-val').forEach(el => el.textContent = d);
-  const s = document.getElementById('sb-time-stat');
-  if (s) s.textContent = n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-tick(); setInterval(tick, 1000);
+function tick(){document.getElementById('clk').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+tick();setInterval(tick,5000);
 
-/* ── TOAST NOTIFICATIONS ── */
-function toast(title, msg, icon = '📌') {
-  const s = document.getElementById('toasts');
-  const el = document.createElement('div'); el.className = 'toast';
-  el.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
-  s.appendChild(el);
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 3200);
+/* ── TOASTS ── */
+const TCOLS={'🎨':['#f07820','#b85510'],'✅':['#48c050','#289030'],'🔒':['#3888e8','#1858b8'],'🎮':['#e83030','#a81818']};
+function toast(title,msg,ico='🎨'){
+  const s=document.getElementById('nstack');
+  const d=document.createElement('div');d.className='toast';
+  const cc=TCOLS[ico]||['#3888e8','#1858b8'];
+  d.innerHTML=`<div class="toast-stripe" style="background:${cc[0]};box-shadow:2px 0 0 ${cc[1]};"></div><div class="toast-ico">${ico}</div><div><div class="toast-t">${title}</div><div class="toast-m">${msg}</div></div>`;
+  s.appendChild(d);
+  setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),200);},3000);
 }
 
-/* ── TAB SYSTEM ── */
-let tabCount = 0;
-const tabs = {};
-let activeTab = null;
-
-const TabBar = {
-  create(title = 'New Tab', url = null) {
-    tabCount++;
-    const id = 'tab-' + tabCount;
-    tabs[id] = { id, title, url, icon: '📄' };
-    const el = document.createElement('div');
-    el.className = 'ftab'; el.id = 'ftab-' + id;
-    el.innerHTML = `
-      <div class="ftab-accent"></div>
-      <span class="ftab-icon">📄</span>
-      <span class="ftab-title">${title}</span>
-      <span class="ftab-close" onclick="TabBar.close('${id}', event)">✕</span>`;
-    el.addEventListener('click', () => TabBar.activate(id));
-    addH(el);
-    const strip = document.getElementById('tab-strip');
-    const btn = strip.querySelector('.tab-new');
-    strip.insertBefore(el, btn);
-    TabBar.activate(id);
-    if (url) Nav.loadInTab(id, url);
-    return id;
+/* ── NAV ── */
+const frame=document.getElementById('bframe'),bv=document.getElementById('bview'),dsh=document.getElementById('dash');
+const Nav={
+  go(v){const u=toURL(v);if(!u)return;Ldr.run(u);},
+  load(u){
+    try{frame.src=__uv$config.prefix+__uv$config.encodeUrl(u);}catch{frame.src=u;}
+    bv.classList.add('on');dsh.style.display='none';
+    document.getElementById('addr').value=u;
   },
-  activate(id) {
-    if (activeTab === id) return;
-    activeTab = id;
-    document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
-    const el = document.getElementById('ftab-' + id);
-    if (el) el.classList.add('active');
-    // show/hide newtab vs frame
-    const t = tabs[id];
-    if (t && t.url) {
-      document.getElementById('new-tab').style.display = 'none';
-      document.getElementById('main-frame').style.display = 'block';
-    } else {
-      document.getElementById('new-tab').style.display = '';
-      document.getElementById('main-frame').style.display = 'none';
-    }
-    if (t && t.url) {
-      document.getElementById('addr-input').value = t.url;
-      document.getElementById('sb-url-display').textContent = t.url;
-    } else {
-      document.getElementById('addr-input').value = '';
-      document.getElementById('sb-url-display').textContent = 'folio://newtab';
-    }
-  },
-  close(id, e) {
-    e && e.stopPropagation();
-    const el = document.getElementById('ftab-' + id);
-    if (el) el.remove();
-    delete tabs[id];
-    const remaining = Object.keys(tabs);
-    if (remaining.length === 0) TabBar.create();
-    else if (activeTab === id) TabBar.activate(remaining[remaining.length - 1]);
-  },
-  updateTitle(title, icon = '🌐') {
-    if (!activeTab) return;
-    tabs[activeTab].title = title;
-    tabs[activeTab].icon = icon;
-    const el = document.getElementById('ftab-' + activeTab);
-    if (el) {
-      el.querySelector('.ftab-title').textContent = title;
-      el.querySelector('.ftab-icon').textContent = icon;
-    }
-  }
+  home(){bv.classList.remove('on');dsh.style.display='';document.getElementById('addr').value='';},
+  focus(){const a=document.getElementById('addr');a.focus();a.select();}
 };
-
-/* ── NAVIGATION ── */
-const Nav = {
-  go(val) {
-    const u = toURL(val);
-    if (!u) return;
-    Loader.launch(u);
-  },
-  loadInTab(tabId, u) {
-    tabs[tabId].url = u;
-    const frame = document.getElementById('main-frame');
-    document.getElementById('new-tab').style.display = 'none';
-    frame.style.display = 'block';
-    document.getElementById('addr-input').value = u;
-    document.getElementById('sb-url-display').textContent = u;
-    try { frame.src = __uv$config.prefix + __uv$config.encodeUrl(u); }
-    catch { frame.src = u; }
-  }
-};
-
-/* ── ADDRESS BAR LOGIC ── */
-const addrInp = document.getElementById('addr-input');
-addT(addrInp);
-document.getElementById('addr-go').addEventListener('click', () => Nav.go(addrInp.value));
-addrInp.addEventListener('keydown', e => { if (e.key === 'Enter') Nav.go(addrInp.value); });
-document.getElementById('btn-back').addEventListener('click', () => { try { document.getElementById('main-frame').contentWindow.history.back(); } catch {} });
-document.getElementById('btn-fwd').addEventListener('click', () => { try { document.getElementById('main-frame').contentWindow.history.forward(); } catch {} });
-document.getElementById('btn-reload').addEventListener('click', () => { try { document.getElementById('main-frame').contentWindow.location.reload(); } catch {} });
-document.getElementById('btn-home').addEventListener('click', () => {
-  if (activeTab) { tabs[activeTab].url = null; TabBar.activate(activeTab); }
-});
-document.getElementById('btn-new-tab').addEventListener('click', () => TabBar.create());
-document.getElementById('tab-strip').addEventListener('click', e => {
-  if (e.target.classList.contains('tab-new') || e.target.closest('.tab-new')) TabBar.create();
-});
-
-/* SIDEBAR TOGGLE */
-const sidebar = document.getElementById('sidebar');
-let sidebarOpen = true;
-document.getElementById('sidebar-toggle').addEventListener('click', () => {
-  sidebarOpen = !sidebarOpen;
-  sidebar.classList.toggle('collapsed', !sidebarOpen);
-});
-
-/* SIDEBAR SEARCH */
-const sbSearch = document.getElementById('sb-search');
-addT(sbSearch);
-sbSearch.addEventListener('keydown', e => { if (e.key === 'Enter') Nav.go(sbSearch.value); });
-
-/* ── NEW TAB PAGE BUILDER ── */
-function buildNewTab() {
-  const nt = document.getElementById('new-tab');
-  nt.innerHTML = `
-    <div class="nt-masthead">
-      <div class="nt-time"><em class="nt-time-val">--:--</em></div>
-      <div class="nt-date nt-date-val">Loading…</div>
-    </div>
-
-    <div class="nt-search-wrap">
-      <label class="nt-search-label">What would you like to explore today?</label>
-      <div class="nt-search-bar">
-        <div class="nt-subject-tag">Search</div>
-        <input class="nt-inp" id="nt-inp" type="text" placeholder="Enter a search query or URL…" autocomplete="off" spellcheck="false">
-        <button class="nt-go" id="nt-go">Go</button>
-      </div>
-    </div>
-
-    <div class="nt-section">
-      <div class="nt-section-head">
-        <span class="nt-section-title">Quick Access</span>
-        <span class="nt-section-sub">Bookmarks</span>
-      </div>
-      <div class="ql-grid" id="nt-ql"></div>
-    </div>
-
-    <div class="nt-section">
-      <div class="nt-section-head">
-        <span class="nt-section-title">Games</span>
-        <span class="nt-section-sub">Interactive Library</span>
-        <span class="nt-section-all" id="nt-see-all">View All →</span>
-      </div>
-      <div class="game-grid" id="nt-games"></div>
-    </div>
-  `;
-
-  tick(); // update clock immediately
-
-  const ntInp = document.getElementById('nt-inp');
-  addT(ntInp);
-  const ntGo = () => Nav.go(ntInp.value);
-  document.getElementById('nt-go').addEventListener('click', ntGo);
-  ntInp.addEventListener('keydown', e => e.key === 'Enter' && ntGo());
-  addH(document.getElementById('nt-go'));
-
-  // quick links
-  const qlGrid = document.getElementById('nt-ql');
-  QUICK_LINKS.forEach(q => {
-    const el = document.createElement('div'); el.className = 'ql-card';
-    el.innerHTML = `<div class="ql-thumb" style="background:${q.bg};color:${q.col};font-size:22px">${q.ic}</div><div class="ql-info"><div class="ql-name">${q.n}</div><div class="ql-url">${q.u.replace('https://','')}</div></div>`;
-    el.addEventListener('click', () => Nav.go(q.u)); addH(el); qlGrid.appendChild(el);
-  });
-
-  // games — hot first, first 8
-  const gameGrid = document.getElementById('nt-games');
-  [...GAMES].sort((a,b) => b.hot - a.hot).slice(0, 8).forEach(g => {
-    const el = document.createElement('div'); el.className = 'game-card';
-    el.innerHTML = `${g.hot ? '<div class="game-hot">Hot</div>' : ''}<div class="game-thumb" style="background:${g.bg}">${g.ic}</div><div class="game-info"><div class="game-name">${g.n}</div><div class="game-tag">${g.t}</div></div>`;
-    el.addEventListener('click', () => Nav.go(g.u)); addH(el); gameGrid.appendChild(el);
-  });
-
-  document.getElementById('nt-see-all').addEventListener('click', () => buildAllGames());
-}
-
-function buildAllGames() {
-  const nt = document.getElementById('new-tab');
-  nt.innerHTML = `
-    <div class="nt-section" style="max-width:700px;width:100%">
-      <div class="nt-section-head">
-        <span class="nt-section-title">All Games</span>
-        <span class="nt-section-sub">${GAMES.length} Titles</span>
-        <span class="nt-section-all" id="back-home">← Back</span>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;" id="cat-pills"></div>
-      <div class="game-grid" id="all-games-grid" style="grid-template-columns:repeat(5,1fr);"></div>
-    </div>
-  `;
-
-  const cats = ['All', 'Shooter', 'FPS', 'Battle', 'Racing', 'Sandbox', 'Crafting', 'Strategy', 'Arcade', 'Puzzle', 'Word', 'Classic', 'Endless', 'Idle', 'Geography', 'Territory', 'Drawing', 'Runner', 'Casual'];
-  let active = 'All';
-  const pillsEl = document.getElementById('cat-pills');
-  const gridEl  = document.getElementById('all-games-grid');
-
-  const renderCats = () => {
-    const list = active === 'All' ? GAMES : GAMES.filter(g => g.t === active);
-    gridEl.innerHTML = '';
-    list.forEach(g => {
-      const el = document.createElement('div'); el.className = 'game-card';
-      el.innerHTML = `${g.hot?'<div class="game-hot">Hot</div>':''}<div class="game-thumb" style="background:${g.bg}">${g.ic}</div><div class="game-info"><div class="game-name">${g.n}</div><div class="game-tag">${g.t}</div></div>`;
-      el.addEventListener('click', () => Nav.go(g.u)); addH(el); gridEl.appendChild(el);
-    });
-  };
-
-  const usedCats = ['All', ...new Set(GAMES.map(g => g.t))];
-  usedCats.forEach(c => {
-    const p = document.createElement('span');
-    p.style.cssText = `padding:3px 12px;border-radius:20px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);color:var(--ink-3);transition:all .14s;background:white;`;
-    p.textContent = c;
-    p.addEventListener('click', () => {
-      active = c;
-      pillsEl.querySelectorAll('span').forEach(x => { x.style.background='white'; x.style.color='var(--ink-3)'; x.style.borderColor='var(--border)'; });
-      p.style.background = 'var(--navy)'; p.style.color = 'white'; p.style.borderColor = 'var(--navy)';
-      renderCats();
-    });
-    if (c === 'All') { p.style.background='var(--navy)'; p.style.color='white'; p.style.borderColor='var(--navy)'; }
-    pillsEl.appendChild(p);
-  });
-  renderCats();
-
-  document.getElementById('back-home').addEventListener('click', () => { buildNewTab(); tick(); });
-}
-
-/* ── SIDEBAR GAMES ── */
-function buildSidebarGames() {
-  const el = document.getElementById('sb-games');
-  GAMES.filter(g => g.hot).slice(0, 9).forEach(g => {
-    const card = document.createElement('div'); card.className = 'sb-game';
-    card.innerHTML = `<span class="sb-game-ico">${g.ic}</span><span class="sb-game-name">${g.n}</span>`;
-    card.addEventListener('click', () => Nav.go(g.u)); addH(card); el.appendChild(card);
-  });
-}
+const aEl=document.getElementById('addr');T(aEl);
+document.getElementById('ago').addEventListener('click',()=>Nav.go(aEl.value));
+aEl.addEventListener('keydown',e=>{if(e.key==='Enter')Nav.go(aEl.value);});
+document.getElementById('nb').addEventListener('click',()=>{try{frame.contentWindow.history.back();}catch{}});
+document.getElementById('nf').addEventListener('click',()=>{try{frame.contentWindow.history.forward();}catch{}});
+document.getElementById('nr').addEventListener('click',()=>{try{frame.contentWindow.location.reload();}catch{}});
+document.getElementById('nd').addEventListener('click',()=>Nav.home());['nb','nf','nr','nd','ago','lcan'].forEach(id=>{const e=document.getElementById(id);if(e)H(e);});
 
 /* ── LOADER ── */
-let swReady = false;
-const SEQS = [
-  ['routing signal','bypassing filter','tunnel active','locked in','opening'],
-  ['shredding firewall','encrypting path','bouncing relay','trace clean','clear'],
-  ['accessing archives','indexing resources','compiling results','ready','loading'],
-  ['calculating route','redirecting traffic','stealth enabled','signal locked','go'],
+const MSGS=[['kneading clay…','shaping the path…','smoothing edges…','firing the kiln…','glazed & sealed!'],['rolling proxy…','pressing filter…','stamp it shut!','heat treatment…','you\'re in!'],['mixing colours…','sculpting tunnel…','thumbprint lock…','baked solid…','let\'s go!'],
 ];
-const Loader = {
-  _t: null,
-  launch(u) {
-    const seq = SEQS[Math.random() * SEQS.length | 0];
-    const el = document.getElementById('loader'),
-          sub = document.getElementById('l-sub'),
-          st  = document.getElementById('l-status'),
-          bar = document.getElementById('lbar');
-    el.classList.add('vis'); bar.style.width = '0%'; sub.textContent = seq[0];
-    const pcts = [8, 26, 48, 68, 86, 96, 100], delays = [120, 300, 380, 400, 340, 260, 160];
-    let step = 0;
-    const next = () => {
-      bar.style.width = pcts[step] + '%';
-      st.textContent = seq[Math.min(step, seq.length - 1)];
-      step++;
-      if (step < pcts.length) this._t = setTimeout(next, delays[step - 1]);
-      else this._t = setTimeout(() => this._nav(u), 200);
+const Ldr={
+  _t:null,
+  run(u){
+    const seq=MSGS[Math.random()*MSGS.length|0];
+    const el=document.getElementById('loader'),lm=document.getElementById('lm'),lst=document.getElementById('lst'),bar=document.getElementById('lbar');
+    el.classList.add('on');bar.style.width='0%';lm.textContent=seq[0];
+    
+    // Stretched delays slightly so the user gets to enjoy ~1.5 cycles of the awesome clay machine
+    const pts=[7,22,42,62,82,96,100],dls=[250,500,600,650,500,450,250];
+    let i=0;
+    const nxt=()=>{
+      bar.style.width=pts[i]+'%';
+      lst.textContent=seq[Math.min(i,seq.length-1)];
+      i++;
+      if(i<pts.length)this._t=setTimeout(nxt,dls[i-1]);
+      else this._t=setTimeout(()=>{el.classList.remove('on');Nav.load(u);},200);
     };
-    this._t = setTimeout(next, delays[0]);
-  },
-  _nav(u) {
-    document.getElementById('loader').classList.remove('vis');
-    if (!activeTab) TabBar.create('Loading…', u);
-    else Nav.loadInTab(activeTab, u);
-    TabBar.updateTitle(u.replace('https://','').replace('http://','').split('/')[0], '🌐');
+    this._t=setTimeout(nxt,dls[0]);
   }
 };
-document.getElementById('l-cancel').addEventListener('click', () => {
-  clearTimeout(Loader._t);
-  document.getElementById('loader').classList.remove('vis');
-  document.getElementById('lbar').style.width = '0%';
+document.getElementById('lcan').addEventListener('click',()=>{
+  clearTimeout(Ldr._t);
+  document.getElementById('loader').classList.remove('on');
+  document.getElementById('lbar').style.width='0%';
 });
 
-/* ── SERVICE WORKER ── */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/' })
-    .then(r => {
-      if (r.active) { swReady = true; return; }
-      const s = r.installing || r.waiting;
-      if (s) s.addEventListener('statechange', () => {
-        if (s.state === 'activated') { swReady = true; toast('Folio', 'Proxy tunnel ready', '🔒'); }
-      });
-    }).catch(() => { swReady = true; });
-} else swReady = true;
+/* ══════════════════════════════
+   BUILD ROWS
+══════════════════════════════ */
+function mkTile(g,hero=false){
+  const d=document.createElement('div');
+  d.className='gtile'+(hero?' gtile-hero':'');
+  d.innerHTML=`
+    <div class="gtile-top" style="background:${g.c[0]};box-shadow:inset 0 -3px 0 ${g.c[1]};">
+      <svg width="100%" height="100%" style="position:absolute;inset:0;" viewBox="0 0 150 44" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="75" cy="6" rx="55" ry="5" fill="rgba(255,255,255,0.22)"/>
+      </svg>
+    </div>
+    <div class="gtile-art">${g.e}</div>
+    <div class="gtile-body">
+      <div class="gtile-name">${g.n}</div>
+      <div class="gtile-tags">
+        <span class="gtag">${g.t}</span>
+        ${hero?'<span class="ghot">🔥 hot</span>':''}
+      </div>
+    </div>`;
+  d.addEventListener('click',()=>Nav.go(g.u));
+  H(d);return d;
+}
 
-/* ════════════════════════════════════
-   BOOT SEQUENCE — pure CSS/JS, no deps
-════════════════════════════════════ */
-(function runBoot() {
-  const steps = [
-    { msg: 'Loading proxy engine…', pct: 12,  dotIdx: null },
-    { msg: 'Engine ready.',         pct: 28,  dotIdx: 0 },
-    { msg: 'Establishing tunnel…',  pct: 42,  dotIdx: null },
-    { msg: 'Tunnel secured.',       pct: 58,  dotIdx: 1 },
-    { msg: 'Applying stealth…',     pct: 70,  dotIdx: null },
-    { msg: 'Stealth active.',       pct: 80,  dotIdx: 2 },
-    { msg: 'Indexing resources…',   pct: 90,  dotIdx: null },
-    { msg: 'Index ready.',          pct: 96,  dotIdx: 3 },
-    { msg: 'Welcome to Folio.',     pct: 100, dotIdx: null },
-  ];
-  const delays = [320, 400, 380, 460, 350, 440, 380, 400, 500];
-  let step = 0;
+function mkSec(title,ico,icoColor,games,firstHero=false){
+  const s=document.createElement('div');s.className='section';
+  const id='rt'+title.replace(/\W/g,'');
+  s.innerHTML=`
+    <div class="sec-head">
+      <div class="sec-stamp" style="border-top:5px solid ${icoColor};">${ico} ${title}</div>
+      <div class="sec-count">${games.length} games</div>
+    </div>
+    <div class="row-track" id="${id}"></div>`;
+  document.getElementById('rows').appendChild(s);
+  const t=document.getElementById(id);
+  games.forEach((g,i)=>t.appendChild(mkTile(g,firstHero&&i===0)));
+}
 
-  const prog    = document.getElementById('boot-prog');
-  const msgEl   = document.getElementById('boot-msg');
-  const bootEl  = document.getElementById('boot');
-  const folioEl = document.getElementById('folio');
+function mkQuick(){
+  const s=document.createElement('div');s.className='section';
+  s.innerHTML=`
+    <div class="sec-head">
+      <div class="sec-stamp" style="border-top:5px solid ${QUICK[0].bc};">🌐 Quick Access</div>
+    </div>
+    <div class="row-track" id="rtquick"></div>`;
+  document.getElementById('rows').appendChild(s);
+  const t=document.getElementById('rtquick');
+  QUICK.forEach(q=>{
+    const d=document.createElement('div');d.className='qtile';
+    d.style.cssText=`background:${q.bg};border-color:${q.bc};box-shadow:5px 5px 0 ${q.bs};`;
+    d.innerHTML=`<div class="qt-icon">${q.e}</div><div><div class="qt-name">${q.n}</div><div class="qt-host">${q.u.replace('https://','')}</div></div>`;
+    d.addEventListener('click',()=>Nav.go(q.u));
+    H(d);t.appendChild(d);
+  });
+}
 
-  // mark all dots as off initially
-  for (let i = 0; i < 4; i++) {
-    const d = document.getElementById('bdot-' + i);
-    if (d) d.classList.add('active');
-  }
+mkQuick();
+mkSec('Trending Now','🔥','#e83030',HOT,true);
+mkSec('Arcade Vault','🕹','#3888e8',ARCADE,false);
+mkSec('Multiplayer','🌐','#48c050',MULTI,false);
 
-  const advance = () => {
-    if (step >= steps.length) {
-      // launch!
-      bootEl.classList.add('boot-exit');
-      setTimeout(() => {
-        bootEl.style.display = 'none';
-        folioEl.classList.add('visible');
-        buildNewTab();
-        buildSidebarGames();
-        TabBar.create('New Tab');
-        tick();
-        setTimeout(() => toast('Folio', 'Research browser ready', '📖'), 400);
-      }, 620);
-      return;
-    }
-    const s = steps[step];
-    prog.style.width = s.pct + '%';
-    msgEl.textContent = s.msg;
-    if (s.dotIdx !== null) {
-      const d = document.getElementById('bdot-' + s.dotIdx);
-      if (d) { d.classList.remove('active'); d.classList.add('done'); }
-    }
-    setTimeout(advance, delays[step]);
-    step++;
-  };
-  setTimeout(advance, 200);
-})();
-
-/* update tab-strip with tab-new button after setup */
-(function() {
-  const strip = document.getElementById('tab-strip');
-  const btn = document.createElement('button');
-  btn.className = 'tab-new'; btn.textContent = '+'; btn.title = 'New tab';
-  btn.addEventListener('click', () => TabBar.create());
-  addH(btn); strip.appendChild(btn);
-})();
+setTimeout(()=>toast('Sculptr','Welcome! Start exploring 🎉','🎨'),500);
 </script>
 </body>
 </html>

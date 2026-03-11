@@ -1726,8 +1726,8 @@ function loadScript(src) {
 
 async function bootUV() {
   try {
-    await loadScript(UV_CONFIG_SRC);
-    await loadScript(UV_BUNDLE);
+    await loadScript(UV_BUNDLE);   // bundle MUST load first — defines Ultraviolet
+    await loadScript(UV_CONFIG_SRC); // config uses Ultraviolet.codec.xor.*
     uvReady = true;
   } catch(e) {
     console.warn('[Nebula] UV scripts failed:', e.message);

@@ -142,25 +142,19 @@ body::after{
     inset 0 1px 0 rgba(255,255,255,0.08);
   z-index:100!important;
 }
-/* ── Window open/close/minimize animations ── */
 
-/* Initial page-load: window materialises from nothing */
 @keyframes winOpen {
   0%   { opacity:0; transform: scale(0.85) translateY(18px); filter: blur(4px); }
   60%  { opacity:1; filter: blur(0); }
   80%  { transform: scale(1.012) translateY(-2px); }
   100% { transform: scale(1) translateY(0); }
 }
-
-/* Minimize: shrink + fly toward dock bottom-center (sucked in) */
 @keyframes winMinimize {
   0%   { opacity:1; transform: scale(1) translate(0,0); filter: blur(0); }
   30%  { opacity:0.9; filter: blur(0); }
   70%  { opacity:0.4; transform: scale(0.3) translate(var(--dock-tx,0px), var(--dock-ty,300px)); filter: blur(3px); }
   100% { opacity:0; transform: scale(0.05) translate(var(--dock-tx,0px), var(--dock-ty,400px)); filter: blur(8px); }
 }
-
-/* Restore: burst out from dock (pulled out) */
 @keyframes winRestore {
   0%   { opacity:0; transform: scale(0.05) translate(var(--dock-tx,0px), var(--dock-ty,400px)); filter: blur(8px); }
   30%  { opacity:0.5; filter: blur(2px); }
@@ -168,8 +162,6 @@ body::after{
   80%  { transform: scale(0.98) translateY(3px); }
   100% { transform: scale(1) translateY(0); }
 }
-
-/* Close: implode to center */
 @keyframes winClose {
   0%   { opacity:1; transform: scale(1); filter: blur(0); }
   40%  { opacity:0.6; transform: scale(0.6); filter: blur(1px); }
@@ -177,22 +169,11 @@ body::after{
 }
 
 .window { transform-origin: center bottom; }
-
-.window.win-opening {
-  animation: winOpen 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
-}
-.window.win-minimizing {
-  pointer-events: none;
-  animation: winMinimize 0.42s cubic-bezier(0.4, 0, 0.8, 0.6) forwards;
-}
-.window.win-restoring {
-  animation: winRestore 0.44s cubic-bezier(0.22, 1.4, 0.36, 1) forwards;
-}
-.window.win-closing {
-  pointer-events: none;
-  animation: winClose 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-.window.minimized { display: none; }
+.window.win-opening   { animation: winOpen 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+.window.win-minimizing{ pointer-events:none; animation: winMinimize 0.42s cubic-bezier(0.4,0,0.8,0.6) forwards; }
+.window.win-restoring { animation: winRestore 0.44s cubic-bezier(0.22, 1.4, 0.36, 1) forwards; }
+.window.win-closing   { pointer-events:none; animation: winClose 0.28s cubic-bezier(0.4,0,1,1) forwards; }
+.window.minimized { display:none; }
 
 /* ── Titlebar ── */
 .titlebar{
@@ -216,7 +197,6 @@ body::after{
 .tl-m{background:radial-gradient(circle at 35% 35%,#ffd070,#e6a500);box-shadow:0 0 0 0.5px rgba(0,0,0,0.5),inset 0 1px 1px rgba(255,255,255,0.3)}
 .tl-x{background:radial-gradient(circle at 35% 35%,#78e878,#20b820);box-shadow:0 0 0 0.5px rgba(0,0,0,0.5),inset 0 1px 1px rgba(255,255,255,0.3)}
 
-/* show symbols on titlebar hover */
 .titlebar:hover .tl-c::after{content:'×';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:rgba(0,0,0,0.6);line-height:1}
 .titlebar:hover .tl-m::after{content:'−';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:rgba(0,0,0,0.6);line-height:1}
 .titlebar:hover .tl-x::after{content:'⊹';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:rgba(0,0,0,0.6);line-height:1}
@@ -227,7 +207,6 @@ body::after{
   white-space:nowrap;pointer-events:none;
   letter-spacing:0.01em;
 }
-
 .tb-right{margin-left:auto;z-index:2}
 
 /* ─── BROWSER WINDOW ─────────────────────────────────────── */
@@ -258,7 +237,6 @@ body::after{
 .nav-btn:active{transform:scale(0.92)}
 .nav-btn:disabled{opacity:0.3;cursor:default}
 
-/* URL bar */
 .url-container{
   flex:1;
   background: var(--surface2);
@@ -347,7 +325,6 @@ body::after{
   background: var(--bg);
 }
 
-/* UV proxy frame — we use a real window.open / location approach via postMessage */
 #uv-frame{
   position:absolute;inset:0;
   border:none;
@@ -395,9 +372,7 @@ body::after{
 .ntp-search input::placeholder{color:var(--text3)}
 .ntp-search-icon{font-size:18px;color:var(--text3);margin-right:10px}
 
-.ntp-shortcuts{
-  display:flex;gap:20px;
-}
+.ntp-shortcuts{display:flex;gap:20px;}
 .ntp-shortcut{
   display:flex;flex-direction:column;align-items:center;
   gap:8px;cursor:pointer;padding:12px;
@@ -519,7 +494,6 @@ body::after{
   margin:0 4px;flex-shrink:0;
 }
 
-/* Dock icon colors */
 .di-1{background:linear-gradient(160deg,#1a6aff,#0044cc)}
 .di-2{background:linear-gradient(160deg,#34aadc,#0070c0)}
 .di-3{background:linear-gradient(160deg,#ff6b35,#e03020)}
@@ -529,7 +503,6 @@ body::after{
 .di-7{background:linear-gradient(160deg,#888,#555)}
 .di-8{background:linear-gradient(160deg,#8ec5fc,#5aa0e8)}
 
-/* ── Bounce ── */
 @keyframes dockBounce{
   0%,100%{transform:translateY(0)}
   20%{transform:translateY(-22px)}
@@ -619,11 +592,8 @@ body::after{
   z-index:200;
 }
 
-.settings-body{
-  display:flex;flex:1;overflow:hidden;
-}
+.settings-body{display:flex;flex:1;overflow:hidden;}
 
-/* Sidebar */
 .settings-sidebar{
   width:200px;flex-shrink:0;
   background:linear-gradient(180deg,#111116 0%,#0e0e12 100%);
@@ -661,16 +631,13 @@ body::after{
   transition:background 0.1s,color 0.1s;
 }
 .settings-nav-item:hover{background:var(--surface2);color:var(--text)}
-.settings-nav-item.active{
-  background:var(--accent);color:white;
-}
+.settings-nav-item.active{background:var(--accent);color:white;}
 .settings-nav-icon{
   width:24px;height:24px;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
   font-size:12px;flex-shrink:0;
 }
 
-/* Content area */
 .settings-content{
   flex:1;overflow-y:auto;padding:24px 28px;
   background:var(--win-bg);
@@ -686,7 +653,6 @@ body::after{
   margin-bottom:20px;letter-spacing:-0.3px;
 }
 
-/* Section card */
 .s-card{
   background:var(--surface);
   border:1px solid var(--border);
@@ -713,7 +679,6 @@ body::after{
 .s-row-desc{font-size:11px;color:var(--text3);margin-top:1px;line-height:1.4}
 .s-row-ctrl{flex-shrink:0;display:flex;align-items:center;gap:8px}
 
-/* Toggle switch */
 .s-toggle{
   width:40px;height:24px;border-radius:12px;
   background:var(--surface3);
@@ -722,10 +687,7 @@ body::after{
   transition:background 0.2s,border-color 0.2s;
   flex-shrink:0;
 }
-.s-toggle.on{
-  background:var(--accent);
-  border-color:var(--accent);
-}
+.s-toggle.on{background:var(--accent);border-color:var(--accent);}
 .s-toggle::after{
   content:'';position:absolute;
   top:2px;left:2px;
@@ -737,7 +699,6 @@ body::after{
 }
 .s-toggle.on::after{transform:translateX(16px)}
 
-/* Select */
 .s-select{
   background:var(--surface2);
   border:1px solid var(--border2);
@@ -751,7 +712,6 @@ body::after{
 }
 .s-select:focus{border-color:var(--accent)}
 
-/* Slider */
 .s-slider{
   -webkit-appearance:none;appearance:none;
   width:130px;height:4px;
@@ -766,7 +726,6 @@ body::after{
   cursor:pointer;
 }
 
-/* Color swatches */
 .s-swatches{display:flex;gap:7px;flex-wrap:wrap}
 .s-swatch{
   width:24px;height:24px;border-radius:50%;
@@ -777,7 +736,6 @@ body::after{
 .s-swatch:hover{transform:scale(1.15)}
 .s-swatch.selected{border-color:white;box-shadow:0 0 0 1px rgba(255,255,255,0.3)}
 
-/* Tag badge */
 .s-badge{
   font-size:10px;font-weight:700;
   padding:2px 7px;border-radius:10px;
@@ -787,7 +745,6 @@ body::after{
 .s-badge.green{background:rgba(34,197,94,0.12);color:#4ade80;border-color:rgba(34,197,94,0.2)}
 .s-badge.yellow{background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.2)}
 
-/* Text input in settings */
 .s-input{
   background:var(--surface2);
   border:1px solid var(--border2);
@@ -799,7 +756,6 @@ body::after{
 }
 .s-input:focus{border-color:var(--accent)}
 
-/* Button */
 .s-btn{
   padding:5px 14px;border-radius:7px;
   font-size:12px;font-weight:600;font-family:var(--font);
@@ -813,7 +769,6 @@ body::after{
 .s-btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border2)}
 .s-btn-ghost:hover{background:var(--surface3);color:var(--text)}
 
-/* Profile avatar */
 .s-avatar{
   width:56px;height:56px;border-radius:50%;
   background:linear-gradient(135deg,var(--accent),#8b5cf6);
@@ -827,7 +782,6 @@ body::after{
   height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.25),transparent);
 }
 
-/* Proxy path row */
 .s-proxy-path{
   font-size:11px;color:var(--accent2);
   font-family:'Courier New',monospace;
@@ -837,10 +791,7 @@ body::after{
   letter-spacing:0.02em;
 }
 
-/* Wallpaper grid */
-.s-wallpaper-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
-}
+.s-wallpaper-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .s-wallpaper-thumb{
   aspect-ratio:16/10;border-radius:8px;cursor:pointer;
   border:2px solid transparent;
@@ -888,7 +839,6 @@ body::after{
 .notif-body h4{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:3px}
 .notif-body p{font-size:11.5px;color:var(--text2);line-height:1.4}
 
-/* Badge */
 .dock-badge{
   position:absolute;top:-4px;right:-4px;
   background:var(--red);color:white;
@@ -898,7 +848,6 @@ body::after{
   border:1.5px solid rgba(14,14,14,0.8);z-index:3;
 }
 
-/* Security banner */
 #sec-banner{
   position:absolute;top:0;left:0;right:0;
   background:linear-gradient(90deg,rgba(239,68,68,0.12),rgba(239,68,68,0.06));
@@ -909,8 +858,7 @@ body::after{
 #sec-banner.show{display:flex}
 #sec-banner .close-banner{
   margin-left:auto;cursor:pointer;color:#fca5a5;opacity:0.6;
-  font-size:14px;line-height:1;
-  transition:opacity 0.1s;
+  font-size:14px;line-height:1;transition:opacity 0.1s;
 }
 #sec-banner .close-banner:hover{opacity:1}
 </style>
@@ -962,7 +910,6 @@ body::after{
 
     <!-- Tabs bar -->
     <div class="tabs-bar" id="tabs-bar">
-      <!-- tabs injected by JS -->
       <button class="new-tab-btn" id="new-tab-btn" title="New Tab">+</button>
     </div>
 
@@ -1044,8 +991,8 @@ body::after{
   <div class="window minimized" id="settings-win">
     <div class="titlebar" id="settings-tb">
       <div class="tl-btns">
-        <div class="tl tl-c" onclick="closeSettings()"></div>
-        <div class="tl tl-m" onclick="minimizeSettings()"></div>
+        <div class="tl tl-c" id="settings-btn-close"></div>
+        <div class="tl tl-m" id="settings-btn-min"></div>
         <div class="tl tl-x"></div>
       </div>
       <span class="tb-title">System Preferences</span>
@@ -1071,7 +1018,7 @@ body::after{
           </div>
           <div class="settings-nav-item" data-page="dock" onclick="switchSettingsPage('dock',this)">
             <div class="settings-nav-icon" style="background:linear-gradient(135deg,#555,#333)">⬛</div>
-            Dock & Menu Bar
+            Dock &amp; Menu Bar
           </div>
         </div>
 
@@ -1083,11 +1030,11 @@ body::after{
           </div>
           <div class="settings-nav-item" data-page="proxy" onclick="switchSettingsPage('proxy',this)">
             <div class="settings-nav-icon" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">🔒</div>
-            Proxy & UV
+            Proxy &amp; UV
           </div>
           <div class="settings-nav-item" data-page="privacy" onclick="switchSettingsPage('privacy',this)">
             <div class="settings-nav-icon" style="background:linear-gradient(135deg,#059669,#064e3b)">🛡</div>
-            Privacy & Security
+            Privacy &amp; Security
           </div>
         </div>
 
@@ -1110,7 +1057,6 @@ body::after{
         <!-- ── APPEARANCE ── -->
         <div class="settings-page active" id="page-appearance">
           <div class="settings-page-title">Appearance</div>
-
           <div class="s-card">
             <div class="s-card-title">Theme</div>
             <div class="s-row">
@@ -1120,7 +1066,7 @@ body::after{
                 <div class="s-row-desc">Use dark appearance for all windows and menus</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-dark" onclick="toggleSetting(this,'darkMode')"></div>
+                <div class="s-toggle on" id="toggle-dark"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1131,20 +1077,20 @@ body::after{
               </div>
               <div class="s-row-ctrl">
                 <div class="s-swatches" id="accent-swatches">
-                  <div class="s-swatch selected" style="background:#3b82f6" data-color="#3b82f6" onclick="setAccentColor(this)" title="Blue"></div>
-                  <div class="s-swatch" style="background:#8b5cf6" data-color="#8b5cf6" onclick="setAccentColor(this)" title="Purple"></div>
-                  <div class="s-swatch" style="background:#ec4899" data-color="#ec4899" onclick="setAccentColor(this)" title="Pink"></div>
-                  <div class="s-swatch" style="background:#ef4444" data-color="#ef4444" onclick="setAccentColor(this)" title="Red"></div>
-                  <div class="s-swatch" style="background:#f97316" data-color="#f97316" onclick="setAccentColor(this)" title="Orange"></div>
-                  <div class="s-swatch" style="background:#22c55e" data-color="#22c55e" onclick="setAccentColor(this)" title="Green"></div>
-                  <div class="s-swatch" style="background:#14b8a6" data-color="#14b8a6" onclick="setAccentColor(this)" title="Teal"></div>
+                  <div class="s-swatch selected" style="background:#3b82f6" data-color="#3b82f6" title="Blue"></div>
+                  <div class="s-swatch" style="background:#8b5cf6" data-color="#8b5cf6" title="Purple"></div>
+                  <div class="s-swatch" style="background:#ec4899" data-color="#ec4899" title="Pink"></div>
+                  <div class="s-swatch" style="background:#ef4444" data-color="#ef4444" title="Red"></div>
+                  <div class="s-swatch" style="background:#f97316" data-color="#f97316" title="Orange"></div>
+                  <div class="s-swatch" style="background:#22c55e" data-color="#22c55e" title="Green"></div>
+                  <div class="s-swatch" style="background:#14b8a6" data-color="#14b8a6" title="Teal"></div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="s-card">
-            <div class="s-card-title">Typography & Zoom</div>
+            <div class="s-card-title">Typography &amp; Zoom</div>
             <div class="s-row">
               <span class="s-row-icon">🔡</span>
               <div class="s-row-info">
@@ -1153,8 +1099,7 @@ body::after{
               </div>
               <div class="s-row-ctrl" style="gap:10px">
                 <span style="font-size:11px;color:var(--text3)" id="font-size-val">12px</span>
-                <input type="range" class="s-slider" min="10" max="16" value="12" id="font-size-slider"
-                  oninput="document.getElementById('font-size-val').textContent=this.value+'px';document.body.style.fontSize=this.value+'px'"/>
+                <input type="range" class="s-slider" min="10" max="16" value="12" id="font-size-slider"/>
               </div>
             </div>
             <div class="s-row">
@@ -1164,7 +1109,7 @@ body::after{
                 <div class="s-row-desc">Disable window open/close animations</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle" id="toggle-motion" onclick="toggleSetting(this,'reduceMotion')"></div>
+                <div class="s-toggle" id="toggle-motion"></div>
               </div>
             </div>
           </div>
@@ -1174,11 +1119,11 @@ body::after{
             <div class="s-row">
               <span class="s-row-icon">🫧</span>
               <div class="s-row-info">
-                <div class="s-row-label">Blur & Transparency</div>
+                <div class="s-row-label">Blur &amp; Transparency</div>
                 <div class="s-row-desc">Glassmorphic blur on dock and menu bar</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-blur" onclick="toggleSetting(this,'blur')"></div>
+                <div class="s-toggle on" id="toggle-blur"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1188,8 +1133,7 @@ body::after{
               </div>
               <div class="s-row-ctrl" style="gap:10px">
                 <span style="font-size:11px;color:var(--text3)" id="blur-val">30px</span>
-                <input type="range" class="s-slider" min="5" max="60" value="30" id="blur-slider"
-                  oninput="document.getElementById('blur-val').textContent=this.value+'px'"/>
+                <input type="range" class="s-slider" min="5" max="60" value="30" id="blur-slider"/>
               </div>
             </div>
           </div>
@@ -1202,14 +1146,14 @@ body::after{
             <div class="s-card-title">Choose Wallpaper</div>
             <div class="s-row" style="flex-direction:column;align-items:flex-start;gap:12px;padding:16px">
               <div class="s-wallpaper-grid" id="wallpaper-grid">
-                <div class="s-wallpaper-thumb selected" data-wp="0" onclick="setWallpaper(this,0)" style="background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(59,130,246,0.18),transparent),radial-gradient(ellipse 60% 50% at 80% 20%,rgba(139,92,246,0.14),transparent),linear-gradient(160deg,#0d0d12,#080810)"><span>🌌</span></div>
-                <div class="s-wallpaper-thumb" data-wp="1" onclick="setWallpaper(this,1)" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"><span>🌊</span></div>
-                <div class="s-wallpaper-thumb" data-wp="2" onclick="setWallpaper(this,2)" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"><span>🔭</span></div>
-                <div class="s-wallpaper-thumb" data-wp="3" onclick="setWallpaper(this,3)" style="background:linear-gradient(135deg,#0d1117,#161b22,#21262d)"><span>⬛</span></div>
-                <div class="s-wallpaper-thumb" data-wp="4" onclick="setWallpaper(this,4)" style="background:linear-gradient(135deg,#0a0a0a,#1a0a1a,#2a0a2a)"><span>🟣</span></div>
-                <div class="s-wallpaper-thumb" data-wp="5" onclick="setWallpaper(this,5)" style="background:linear-gradient(135deg,#0a1a0a,#0a2a0a,#0a3a1a)"><span>🌿</span></div>
-                <div class="s-wallpaper-thumb" data-wp="6" onclick="setWallpaper(this,6)" style="background:linear-gradient(135deg,#1a0a0a,#2a1010,#3a1818)"><span>🔴</span></div>
-                <div class="s-wallpaper-thumb" data-wp="7" onclick="setWallpaper(this,7)" style="background:linear-gradient(135deg,#0a0a1a,#101038,#1a1a50)"><span>💙</span></div>
+                <div class="s-wallpaper-thumb selected" data-wp="0" style="background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(59,130,246,0.18),transparent),radial-gradient(ellipse 60% 50% at 80% 20%,rgba(139,92,246,0.14),transparent),linear-gradient(160deg,#0d0d12,#080810)"><span>🌌</span></div>
+                <div class="s-wallpaper-thumb" data-wp="1" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"><span>🌊</span></div>
+                <div class="s-wallpaper-thumb" data-wp="2" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"><span>🔭</span></div>
+                <div class="s-wallpaper-thumb" data-wp="3" style="background:linear-gradient(135deg,#0d1117,#161b22,#21262d)"><span>⬛</span></div>
+                <div class="s-wallpaper-thumb" data-wp="4" style="background:linear-gradient(135deg,#0a0a0a,#1a0a1a,#2a0a2a)"><span>🟣</span></div>
+                <div class="s-wallpaper-thumb" data-wp="5" style="background:linear-gradient(135deg,#0a1a0a,#0a2a0a,#0a3a1a)"><span>🌿</span></div>
+                <div class="s-wallpaper-thumb" data-wp="6" style="background:linear-gradient(135deg,#1a0a0a,#2a1010,#3a1818)"><span>🔴</span></div>
+                <div class="s-wallpaper-thumb" data-wp="7" style="background:linear-gradient(135deg,#0a0a1a,#101038,#1a1a50)"><span>💙</span></div>
               </div>
             </div>
           </div>
@@ -1219,10 +1163,10 @@ body::after{
               <span class="s-row-icon">🔄</span>
               <div class="s-row-info">
                 <div class="s-row-label">Auto-rotate Wallpaper</div>
-                <div class="s-row-desc">Change wallpaper every hour</div>
+                <div class="s-row-desc">Change wallpaper every 30 seconds</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle" id="toggle-autowall" onclick="toggleSetting(this,'autoWall')"></div>
+                <div class="s-toggle" id="toggle-autowall"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1232,7 +1176,7 @@ body::after{
                 <div class="s-row-desc">Subtle dot grid texture on wallpaper</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-grid" onclick="toggleSetting(this,'grid')"></div>
+                <div class="s-toggle on" id="toggle-grid"></div>
               </div>
             </div>
           </div>
@@ -1250,8 +1194,7 @@ body::after{
               </div>
               <div class="s-row-ctrl" style="gap:10px">
                 <span style="font-size:11px;color:var(--text3)" id="dock-size-val">46px</span>
-                <input type="range" class="s-slider" min="28" max="72" value="46" id="dock-size-slider"
-                  oninput="setDockSize(this.value)"/>
+                <input type="range" class="s-slider" min="28" max="72" value="46" id="dock-size-slider"/>
               </div>
             </div>
             <div class="s-row">
@@ -1261,7 +1204,7 @@ body::after{
                 <div class="s-row-desc">Enlarge icons on hover</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-mag" onclick="toggleSetting(this,'magnify')"></div>
+                <div class="s-toggle on" id="toggle-mag"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1270,7 +1213,7 @@ body::after{
                 <div class="s-row-label">Position on Screen</div>
               </div>
               <div class="s-row-ctrl">
-                <select class="s-select" onchange="showNotif('⬛','Dock','Position updated to '+this.value)">
+                <select class="s-select" id="dock-position-select">
                   <option>Bottom</option>
                   <option>Left</option>
                   <option>Right</option>
@@ -1284,7 +1227,7 @@ body::after{
                 <div class="s-row-desc">Hide the dock when not in use</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle" id="toggle-autohide" onclick="toggleDockHide(this)"></div>
+                <div class="s-toggle" id="toggle-autohide"></div>
               </div>
             </div>
           </div>
@@ -1296,7 +1239,7 @@ body::after{
                 <div class="s-row-label">Show Date in Clock</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-date" onclick="toggleSetting(this,'showDate')"></div>
+                <div class="s-toggle on" id="toggle-date"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1305,7 +1248,7 @@ body::after{
                 <div class="s-row-label">Show Battery Icon</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-battery" onclick="toggleSetting(this,'battery')"></div>
+                <div class="s-toggle on" id="toggle-battery"></div>
               </div>
             </div>
           </div>
@@ -1332,7 +1275,7 @@ body::after{
                 <div class="s-row-label">Default Search Engine</div>
               </div>
               <div class="s-row-ctrl">
-                <select class="s-select" id="search-engine-select" onchange="setSearchEngine(this.value)">
+                <select class="s-select" id="search-engine-select">
                   <option value="https://www.google.com/search?q=">Google</option>
                   <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
                   <option value="https://search.brave.com/search?q=">Brave Search</option>
@@ -1347,7 +1290,7 @@ body::after{
                 <div class="s-row-desc">Reopen tabs from previous session on start</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle" id="toggle-session" onclick="toggleSetting(this,'restoreSession')"></div>
+                <div class="s-toggle" id="toggle-session"></div>
               </div>
             </div>
           </div>
@@ -1359,7 +1302,7 @@ body::after{
                 <div class="s-row-label">Show Tab Favicons</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-favicons" onclick="toggleSetting(this,'favicons')"></div>
+                <div class="s-toggle on" id="toggle-favicons"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1369,7 +1312,7 @@ body::after{
                 <div class="s-row-desc">Show quick-launch grid on new tab page</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-shortcuts" onclick="toggleSetting(this,'shortcuts')"></div>
+                <div class="s-toggle on" id="toggle-shortcuts"></div>
               </div>
             </div>
           </div>
@@ -1381,7 +1324,7 @@ body::after{
                 <div class="s-row-label">Autoplay Media</div>
               </div>
               <div class="s-row-ctrl">
-                <select class="s-select">
+                <select class="s-select" id="autoplay-select">
                   <option>Allow All</option>
                   <option>Block Audio</option>
                   <option>Block All</option>
@@ -1394,7 +1337,7 @@ body::after{
                 <div class="s-row-label">Accept Cookies</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-cookies" onclick="toggleSetting(this,'cookies')"></div>
+                <div class="s-toggle on" id="toggle-cookies"></div>
               </div>
             </div>
           </div>
@@ -1453,7 +1396,7 @@ body::after{
                 <div class="s-row-desc">Force re-register the UV service worker</div>
               </div>
               <div class="s-row-ctrl">
-                <button class="s-btn s-btn-ghost" onclick="reloadSW()">Reload SW</button>
+                <button class="s-btn s-btn-ghost" id="btn-reload-sw">Reload SW</button>
               </div>
             </div>
             <div class="s-row">
@@ -1463,7 +1406,7 @@ body::after{
                 <div class="s-row-desc">Wipe cached proxy responses</div>
               </div>
               <div class="s-row-ctrl">
-                <button class="s-btn s-btn-danger" onclick="clearProxyCache()">Clear Cache</button>
+                <button class="s-btn s-btn-danger" id="btn-clear-cache">Clear Cache</button>
               </div>
             </div>
           </div>
@@ -1481,7 +1424,7 @@ body::after{
                 <div class="s-row-desc">Prevent known tracking scripts from loading</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-trackers" onclick="toggleSetting(this,'blockTrackers')"></div>
+                <div class="s-toggle on" id="toggle-trackers"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1491,7 +1434,7 @@ body::after{
                 <div class="s-row-desc">Mask browser fingerprint via UV headers</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle" id="toggle-ua" onclick="toggleSetting(this,'spoofUA')"></div>
+                <div class="s-toggle" id="toggle-ua"></div>
               </div>
             </div>
           </div>
@@ -1503,7 +1446,7 @@ body::after{
                 <div class="s-row-label">Save Browsing History</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-history" onclick="toggleSetting(this,'history')"></div>
+                <div class="s-toggle on" id="toggle-history"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1513,7 +1456,7 @@ body::after{
                 <div class="s-row-desc">Wipe all browsing history from this session</div>
               </div>
               <div class="s-row-ctrl">
-                <button class="s-btn s-btn-danger" onclick="clearHistory()">Clear History</button>
+                <button class="s-btn s-btn-danger" id="btn-clear-history">Clear History</button>
               </div>
             </div>
             <div class="s-row">
@@ -1523,7 +1466,7 @@ body::after{
                 <div class="s-row-desc">Warn when navigating to non-HTTPS sites</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-https" onclick="toggleSetting(this,'httpsOnly')"></div>
+                <div class="s-toggle on" id="toggle-https"></div>
               </div>
             </div>
           </div>
@@ -1541,7 +1484,7 @@ body::after{
                 <div class="s-row-desc">Show system notifications for events</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle on" id="toggle-notifs" onclick="toggleSetting(this,'notifs')"></div>
+                <div class="s-toggle on" id="toggle-notifs"></div>
               </div>
             </div>
             <div class="s-row">
@@ -1550,7 +1493,7 @@ body::after{
                 <div class="s-row-label">Notification Duration</div>
               </div>
               <div class="s-row-ctrl">
-                <select class="s-select" onchange="showNotif('⏱','Notifications','Duration set to '+this.value)">
+                <select class="s-select" id="notif-duration-select">
                   <option>2 seconds</option>
                   <option selected>4 seconds</option>
                   <option>8 seconds</option>
@@ -1565,7 +1508,7 @@ body::after{
                 <div class="s-row-desc">Silence all notifications</div>
               </div>
               <div class="s-row-ctrl">
-                <div class="s-toggle" id="toggle-dnd" onclick="toggleSetting(this,'dnd')"></div>
+                <div class="s-toggle" id="toggle-dnd"></div>
               </div>
             </div>
           </div>
@@ -1577,7 +1520,7 @@ body::after{
                 <div class="s-row-label">Send Test Notification</div>
               </div>
               <div class="s-row-ctrl">
-                <button class="s-btn s-btn-primary" onclick="showNotif('🔔','Test Notification','This is a test — notifications are working!')">Send Test</button>
+                <button class="s-btn s-btn-primary" id="btn-test-notif">Send Test</button>
               </div>
             </div>
           </div>
@@ -1628,7 +1571,7 @@ body::after{
                 <div class="s-row-desc">Restore Nebula to default settings</div>
               </div>
               <div class="s-row-ctrl">
-                <button class="s-btn s-btn-danger" onclick="resetSettings()">Reset</button>
+                <button class="s-btn s-btn-danger" id="btn-reset-settings">Reset</button>
               </div>
             </div>
           </div>
@@ -1656,7 +1599,7 @@ body::after{
     <div class="dock-item" data-tip="YouTube" onclick="navigateTo('https://youtube.com')">
       <div class="dock-tip">YouTube</div>
       <div class="di di-3">▶</div>
-      </div>
+    </div>
     <div class="dock-item" data-tip="Messages" onclick="showNotif('💬','Messages','You have 3 unread messages')">
       <div class="dock-tip">Messages</div>
       <div class="di di-4" style="position:relative">💬<div class="dock-badge">3</div></div>
@@ -1693,9 +1636,9 @@ body::after{
 <!-- ─── CONTEXT MENU ─── -->
 <div id="ctx-menu">
   <div class="ctx-item" onclick="newTab()">📄 New Tab</div>
-  <div class="ctx-item" onclick="navigateTo(document.getElementById('url-input').value||'https://google.com')">🔄 Reload</div>
+  <div class="ctx-item" id="ctx-reload">🔄 Reload</div>
   <div class="ctx-sep"></div>
-  <div class="ctx-item" onclick="document.getElementById('url-input').select()">🔗 Copy URL</div>
+  <div class="ctx-item" id="ctx-copy-url">🔗 Copy URL</div>
   <div class="ctx-item" onclick="toggleFullscreen()">⛶ Toggle Fullscreen</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item danger" onclick="hideCtx()">✕ Cancel</div>
@@ -1705,23 +1648,72 @@ body::after{
 <div id="notif-area"></div>
 
 <script>
+'use strict';
+
 /* ═══════════════════════════════════════════════════════════
-   UV PROXY — Same-domain setup, /uv/uv.sw.js
-   Loads uv.config.js then uv.bundle.js in order,
-   registers the SW under the UV prefix scope,
-   then uses __uv$config.encodeUrl() for all navigation.
+   GLOBALS & STATE
    ═══════════════════════════════════════════════════════════ */
-
-// These match standard Ultraviolet defaults.
-// Only change if your server differs.
-const UV_SW     = '/uv/uv.sw.js';
-const UV_BUNDLE = '/uv/uv.bundle.js';
-const UV_CONFIG_SRC = '/uv/uv.config.js';
-
 let uvReady = false;
 let swReady = false;
+let searchEngineUrl = 'https://www.google.com/search?q=';
+let historySavingEnabled = true;
+let httpsOnlyMode = true;
+let notifsEnabled = true;
+let dndEnabled    = false;
+let notifDuration = 4000;
+let showDateInClock = true;
+let magEnabled = true;
+let wallAutoTimer = null;
+let currentWpIdx = 0;
+let dockHideListeners = { enter: null, leave: null };
 
-/* Load a script and return a promise */
+const UV_SW      = '/uv/uv.sw.js';
+const UV_BUNDLE  = '/uv/uv.bundle.js';
+const UV_CONFIG_SRC = '/uv/uv.config.js';
+
+/* ═══════════════════════════════════════════════════════════
+   NOTIFICATIONS  (defined first so everything can call them)
+   ═══════════════════════════════════════════════════════════ */
+function _baseShowNotif(icon, title, body, dur) {
+  dur = (dur !== undefined) ? dur : 4000;
+  const area = document.getElementById('notif-area');
+  const el = document.createElement('div');
+  el.className = 'notif';
+  el.innerHTML = `<div class="notif-icon">${icon}</div><div class="notif-body"><h4>${title}</h4><p>${body}</p></div>`;
+  area.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'all 0.4s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(320px)';
+    setTimeout(() => el.remove(), 400);
+  }, dur);
+  el.addEventListener('click', () => el.remove());
+}
+
+function showNotif(icon, title, body, dur) {
+  if (!notifsEnabled || dndEnabled) return;
+  _baseShowNotif(icon, title, body, dur !== undefined ? dur : notifDuration);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CLOCK
+   ═══════════════════════════════════════════════════════════ */
+function updateClock() {
+  const n  = new Date();
+  const h  = n.getHours(), m = n.getMinutes();
+  const ap = h < 12 ? 'AM' : 'PM';
+  const hh = h % 12 || 12;
+  const mm = String(m).padStart(2, '0');
+  const timeStr = `${hh}:${mm} ${ap}`;
+  const dateStr = n.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+  document.getElementById('mb-clock').textContent = showDateInClock ? `${dateStr}  ${timeStr}` : timeStr;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+/* ═══════════════════════════════════════════════════════════
+   UV BOOT
+   ═══════════════════════════════════════════════════════════ */
 function loadScript(src) {
   return new Promise((res, rej) => {
     const s = document.createElement('script');
@@ -1732,38 +1724,30 @@ function loadScript(src) {
   });
 }
 
-/* Boot UV — config MUST load before bundle */
 async function bootUV() {
   try {
-    await loadScript(UV_CONFIG_SRC);   // sets window.__uv$config
-    await loadScript(UV_BUNDLE);       // UV runtime
+    await loadScript(UV_CONFIG_SRC);
+    await loadScript(UV_BUNDLE);
     uvReady = true;
   } catch(e) {
-    console.warn('[Nebula] UV scripts failed to load:', e.message);
+    console.warn('[Nebula] UV scripts failed:', e.message);
     uvReady = false;
   }
 }
 
-/* Register the UV service worker */
 async function registerSW() {
-  if (!('serviceWorker' in navigator)) {
-    console.warn('[Nebula] Service workers not supported.');
-    return false;
-  }
+  if (!('serviceWorker' in navigator)) return false;
   try {
-    // UV SW must be registered with its own prefix as scope
-    const cfg = window.__uv$config;
+    const cfg   = window.__uv$config;
     const scope = cfg ? cfg.prefix : '/service/uv/';
-    const reg = await navigator.serviceWorker.register(UV_SW, { scope });
-    // Wait for the SW to be active
+    const reg   = await navigator.serviceWorker.register(UV_SW, { scope });
     if (reg.installing || reg.waiting) {
       await new Promise(resolve => {
         const sw = reg.installing || reg.waiting;
-        sw.addEventListener('statechange', function handler() {
-          if (sw.state === 'activated') { sw.removeEventListener('statechange', handler); resolve(); }
+        sw.addEventListener('statechange', function h() {
+          if (sw.state === 'activated') { sw.removeEventListener('statechange', h); resolve(); }
         });
-        // Also resolve if already controlled
-        setTimeout(resolve, 3000); // safety timeout
+        setTimeout(resolve, 3000);
       });
     }
     await navigator.serviceWorker.ready;
@@ -1776,56 +1760,73 @@ async function registerSW() {
   }
 }
 
-/* Build the proxied URL using UV's own encoder */
 function getProxiedUrl(url) {
   if (!uvReady || !swReady) return null;
   const cfg = window.__uv$config;
   if (!cfg || typeof cfg.encodeUrl !== 'function') return null;
-  try {
-    return cfg.prefix + cfg.encodeUrl(url);
-  } catch(e) {
-    console.warn('[Nebula] encodeUrl failed:', e);
-    return null;
-  }
+  try { return cfg.prefix + cfg.encodeUrl(url); }
+  catch(e) { console.warn('[Nebula] encodeUrl failed:', e); return null; }
 }
 
-/* Startup sequence */
+function decodeProxiedHref(href) {
+  const cfg = window.__uv$config;
+  if (!cfg || typeof cfg.decodeUrl !== 'function') return null;
+  try {
+    const prefix = cfg.prefix;
+    const idx = href.indexOf(prefix);
+    if (idx === -1) return null;
+    return cfg.decodeUrl(href.slice(idx + prefix.length));
+  } catch(e) { return null; }
+}
+
 (async () => {
   await bootUV();
   await registerSW();
-
-  if (uvReady && swReady) {
-    showNotif('🌌', 'Nebula Ready', 'Ultraviolet proxy is active.');
-  } else if (uvReady && !swReady) {
-    showNotif('⚠️', 'SW Not Ready', 'UV loaded but service worker failed. Ensure this page is served from your UV server root.');
-  } else {
-    showNotif('⚠️', 'UV Not Found', 'Could not load /uv/uv.config.js or /uv/uv.bundle.js. Serve this file from your UV server.');
-  }
+  refreshProxyStatus();
+  if (uvReady && swReady)      showNotif('🌌','Nebula Ready','Ultraviolet proxy is active.');
+  else if (uvReady && !swReady) showNotif('⚠️','SW Not Ready','UV loaded but service worker failed.');
+  else                          showNotif('⚠️','UV Not Found','Could not load UV scripts. Serve from your UV server.');
 })();
 
-/* ═══════════════ TAB SYSTEM ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   URL PROCESSING  (single definition)
+   ═══════════════════════════════════════════════════════════ */
+function processUrl(raw) {
+  raw = raw.trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (/^[\w-]+\.[\w.-]+/.test(raw) && !raw.includes(' ')) return 'https://' + raw;
+  return searchEngineUrl + encodeURIComponent(raw);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB SYSTEM
+   ═══════════════════════════════════════════════════════════ */
 let tabs = [];
 let activeTab = null;
 let tabIdCounter = 0;
 
-function createTab(url = '', title = 'New Tab', favicon = '🌐') {
-  const id = ++tabIdCounter;
-  const tab = { id, url, title, favicon, history: [], historyIndex: -1 };
+function createTab(url, title, favicon) {
+  url     = url     || '';
+  title   = title   || 'New Tab';
+  favicon = favicon || '🌐';
+  const id  = ++tabIdCounter;
+  const tab = { id, url, title, favicon, history: [], historyIndex: -1, forward: [] };
   tabs.push(tab);
   renderTabs();
   switchTab(id);
-  if (url) navigateTo(url, id);
+  if (url) _navTo(url, id);
   return tab;
 }
 
 function closeTab(id) {
   const idx = tabs.findIndex(t => t.id === id);
-  if (tabs.length === 1) { newTab(); }
+  if (tabs.length === 1) { newTab(); return; }
   tabs = tabs.filter(t => t.id !== id);
   renderTabs();
   if (activeTab === id) {
-    const newActive = tabs[Math.min(idx, tabs.length - 1)];
-    if (newActive) switchTab(newActive.id);
+    const next = tabs[Math.min(idx, tabs.length - 1)];
+    if (next) switchTab(next.id);
   }
 }
 
@@ -1835,108 +1836,123 @@ function switchTab(id) {
   const tab = tabs.find(t => t.id === id);
   if (!tab) return;
   updateUrlBar(tab.url);
-  document.getElementById('tb-title').textContent = tab.title + ' — Nebula';
+  document.getElementById('tb-title').textContent = (tab.title || 'New Tab') + ' — Nebula';
   updateNavBtns(tab);
-
-  if (!tab.url) {
-    showNewTabPage();
-  } else {
-    loadInFrame(tab.url);
-  }
+  if (!tab.url) showNewTabPage();
+  else          loadInFrame(tab.url);
 }
 
 function renderTabs() {
-  const bar = document.getElementById('tabs-bar');
-  // Remove old tabs
-  bar.querySelectorAll('.tab').forEach(el => el.remove());
+  const bar    = document.getElementById('tabs-bar');
   const newBtn = document.getElementById('new-tab-btn');
+  bar.querySelectorAll('.tab').forEach(el => el.remove());
   tabs.forEach(tab => {
     const el = document.createElement('div');
     el.className = 'tab' + (tab.id === activeTab ? ' active' : '');
     el.dataset.id = tab.id;
-    el.innerHTML = `
-      <span class="tab-favicon">${tab.favicon}</span>
-      <span class="tab-title">${tab.title}</span>
-      <span class="tab-close" data-id="${tab.id}">×</span>`;
+    el.innerHTML = `<span class="tab-favicon">${tab.favicon}</span><span class="tab-title">${tab.title}</span><span class="tab-close" data-id="${tab.id}">×</span>`;
     el.addEventListener('click', (e) => {
-      if (e.target.classList.contains('tab-close')) {
-        closeTab(tab.id);
-      } else {
-        switchTab(tab.id);
-      }
+      if (e.target.classList.contains('tab-close')) closeTab(tab.id);
+      else switchTab(tab.id);
     });
     bar.insertBefore(el, newBtn);
   });
 }
 
-function newTab() {
-  createTab('', 'New Tab');
+function newTab() { createTab('', 'New Tab'); }
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION  (single navigateTo definition)
+   ═══════════════════════════════════════════════════════════ */
+function navigateTo(url, tabId) {
+  _navTo(url, tabId);
 }
 
-/* ═══════════════ NAVIGATION ═══════════════ */
-function _baseProcessUrl(raw) {
-  raw = raw.trim();
-  if (!raw) return '';
-  if (/^https?:\/\//i.test(raw)) return raw;
-  if (/^[\w-]+\.[\w.-]+/.test(raw) && !raw.includes(' ')) return 'https://' + raw;
-  return 'https://www.google.com/search?q=' + encodeURIComponent(raw);
-}
+function _navTo(url, tabId) {
+  tabId = tabId || activeTab;
+  const tab = tabs.find(t => t.id === tabId);
+  if (!tab) return;
+  const full = processUrl(url);
+  if (!full) return;
 
-/* Build proxied URL using UV's own encoder from uv.config.js */
-function getProxiedUrl(url) {
-  if (!uvReady || !swReady) return null;
-  const cfg = window.__uv$config;
-  if (!cfg || typeof cfg.encodeUrl !== 'function') return null;
-  try {
-    return cfg.prefix + cfg.encodeUrl(url);
-  } catch(e) {
-    console.warn('[Nebula] encodeUrl error:', e);
-    return null;
+  if (httpsOnlyMode && full.startsWith('http://')) {
+    showNotif('⚠️','Security','Blocked: HTTP site. HTTPS-only is enabled.');
+    document.getElementById('sec-banner').classList.add('show');
+    return;
   }
+
+  if (historySavingEnabled && tab.url && tab.url !== full) {
+    tab.history.push(tab.url);
+    tab.historyIndex = tab.history.length - 1;
+  }
+  tab.forward  = [];
+  tab.url      = full;
+  tab.title    = extractDomain(full);
+  tab.favicon  = getFavicon(full);
+  renderTabs();
+  updateUrlBar(full);
+  document.getElementById('tb-title').textContent = tab.title + ' — Nebula';
+  updateNavBtns(tab);
+  loadInFrame(full);
 }
 
-/* Decode a UV proxy href back to the real URL */
-function decodeProxiedHref(href) {
-  const cfg = window.__uv$config;
-  if (!cfg || typeof cfg.decodeUrl !== 'function') return null;
-  try {
-    const prefix = cfg.prefix;
-    const idx = href.indexOf(prefix);
-    if (idx === -1) return null;
-    const encoded = href.slice(idx + prefix.length);
-    return cfg.decodeUrl(encoded);
-  } catch(e) { return null; }
+function extractDomain(url) {
+  try { return new URL(url).hostname.replace('www.',''); }
+  catch { return url.slice(0, 30); }
 }
 
-/* ── URL tracking: poll the UV iframe for navigation changes ── */
-let frameTrackInterval = null;
-function startFrameTracking() {
-  stopFrameTracking();
-  frameTrackInterval = setInterval(() => {
-    try {
-      const frame = document.getElementById('uv-frame');
-      const fhref = frame.contentWindow?.location?.href;
-      if (!fhref || fhref === 'about:blank') return;
-      const real = decodeProxiedHref(fhref);
-      if (!real) return;
-      const bar = document.getElementById('url-input');
-      if (real !== bar.value) {
-        bar.value = real;
-        setSecurityIndicator(real);
-        const tab = tabs.find(t => t.id === activeTab);
-        if (tab) {
-          tab.url = real;
-          tab.title = extractDomain(real);
-          tab.favicon = getFavicon(real);
-          document.getElementById('tb-title').textContent = tab.title + ' — Nebula';
-          renderTabs();
-        }
-      }
-    } catch(e) { /* cross-origin read — normal, ignore */ }
-  }, 700);
+function getFavicon(url) {
+  const map = {
+    'google.com':'🅶','youtube.com':'▶','reddit.com':'👽',
+    'github.com':'⌥','twitter.com':'𝕏','x.com':'𝕏',
+    'discord.com':'🎮','music.youtube.com':'🎵','drive.google.com':'📁',
+    'wikipedia.org':'📖','netflix.com':'🎬','spotify.com':'🎶'
+  };
+  try { const h = new URL(url).hostname.replace('www.',''); return map[h] || '🌐'; }
+  catch { return '🌐'; }
 }
-function stopFrameTracking() {
-  if (frameTrackInterval) { clearInterval(frameTrackInterval); frameTrackInterval = null; }
+
+function navBack() {
+  const tab = tabs.find(t => t.id === activeTab);
+  if (!tab || tab.history.length === 0) return;
+  tab.forward.push(tab.url);
+  tab.url = tab.history.pop();
+  tab.historyIndex = tab.history.length - 1;
+  updateUrlBar(tab.url);
+  tab.title  = extractDomain(tab.url);
+  tab.favicon = getFavicon(tab.url);
+  renderTabs();
+  updateNavBtns(tab);
+  loadInFrame(tab.url);
+}
+
+function navForward() {
+  const tab = tabs.find(t => t.id === activeTab);
+  if (!tab || tab.forward.length === 0) return;
+  tab.history.push(tab.url);
+  tab.historyIndex = tab.history.length - 1;
+  tab.url = tab.forward.pop();
+  updateUrlBar(tab.url);
+  tab.title  = extractDomain(tab.url);
+  tab.favicon = getFavicon(tab.url);
+  renderTabs();
+  updateNavBtns(tab);
+  loadInFrame(tab.url);
+}
+
+function navRefresh() {
+  const tab = tabs.find(t => t.id === activeTab);
+  if (tab && tab.url) loadInFrame(tab.url);
+}
+
+function updateUrlBar(url) {
+  document.getElementById('url-input').value = url || '';
+  if (url) setSecurityIndicator(url);
+}
+
+function updateNavBtns(tab) {
+  document.getElementById('nav-back').disabled    = !tab.history || tab.history.length === 0;
+  document.getElementById('nav-forward').disabled = !tab.forward || tab.forward.length === 0;
 }
 
 function setSecurityIndicator(url) {
@@ -1944,8 +1960,13 @@ function setSecurityIndicator(url) {
   document.getElementById('sec-banner').classList.toggle('show', !secure);
   const lock = document.getElementById('url-lock');
   lock.textContent = secure ? '🔒' : '⚠️';
-  lock.style.color  = secure ? 'var(--green)' : 'var(--yellow)';
+  lock.style.color = secure ? 'var(--green)' : 'var(--yellow)';
 }
+
+/* ═══════════════════════════════════════════════════════════
+   FRAME / LOAD
+   ═══════════════════════════════════════════════════════════ */
+let frameTrackInterval = null;
 
 function showNewTabPage() {
   document.getElementById('new-tab-page').classList.remove('hidden');
@@ -1956,21 +1977,23 @@ function showNewTabPage() {
   stopFrameTracking();
 }
 
-function _baseLoadInFrame(url) {
+function loadInFrame(url) {
+  const frame = document.getElementById('uv-frame');
+  document.getElementById('new-tab-page').classList.add('hidden');
+  frame.classList.remove('hidden');
+  setSecurityIndicator(url);
 
   const proxied = getProxiedUrl(url);
-
   if (proxied) {
     frame.src = proxied;
     startLoad();
     startFrameTracking();
-    frame.onload = () => { startLoad(); };
+    frame.onload = () => { finishLoad(); };
   } else {
-    // UV not ready — show a helpful error page inside the frame
     stopFrameTracking();
-    const cfg = window.__uv$config;
+    const cfg    = window.__uv$config;
     const prefix = cfg ? cfg.prefix : '/service/uv/';
-    const html = `<!DOCTYPE html><html><head><style>
+    frame.srcdoc = `<!DOCTYPE html><html><head><style>
       *{margin:0;padding:0;box-sizing:border-box}
       body{background:#0e0e0e;color:#9a9aa8;display:flex;flex-direction:column;
         align-items:center;justify-content:center;height:100vh;
@@ -1980,185 +2003,87 @@ function _baseLoadInFrame(url) {
       code{background:#1e1e24;padding:2px 8px;border-radius:4px;color:#60a5fa;font-size:12px}
       .url{color:#60a5fa;word-break:break-all;font-size:13px;padding:10px 16px;
         background:#0a0a14;border:1px solid rgba(96,165,250,0.2);border-radius:8px;max-width:500px}
-      .steps{text-align:left;max-width:440px;background:#111118;
-        border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px 20px}
-      .steps li{margin:6px 0;font-size:12px;line-height:1.6}
+      ol{text-align:left;max-width:440px;background:#111118;
+        border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px 20px 16px 36px}
+      li{margin:6px 0;font-size:12px;line-height:1.6}
     </style></head><body>
       <div style="font-size:52px;filter:drop-shadow(0 0 20px rgba(59,130,246,0.4))">🌌</div>
       <h2>Ultraviolet Proxy Not Ready</h2>
-      <p>Nebula is waiting for Ultraviolet to initialise. Make sure this file is served <strong>from your UV server root</strong> — not opened directly from disk.</p>
+      <p>Serve this file from your UV server — not opened directly from disk.</p>
       <div class="url">Requested: <strong>${url}</strong></div>
-      <ol class="steps">
-        <li>Serve this file from your UV server (e.g. <code>node server.js</code>)</li>
-        <li>UV config must be at <code>/uv/uv.config.js</code></li>
-        <li>UV bundle must be at <code>/uv/uv.bundle.js</code></li>
-        <li>Service worker registers at <code>/uv/uv.sw.js</code> → scope <code>${prefix}</code></li>
-        <li>Refresh the page once the server is running</li>
+      <ol>
+        <li>Run your UV server (e.g. <code>node server.js</code>)</li>
+        <li>UV config at <code>/uv/uv.config.js</code></li>
+        <li>UV bundle at <code>/uv/uv.bundle.js</code></li>
+        <li>Service worker at <code>/uv/uv.sw.js</code> → scope <code>${prefix}</code></li>
+        <li>Refresh once the server is running</li>
       </ol>
     </body></html>`;
-    frame.srcdoc = html;
   }
 }
 
-function _baseNavigateTo(url, tabId) {
-  if (!tabId) tabId = activeTab;
-  const tab = tabs.find(t => t.id === tabId);
-  if (!tab) return;
-  const full = processUrl(url);
-  if (!full) return;
-  if (tab.url && tab.url !== full) {
-    tab.history = tab.history || [];
-    tab.history.push(tab.url);
-    tab.historyIndex = tab.history.length - 1;
-  }
-  tab.forward = [];
-  tab.url = full;
-  tab.title = extractDomain(full);
-  tab.favicon = getFavicon(full);
-  renderTabs();
-  updateUrlBar(full);
-  document.getElementById('tb-title').textContent = tab.title + ' — Nebula';
-  updateNavBtns(tab);
-  loadInFrame(full);
+function startFrameTracking() {
+  stopFrameTracking();
+  frameTrackInterval = setInterval(() => {
+    try {
+      const frame = document.getElementById('uv-frame');
+      const fhref = frame.contentWindow && frame.contentWindow.location && frame.contentWindow.location.href;
+      if (!fhref || fhref === 'about:blank') return;
+      const real = decodeProxiedHref(fhref);
+      if (!real) return;
+      const bar = document.getElementById('url-input');
+      if (real !== bar.value) {
+        bar.value = real;
+        setSecurityIndicator(real);
+        const tab = tabs.find(t => t.id === activeTab);
+        if (tab) {
+          tab.url    = real;
+          tab.title  = extractDomain(real);
+          tab.favicon = getFavicon(real);
+          document.getElementById('tb-title').textContent = tab.title + ' — Nebula';
+          renderTabs();
+        }
+      }
+    } catch(e) { /* cross-origin — normal */ }
+  }, 700);
 }
 
-function extractDomain(url) {
-  try {
-    return new URL(url).hostname.replace('www.','');
-  } catch { return url.slice(0,30); }
+function stopFrameTracking() {
+  if (frameTrackInterval) { clearInterval(frameTrackInterval); frameTrackInterval = null; }
 }
 
-function getFavicon(url) {
-  const map = {
-    'google.com':'🅶','youtube.com':'▶','reddit.com':'👽',
-    'github.com':'⌥','twitter.com':'𝕏','x.com':'𝕏',
-    'discord.com':'🎮','music.youtube.com':'🎵','drive.google.com':'📁',
-    'wikipedia.org':'📖','netflix.com':'🎬','spotify.com':'🎶'
-  };
-  try {
-    const h = new URL(url).hostname.replace('www.','');
-    return map[h] || '🌐';
-  } catch { return '🌐'; }
-}
-
-function navBack() {
-  const tab = tabs.find(t => t.id === activeTab);
-  if (!tab || tab.historyIndex < 0) return;
-  // Push current to forward stack
-  tab.forward = tab.forward || [];
-  tab.forward.push(tab.url);
-  tab.url = tab.history[tab.historyIndex];
-  tab.history.splice(tab.historyIndex, 1);
-  tab.historyIndex = tab.history.length - 1;
-  updateUrlBar(tab.url);
-  tab.title = extractDomain(tab.url);
-  tab.favicon = getFavicon(tab.url);
-  renderTabs();
-  updateNavBtns(tab);
-  loadInFrame(tab.url);
-}
-
-function navForward() {
-  const tab = tabs.find(t => t.id === activeTab);
-  if (!tab || !tab.forward || tab.forward.length === 0) return;
-  // Push current to back history
-  tab.history.push(tab.url);
-  tab.historyIndex = tab.history.length - 1;
-  tab.url = tab.forward.pop();
-  updateUrlBar(tab.url);
-  tab.title = extractDomain(tab.url);
-  tab.favicon = getFavicon(tab.url);
-  renderTabs();
-  updateNavBtns(tab);
-  loadInFrame(tab.url);
-}
-
-function navRefresh() {
-  const tab = tabs.find(t => t.id === activeTab);
-  if (!tab || !tab.url) return;
-  // Re-build the proxied URL fresh — do not reuse stale frame src
-  loadInFrame(tab.url);
-}
-
-function updateUrlBar(url) {
-  document.getElementById('url-input').value = url || '';
-}
-
-function updateNavBtns(tab) {
-  document.getElementById('nav-back').disabled    = !tab.history || tab.history.length === 0;
-  document.getElementById('nav-forward').disabled = !tab.forward || tab.forward.length === 0;
-}
-
-/* ═══════════════ LOAD BAR ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   LOAD BAR
+   ═══════════════════════════════════════════════════════════ */
 let loadTimer;
 function startLoad() {
   const bar = document.getElementById('load-bar');
   bar.className = 'loading';
   clearTimeout(loadTimer);
-  loadTimer = setTimeout(() => { bar.className = 'done'; }, 1200);
+}
+function finishLoad() {
+  const bar = document.getElementById('load-bar');
+  bar.className = 'done';
 }
 
-/* ═══════════════ WINDOW DRAG ═══════════════ */
-let drag = null;
-document.getElementById('browser-tb').addEventListener('mousedown', (e) => {
-  if (e.target.classList.contains('tl')) return;
-  const win = document.getElementById('browser-win');
-  drag = {
-    el: win,
-    ox: e.clientX - win.offsetLeft,
-    oy: e.clientY - win.offsetTop
-  };
-  win.style.transition = 'none';
-  e.preventDefault();
-});
-document.addEventListener('mousemove', (e) => {
-  if (!drag) return;
-  const d = document.getElementById('desktop');
-  const maxX = d.offsetWidth - drag.el.offsetWidth;
-  const maxY = d.offsetHeight - drag.el.offsetHeight;
-  drag.el.style.left = Math.max(0, Math.min(e.clientX - drag.ox, maxX)) + 'px';
-  drag.el.style.top  = Math.max(0, Math.min(e.clientY - drag.oy, maxY)) + 'px';
-});
-document.addEventListener('mouseup', () => { drag = null; });
-
-/* ═══════════════ RESIZE ═══════════════ */
-let resizing = null;
-document.getElementById('resize-handle').addEventListener('mousedown', (e) => {
-  const win = document.getElementById('browser-win');
-  resizing = { el: win, sx: e.clientX, sy: e.clientY, sw: win.offsetWidth, sh: win.offsetHeight };
-  e.preventDefault(); e.stopPropagation();
-});
-document.addEventListener('mousemove', (e) => {
-  if (!resizing) return;
-  const w = Math.max(400, resizing.sw + e.clientX - resizing.sx);
-  const h = Math.max(300, resizing.sh + e.clientY - resizing.sy);
-  resizing.el.style.width  = w + 'px';
-  resizing.el.style.height = h + 'px';
-});
-document.addEventListener('mouseup', () => { resizing = null; });
-
-/* ═══════════════ WINDOW ANIMATIONS ═══════════════ */
-
-/* Calculate CSS vars for the dock-suck target offset
-   so the window flies toward the Nebula dock icon */
-function setDockTarget(win, tip) {
-  const label = tip || (win.id === 'settings-win' ? 'Settings' : 'Nebula');
-  const dockIcon = document.querySelector(`.dock-item[data-tip="${label}"] .di`);
-  if (!dockIcon) return;
-  const iconR = dockIcon.getBoundingClientRect();
-  const winR  = win.getBoundingClientRect();
-  const tx = (iconR.left + iconR.width  / 2) - (winR.left + winR.width  / 2);
-  const ty = (iconR.top  + iconR.height / 2) - (winR.top  + winR.height / 2);
-  win.style.setProperty('--dock-tx', tx + 'px');
-  win.style.setProperty('--dock-ty', ty + 'px');
+/* ═══════════════════════════════════════════════════════════
+   WINDOW ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+function setDockTarget(win) {
+  const tip  = win.id === 'settings-win' ? 'Settings' : 'Nebula';
+  const icon = document.querySelector(`.dock-item[data-tip="${tip}"] .di`);
+  if (!icon) return;
+  const ir  = icon.getBoundingClientRect();
+  const wr  = win.getBoundingClientRect();
+  win.style.setProperty('--dock-tx', ((ir.left + ir.width/2) - (wr.left + wr.width/2)) + 'px');
+  win.style.setProperty('--dock-ty', ((ir.top  + ir.height/2) - (wr.top + wr.height/2)) + 'px');
 }
 
 function winAnimate(win, cls, duration, onDone) {
-  // strip any active animation classes first
   win.classList.remove('win-opening','win-minimizing','win-restoring','win-closing');
-  void win.offsetWidth; // reflow
+  void win.offsetWidth;
   win.classList.add(cls);
-  const tid = setTimeout(() => {
+  setTimeout(() => {
     win.classList.remove(cls);
     if (onDone) onDone();
   }, duration);
@@ -2167,10 +2092,8 @@ function winAnimate(win, cls, duration, onDone) {
 function minimizeWindow(win) {
   if (win.classList.contains('minimized')) return;
   setDockTarget(win);
-  winAnimate(win, 'win-minimizing', 420, () => {
-    win.classList.add('minimized');
-  });
-  const tip = win.id === 'settings-win' ? 'Settings' : 'Nebula';
+  winAnimate(win, 'win-minimizing', 420, () => win.classList.add('minimized'));
+  const tip      = win.id === 'settings-win' ? 'Settings' : 'Nebula';
   const dockItem = document.querySelector(`.dock-item[data-tip="${tip}"]`);
   if (dockItem) {
     dockItem.classList.add('bounce-anim');
@@ -2185,25 +2108,22 @@ function restoreWindow(win) {
 }
 
 function closeWindow(win) {
-  winAnimate(win, 'win-closing', 280, () => {
-    win.classList.add('minimized');
-  });
+  winAnimate(win, 'win-closing', 280, () => win.classList.add('minimized'));
 }
 
-/* ═══════════════ TRAFFIC LIGHTS ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   BROWSER TRAFFIC LIGHTS
+   ═══════════════════════════════════════════════════════════ */
 document.getElementById('btn-close').addEventListener('click', () => {
   const win = document.getElementById('browser-win');
-  if (win.classList.contains('minimized')) {
-    restoreWindow(win);
-  } else {
-    closeWindow(win);
-  }
+  if (win.classList.contains('minimized')) restoreWindow(win);
+  else closeWindow(win);
 });
 
 document.getElementById('btn-min').addEventListener('click', () => {
   const win = document.getElementById('browser-win');
   minimizeWindow(win);
-  showNotif('🌌', 'Nebula', 'Window minimized — click the dock icon to restore.');
+  showNotif('🌌','Nebula','Window minimized — click the dock icon to restore.');
 });
 
 document.getElementById('btn-max').addEventListener('click', toggleFullWin);
@@ -2211,25 +2131,30 @@ document.getElementById('btn-max').addEventListener('click', toggleFullWin);
 function toggleFullWin() {
   const win = document.getElementById('browser-win');
   if (win.dataset.full === '1') {
-    // restore to saved size with a quick spring
-    win.style.cssText = win.dataset.prev || '';
-    win.dataset.full = '0';
+    win.style.cssText  = win.dataset.prev || '';
+    win.dataset.full   = '0';
     winAnimate(win, 'win-restoring', 380, () => {});
   } else {
-    win.dataset.prev = win.style.cssText;
-    winAnimate(win, 'win-minimizing', 200, () => {
-      win.style.cssText = `width:100%;height:100%;top:0;left:0;border-radius:0;`;
-      win.dataset.full = '1';
-      winAnimate(win, 'win-opening', 320, () => {});
-    });
+    win.dataset.prev  = win.style.cssText;
+    win.style.cssText = 'width:100%;height:100%;top:0;left:0;border-radius:0;';
+    win.dataset.full  = '1';
+    winAnimate(win, 'win-opening', 320, () => {});
   }
 }
 
-document.getElementById('close-banner').addEventListener('click', () => {
-  document.getElementById('sec-banner').classList.remove('show');
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS TRAFFIC LIGHTS
+   ═══════════════════════════════════════════════════════════ */
+document.getElementById('settings-btn-close').addEventListener('click', () => {
+  closeWindow(document.getElementById('settings-win'));
+});
+document.getElementById('settings-btn-min').addEventListener('click', () => {
+  minimizeWindow(document.getElementById('settings-win'));
 });
 
-/* ═══════════════ DOCK ACTION ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   DOCK ACTION
+   ═══════════════════════════════════════════════════════════ */
 function dockAction(type) {
   if (type === 'browser') {
     const win = document.getElementById('browser-win');
@@ -2239,20 +2164,66 @@ function dockAction(type) {
     const sw = document.getElementById('settings-win');
     if (sw.classList.contains('minimized')) {
       restoreWindow(sw);
-      setTimeout(() => {
-        try { refreshAboutPage(); } catch(e){}
-        try { refreshProxyStatus(); } catch(e){}
-      }, 100);
+      setTimeout(() => { refreshAboutPage(); refreshProxyStatus(); }, 100);
     } else {
       minimizeWindow(sw);
     }
   }
 }
 
-/* ═══════════════ URL BAR INTERACTION ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   WINDOW DRAG
+   ═══════════════════════════════════════════════════════════ */
+let drag = null;
+
+function makeDraggable(titlebarEl, winEl) {
+  titlebarEl.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('tl')) return;
+    drag = { el: winEl, ox: e.clientX - winEl.offsetLeft, oy: e.clientY - winEl.offsetTop };
+    winEl.style.transition = 'none';
+    e.preventDefault();
+  });
+}
+makeDraggable(document.getElementById('browser-tb'),  document.getElementById('browser-win'));
+makeDraggable(document.getElementById('settings-tb'), document.getElementById('settings-win'));
+
+document.addEventListener('mousemove', (e) => {
+  if (!drag) return;
+  const d    = document.getElementById('desktop');
+  const maxX = d.offsetWidth  - drag.el.offsetWidth;
+  const maxY = d.offsetHeight - drag.el.offsetHeight;
+  drag.el.style.left = Math.max(0, Math.min(e.clientX - drag.ox, maxX)) + 'px';
+  drag.el.style.top  = Math.max(0, Math.min(e.clientY - drag.oy, maxY)) + 'px';
+});
+document.addEventListener('mouseup', () => { drag = null; });
+
+/* ═══════════════════════════════════════════════════════════
+   RESIZE
+   ═══════════════════════════════════════════════════════════ */
+let resizing = null;
+
+function makeResizable(handleEl, winEl, minW, minH) {
+  handleEl.addEventListener('mousedown', (e) => {
+    resizing = { el: winEl, sx: e.clientX, sy: e.clientY, sw: winEl.offsetWidth, sh: winEl.offsetHeight, minW, minH };
+    e.preventDefault(); e.stopPropagation();
+  });
+}
+makeResizable(document.getElementById('resize-handle'),    document.getElementById('browser-win'),  400, 300);
+makeResizable(document.getElementById('settings-resize'),  document.getElementById('settings-win'), 560, 400);
+
+document.addEventListener('mousemove', (e) => {
+  if (!resizing) return;
+  resizing.el.style.width  = Math.max(resizing.minW, resizing.sw + e.clientX - resizing.sx) + 'px';
+  resizing.el.style.height = Math.max(resizing.minH, resizing.sh + e.clientY - resizing.sy) + 'px';
+});
+document.addEventListener('mouseup', () => { resizing = null; });
+
+/* ═══════════════════════════════════════════════════════════
+   URL BAR
+   ═══════════════════════════════════════════════════════════ */
 const urlInput = document.getElementById('url-input');
 urlInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { navigateTo(urlInput.value); urlInput.blur(); }
+  if (e.key === 'Enter')  { navigateTo(urlInput.value); urlInput.blur(); }
   if (e.key === 'Escape') { urlInput.blur(); }
 });
 urlInput.addEventListener('focus', () => urlInput.select());
@@ -2268,60 +2239,59 @@ document.getElementById('nav-home').addEventListener('click', () => {
 document.getElementById('new-tab-btn').addEventListener('click', newTab);
 document.getElementById('nav-bm').addEventListener('click', () => {
   const tab = tabs.find(t => t.id === activeTab);
-  showNotif('☆','Bookmarked', tab?.title || 'Page');
-  document.getElementById('nav-bm').textContent = '★';
-  setTimeout(()=>document.getElementById('nav-bm').textContent = '☆', 2000);
+  showNotif('☆','Bookmarked', tab ? tab.title : 'Page');
+  const bm = document.getElementById('nav-bm');
+  bm.textContent = '★';
+  setTimeout(() => bm.textContent = '☆', 2000);
 });
 
-// NTP search
+document.getElementById('close-banner').addEventListener('click', () => {
+  document.getElementById('sec-banner').classList.remove('show');
+});
+
+/* NTP search */
 document.getElementById('ntp-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { navigateTo(document.getElementById('ntp-input').value); }
-});
-document.getElementById('ntp-search-box').addEventListener('click', () => {
-  document.getElementById('ntp-input').focus();
+  if (e.key === 'Enter') navigateTo(document.getElementById('ntp-input').value);
 });
 
-/* ═══════════════ CLOCK ═══════════════ */
-// updateClock defined in settings section — called here
-updateClock(); setInterval(updateClock, 10000);
-
-/* ═══════════════ SPOTLIGHT ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   SPOTLIGHT
+   ═══════════════════════════════════════════════════════════ */
 const SPOT_SUGGESTIONS = [
-  {icon:'🅶', label:'Google', action:()=>navigateTo('https://google.com')},
-  {icon:'▶', label:'YouTube', action:()=>navigateTo('https://youtube.com')},
-  {icon:'👽', label:'Reddit',  action:()=>navigateTo('https://reddit.com')},
-  {icon:'⌥', label:'GitHub',  action:()=>navigateTo('https://github.com')},
-  {icon:'𝕏', label:'Twitter', action:()=>navigateTo('https://twitter.com')},
-  {icon:'📖',label:'Wikipedia',action:()=>navigateTo('https://wikipedia.org')},
-  {icon:'🎶',label:'Spotify', action:()=>navigateTo('https://spotify.com')},
-  {icon:'🎬',label:'Netflix', action:()=>navigateTo('https://netflix.com')},
+  {icon:'🅶',  label:'Google',    action:()=>navigateTo('https://google.com')},
+  {icon:'▶',   label:'YouTube',   action:()=>navigateTo('https://youtube.com')},
+  {icon:'👽',  label:'Reddit',    action:()=>navigateTo('https://reddit.com')},
+  {icon:'⌥',   label:'GitHub',    action:()=>navigateTo('https://github.com')},
+  {icon:'𝕏',   label:'Twitter',   action:()=>navigateTo('https://twitter.com')},
+  {icon:'📖',  label:'Wikipedia', action:()=>navigateTo('https://wikipedia.org')},
+  {icon:'🎶',  label:'Spotify',   action:()=>navigateTo('https://spotify.com')},
+  {icon:'🎬',  label:'Netflix',   action:()=>navigateTo('https://netflix.com')},
 ];
 
 document.getElementById('spotlight-trigger').addEventListener('click', toggleSpotlight);
+
 document.getElementById('spot-input').addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase();
+  const q   = e.target.value.toLowerCase();
   const res = document.getElementById('spot-results');
-  if (!q) { res.classList.remove('show'); res.innerHTML=''; return; }
+  if (!q) { res.classList.remove('show'); res.innerHTML = ''; return; }
   const matches = SPOT_SUGGESTIONS.filter(s => s.label.toLowerCase().includes(q));
   const all = [...matches,
     {icon:'🔍', label:`Search "${e.target.value}"`, action:()=>navigateTo(e.target.value)},
-    {icon:'🌐', label:`Go to ${e.target.value}`, action:()=>navigateTo(e.target.value)}
+    {icon:'🌐', label:`Go to ${e.target.value}`,    action:()=>navigateTo(e.target.value)}
   ];
-  res.innerHTML = all.slice(0,8).map((s,i) =>
-    `<div class="spot-row" data-i="${i}">${s.icon ? `<span class="spot-row-icon">${s.icon}</span>` : ''} ${s.label}</div>`
+  const shown = all.slice(0, 8);
+  res.innerHTML = shown.map((s, i) =>
+    `<div class="spot-row" data-i="${i}"><span class="spot-row-icon">${s.icon||''}</span> ${s.label}</div>`
   ).join('');
-  res._actions = all;
   res.classList.add('show');
-  res.querySelectorAll('.spot-row').forEach((r,i) => {
-    r.addEventListener('click', () => { all[i].action(); hideSpotlight(); });
+  res.querySelectorAll('.spot-row').forEach((r, i) => {
+    r.addEventListener('click', () => { shown[i].action(); hideSpotlight(); });
   });
 });
+
 document.getElementById('spot-input').addEventListener('keydown', (e) => {
   if (e.key === 'Escape') hideSpotlight();
-  if (e.key === 'Enter') {
-    const q = e.target.value;
-    if (q) { navigateTo(q); hideSpotlight(); }
-  }
+  if (e.key === 'Enter' && e.target.value) { navigateTo(e.target.value); hideSpotlight(); }
 });
 
 function toggleSpotlight() {
@@ -2332,108 +2302,56 @@ function toggleSpotlight() {
 function hideSpotlight() {
   document.getElementById('spotlight').classList.remove('show');
   document.getElementById('spot-input').value = '';
-  document.getElementById('spot-results').classList.remove('show');
-  document.getElementById('spot-results').innerHTML = '';
+  const res = document.getElementById('spot-results');
+  res.classList.remove('show');
+  res.innerHTML = '';
 }
 
-/* ═══════════════ CONTEXT MENU ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   CONTEXT MENU
+   ═══════════════════════════════════════════════════════════ */
 document.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   const m = document.getElementById('ctx-menu');
-  m.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+  m.style.left = Math.min(e.clientX, window.innerWidth  - 200) + 'px';
   m.style.top  = Math.min(e.clientY, window.innerHeight - 200) + 'px';
   m.classList.add('show');
 });
 document.addEventListener('click', () => hideCtx());
+
 function hideCtx() { document.getElementById('ctx-menu').classList.remove('show'); }
 
-/* ═══════════════ NOTIFICATIONS ═══════════════ */
-function _baseShowNotif(icon, title, body, duration = 4000) {
-  const area = document.getElementById('notif-area');
-  const el = document.createElement('div');
-  el.className = 'notif';
-  el.innerHTML = `<div class="notif-icon">${icon}</div><div class="notif-body"><h4>${title}</h4><p>${body}</p></div>`;
-  area.appendChild(el);
-  setTimeout(() => {
-    el.style.transition = 'all 0.4s ease';
-    el.style.opacity = '0';
-    el.style.transform = 'translateX(320px)';
-    setTimeout(() => el.remove(), 400);
-  }, duration);
-  el.addEventListener('click', () => el.remove());
-}
+document.getElementById('ctx-reload').addEventListener('click', () => {
+  navRefresh(); hideCtx();
+});
+document.getElementById('ctx-copy-url').addEventListener('click', () => {
+  navigator.clipboard && navigator.clipboard.writeText(document.getElementById('url-input').value);
+  hideCtx();
+});
 
-/* ═══════════════ KEYBOARD SHORTCUTS ═══════════════ */
+/* ═══════════════════════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+   ═══════════════════════════════════════════════════════════ */
 document.addEventListener('keydown', (e) => {
   const mod = e.metaKey || e.ctrlKey;
-  if (mod && e.key === 'k') { e.preventDefault(); toggleSpotlight(); }
-  if (mod && e.key === 't') { e.preventDefault(); newTab(); }
-  if (mod && e.key === 'w') { e.preventDefault(); closeTab(activeTab); }
-  if (mod && e.key === 'l') { e.preventDefault(); urlInput.focus(); urlInput.select(); }
-  if (mod && e.key === 'r') { e.preventDefault(); navRefresh(); }
+  if (mod && e.key === 'k')         { e.preventDefault(); toggleSpotlight(); }
+  if (mod && e.key === 't')         { e.preventDefault(); newTab(); }
+  if (mod && e.key === 'w')         { e.preventDefault(); closeTab(activeTab); }
+  if (mod && e.key === 'l')         { e.preventDefault(); urlInput.focus(); urlInput.select(); }
+  if (mod && e.key === 'r')         { e.preventDefault(); navRefresh(); }
   if (mod && e.key === 'ArrowLeft') { e.preventDefault(); navBack(); }
-  if (e.key === 'Escape') { hideSpotlight(); hideCtx(); }
-  if (mod && e.key === 'Enter') { toggleFullscreen(); }
+  if (e.key === 'Escape')           { hideSpotlight(); hideCtx(); }
+  if (mod && e.key === 'Enter')     { toggleFullscreen(); }
 });
 
 function toggleFullscreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
 }
 
-/* ═══════════════ SETTINGS WINDOW ═══════════════ */
-
-const settingsWin = document.getElementById('settings-win');
-let settingsDragData = null;
-
-/* Open / close settings */
-function openSettings() {
-  if (!settingsWin.classList.contains('minimized')) return;
-  restoreWindow(settingsWin);
-  // defer so functions defined later in file are available
-  setTimeout(() => {
-    try { refreshAboutPage(); } catch(e){}
-    try { refreshProxyStatus(); } catch(e){}
-  }, 50);
-}
-function closeSettings() { closeWindow(settingsWin); }
-function minimizeSettings() { minimizeWindow(settingsWin); }
-
-/* Drag settings titlebar */
-document.getElementById('settings-tb').addEventListener('mousedown', (e) => {
-  if (e.target.classList.contains('tl')) return;
-  settingsDragData = {
-    el: settingsWin,
-    ox: e.clientX - settingsWin.offsetLeft,
-    oy: e.clientY - settingsWin.offsetTop
-  };
-  settingsWin.style.transition = 'none';
-  e.preventDefault();
-});
-document.addEventListener('mousemove', (e) => {
-  if (!settingsDragData) return;
-  const d = document.getElementById('desktop');
-  const maxX = d.offsetWidth  - settingsDragData.el.offsetWidth;
-  const maxY = d.offsetHeight - settingsDragData.el.offsetHeight;
-  settingsDragData.el.style.left = Math.max(0, Math.min(e.clientX - settingsDragData.ox, maxX)) + 'px';
-  settingsDragData.el.style.top  = Math.max(0, Math.min(e.clientY - settingsDragData.oy, maxY)) + 'px';
-});
-document.addEventListener('mouseup', () => { settingsDragData = null; });
-
-/* Resize settings window */
-let settingsResizing = null;
-document.getElementById('settings-resize').addEventListener('mousedown', (e) => {
-  settingsResizing = { sx: e.clientX, sy: e.clientY, sw: settingsWin.offsetWidth, sh: settingsWin.offsetHeight };
-  e.preventDefault(); e.stopPropagation();
-});
-document.addEventListener('mousemove', (e) => {
-  if (!settingsResizing) return;
-  settingsWin.style.width  = Math.max(560, settingsResizing.sw + e.clientX - settingsResizing.sx) + 'px';
-  settingsWin.style.height = Math.max(400, settingsResizing.sh + e.clientY - settingsResizing.sy) + 'px';
-});
-document.addEventListener('mouseup', () => { settingsResizing = null; });
-
-/* Switch pages */
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — PAGE SWITCHING
+   ═══════════════════════════════════════════════════════════ */
 function switchSettingsPage(pageId, navEl) {
   document.querySelectorAll('.settings-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
@@ -2441,60 +2359,63 @@ function switchSettingsPage(pageId, navEl) {
   navEl.classList.add('active');
 }
 
-/* ══════════════════════════════════════════════════════════
-   SETTINGS — ALL FULLY FUNCTIONAL
-   ══════════════════════════════════════════════════════════ */
+/* Focus management */
+document.getElementById('settings-win').addEventListener('mousedown', () => {
+  document.getElementById('settings-win').classList.add('focused');
+  document.getElementById('browser-win').classList.remove('focused');
+});
+document.getElementById('browser-win').addEventListener('mousedown', () => {
+  document.getElementById('browser-win').classList.add('focused');
+  document.getElementById('settings-win').classList.remove('focused');
+});
 
-// ── Helpers ──────────────────────────────────────────────
-function hexToRgb(hex){
-  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return `${r},${g},${b}`;
-}
-function lightenHex(hex,amt=40){
-  let r=parseInt(hex.slice(1,3),16)+amt,g=parseInt(hex.slice(3,5),16)+amt,b=parseInt(hex.slice(5,7),16)+amt;
-  return '#'+[r,g,b].map(v=>Math.min(255,v).toString(16).padStart(2,'0')).join('');
-}
-
-// ── APPEARANCE ───────────────────────────────────────────
-
-/* Dark mode toggle — switches bg/surface/text variables between light and dark */
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — APPEARANCE
+   ═══════════════════════════════════════════════════════════ */
 function toggleDarkMode(el) {
   el.classList.toggle('on');
   const dark = el.classList.contains('on');
   const root = document.documentElement;
   if (dark) {
-    root.style.setProperty('--bg',       '#0e0e0e');
-    root.style.setProperty('--surface',  '#1a1a1e');
-    root.style.setProperty('--surface2', '#242428');
-    root.style.setProperty('--surface3', '#2e2e34');
-    root.style.setProperty('--win-bg',   '#121214');
-    root.style.setProperty('--text',     '#e8e8ea');
-    root.style.setProperty('--text2',    '#9a9aa8');
-    root.style.setProperty('--text3',    '#5a5a68');
-    root.style.setProperty('--border',   'rgba(255,255,255,0.08)');
-    root.style.setProperty('--border2',  'rgba(255,255,255,0.13)');
+    root.style.setProperty('--bg',          '#0e0e0e');
+    root.style.setProperty('--surface',     '#1a1a1e');
+    root.style.setProperty('--surface2',    '#242428');
+    root.style.setProperty('--surface3',    '#2e2e34');
+    root.style.setProperty('--win-bg',      '#121214');
+    root.style.setProperty('--text',        '#e8e8ea');
+    root.style.setProperty('--text2',       '#9a9aa8');
+    root.style.setProperty('--text3',       '#5a5a68');
+    root.style.setProperty('--border',      'rgba(255,255,255,0.08)');
+    root.style.setProperty('--border2',     'rgba(255,255,255,0.13)');
     root.style.setProperty('--menubar-glass','rgba(14,14,14,0.88)');
-    root.style.setProperty('--dock-glass','rgba(28,28,34,0.82)');
-    root.style.setProperty('--win-border','rgba(255,255,255,0.10)');
+    root.style.setProperty('--dock-glass',  'rgba(28,28,34,0.82)');
+    root.style.setProperty('--win-border',  'rgba(255,255,255,0.10)');
   } else {
-    root.style.setProperty('--bg',       '#f0f0f5');
-    root.style.setProperty('--surface',  '#e4e4ec');
-    root.style.setProperty('--surface2', '#d8d8e0');
-    root.style.setProperty('--surface3', '#ccccda');
-    root.style.setProperty('--win-bg',   '#ffffff');
-    root.style.setProperty('--text',     '#1a1a24');
-    root.style.setProperty('--text2',    '#555560');
-    root.style.setProperty('--text3',    '#9090a0');
-    root.style.setProperty('--border',   'rgba(0,0,0,0.08)');
-    root.style.setProperty('--border2',  'rgba(0,0,0,0.14)');
+    root.style.setProperty('--bg',          '#f0f0f5');
+    root.style.setProperty('--surface',     '#e4e4ec');
+    root.style.setProperty('--surface2',    '#d8d8e0');
+    root.style.setProperty('--surface3',    '#ccccda');
+    root.style.setProperty('--win-bg',      '#ffffff');
+    root.style.setProperty('--text',        '#1a1a24');
+    root.style.setProperty('--text2',       '#555560');
+    root.style.setProperty('--text3',       '#9090a0');
+    root.style.setProperty('--border',      'rgba(0,0,0,0.08)');
+    root.style.setProperty('--border2',     'rgba(0,0,0,0.14)');
     root.style.setProperty('--menubar-glass','rgba(240,240,245,0.88)');
-    root.style.setProperty('--dock-glass','rgba(220,220,230,0.82)');
-    root.style.setProperty('--win-border','rgba(0,0,0,0.12)');
+    root.style.setProperty('--dock-glass',  'rgba(220,220,230,0.82)');
+    root.style.setProperty('--win-border',  'rgba(0,0,0,0.12)');
   }
-  showNotif(dark?'🌙':'☀️','Appearance', dark ? 'Dark mode enabled' : 'Light mode enabled');
+  showNotif(dark ? '🌙' : '☀️','Appearance', dark ? 'Dark mode enabled' : 'Light mode enabled');
 }
 
-/* Accent color — updates all dependent CSS vars + slider thumb colour */
+function lightenHex(hex, amt) {
+  amt = amt || 40;
+  let r = parseInt(hex.slice(1,3),16)+amt,
+      g = parseInt(hex.slice(3,5),16)+amt,
+      b = parseInt(hex.slice(5,7),16)+amt;
+  return '#'+[r,g,b].map(v=>Math.min(255,v).toString(16).padStart(2,'0')).join('');
+}
+
 function setAccentColor(el) {
   const color = el.dataset.color;
   const light = lightenHex(color, 30);
@@ -2503,50 +2424,42 @@ function setAccentColor(el) {
   const root = document.documentElement;
   root.style.setProperty('--accent',  color);
   root.style.setProperty('--accent2', light);
-  // update slider fills
-  document.querySelectorAll('.s-slider').forEach(s => {
-    s.style.setProperty('--thumb', color);
-    s.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${((s.value-s.min)/(s.max-s.min))*100}%, var(--surface3) ${((s.value-s.min)/(s.max-s.min))*100}%, var(--surface3) 100%)`;
-  });
+  document.querySelectorAll('.s-slider').forEach(s => updateSliderFill(s));
   showNotif('🎨','Appearance','Accent color updated');
 }
 
-/* Font size */
+// Wire up swatch clicks
+document.querySelectorAll('.s-swatch').forEach(s => {
+  s.addEventListener('click', () => setAccentColor(s));
+});
+
 document.getElementById('font-size-slider').addEventListener('input', function() {
   document.getElementById('font-size-val').textContent = this.value + 'px';
   document.body.style.fontSize = this.value + 'px';
   updateSliderFill(this);
 });
 
-/* Reduce motion — disables/enables all window animations */
 function toggleReduceMotion(el) {
   el.classList.toggle('on');
   const reduce = el.classList.contains('on');
-  const style = document.getElementById('motion-style') || (() => {
-    const s = document.createElement('style'); s.id='motion-style'; document.head.appendChild(s); return s;
-  })();
-  style.textContent = reduce ? `
-    .win-opening,.win-minimizing,.win-restoring,.win-closing { animation-duration: 0.01ms !important; }
-    .dock-item { transition: none !important; }
-    .bounce-anim .di { animation: none !important; }
-  ` : '';
-  showNotif(reduce?'🧘':'💫','Motion', reduce ? 'Animations disabled' : 'Animations enabled');
+  let styleEl = document.getElementById('motion-style');
+  if (!styleEl) { styleEl = document.createElement('style'); styleEl.id = 'motion-style'; document.head.appendChild(styleEl); }
+  styleEl.textContent = reduce ? `.win-opening,.win-minimizing,.win-restoring,.win-closing{animation-duration:0.01ms!important}.dock-item{transition:none!important}.bounce-anim .di{animation:none!important}` : '';
+  showNotif(reduce ? '🧘' : '💫','Motion', reduce ? 'Animations disabled' : 'Animations enabled');
 }
 
-/* Blur toggle — removes/restores backdrop-filter on menubar + dock */
 function toggleBlur(el) {
   el.classList.toggle('on');
-  const on = el.classList.contains('on');
-  const blurVal = document.getElementById('blur-slider').value;
-  const bf = on ? `blur(${blurVal}px) saturate(1.4)` : 'none';
+  const on  = el.classList.contains('on');
+  const val = document.getElementById('blur-slider').value;
+  const bf  = on ? `blur(${val}px) saturate(1.4)` : 'none';
   document.getElementById('menubar').style.backdropFilter = bf;
   document.getElementById('menubar').style.webkitBackdropFilter = bf;
   document.getElementById('dock').style.backdropFilter = bf;
   document.getElementById('dock').style.webkitBackdropFilter = bf;
-  showNotif(on?'🫧':'▪️','Appearance', on ? 'Blur enabled' : 'Blur disabled');
+  showNotif(on ? '🫧' : '▪️','Appearance', on ? 'Blur enabled' : 'Blur disabled');
 }
 
-/* Blur amount slider */
 document.getElementById('blur-slider').addEventListener('input', function() {
   document.getElementById('blur-val').textContent = this.value + 'px';
   updateSliderFill(this);
@@ -2559,8 +2472,9 @@ document.getElementById('blur-slider').addEventListener('input', function() {
   }
 });
 
-// ── WALLPAPER ─────────────────────────────────────────────
-
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — WALLPAPER
+   ═══════════════════════════════════════════════════════════ */
 const WALLPAPERS = [
   'radial-gradient(ellipse 80% 60% at 20% 80%,rgba(59,130,246,0.18),transparent),radial-gradient(ellipse 60% 50% at 80% 20%,rgba(139,92,246,0.14),transparent),linear-gradient(160deg,#0d0d12,#080810)',
   'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',
@@ -2571,8 +2485,11 @@ const WALLPAPERS = [
   'linear-gradient(135deg,#1a0a0a,#2a1010,#3a1818)',
   'linear-gradient(135deg,#0a0a1a,#101038,#1a1a50)',
 ];
-let wallAutoTimer = null;
-let currentWpIdx = 0;
+
+// Wire wallpaper thumbs
+document.querySelectorAll('.s-wallpaper-thumb').forEach(el => {
+  el.addEventListener('click', () => setWallpaper(el, parseInt(el.dataset.wp)));
+});
 
 function setWallpaper(el, idx) {
   document.querySelectorAll('.s-wallpaper-thumb').forEach(t => t.classList.remove('selected'));
@@ -2584,7 +2501,6 @@ function setWallpaper(el, idx) {
   showNotif('🖼','Wallpaper','Wallpaper updated');
 }
 
-/* Auto-rotate wallpaper every hour (demo: every 30s) */
 function toggleAutoWallpaper(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
@@ -2600,51 +2516,51 @@ function toggleAutoWallpaper(el) {
   }
 }
 
-/* Grid overlay on wallpaper */
 function toggleWallpaperGrid(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
-  const styleEl = document.getElementById('grid-style') || (() => {
-    const s = document.createElement('style'); s.id='grid-style'; document.head.appendChild(s); return s;
-  })();
-  styleEl.textContent = on ? '' : '.wallpaper::after { display:none; }';
+  let styleEl = document.getElementById('grid-style');
+  if (!styleEl) { styleEl = document.createElement('style'); styleEl.id = 'grid-style'; document.head.appendChild(styleEl); }
+  styleEl.textContent = on ? '' : '.wallpaper::after{display:none}';
   showNotif('🎞','Wallpaper', on ? 'Grid overlay shown' : 'Grid overlay hidden');
 }
 
-// ── DOCK ─────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — DOCK
+   ═══════════════════════════════════════════════════════════ */
+document.getElementById('dock-size-slider').addEventListener('input', function() {
+  setDockSize(this.value);
+});
 
-/* Dock size */
 function setDockSize(val) {
   document.getElementById('dock-size-val').textContent = val + 'px';
   const sz = parseInt(val);
   document.querySelectorAll('.di').forEach(d => {
-    d.style.width  = sz + 'px';
-    d.style.height = sz + 'px';
-    d.style.fontSize = Math.round(sz * 0.52) + 'px';
+    d.style.width        = sz + 'px';
+    d.style.height       = sz + 'px';
+    d.style.fontSize     = Math.round(sz * 0.52) + 'px';
     d.style.borderRadius = Math.round(sz * 0.26) + 'px';
   });
   updateSliderFill(document.getElementById('dock-size-slider'));
 }
 
-/* Dock magnification */
-let magEnabled = true;
 function toggleMagnification(el) {
   el.classList.toggle('on');
   magEnabled = el.classList.contains('on');
   showNotif('🔍','Dock', magEnabled ? 'Magnification enabled' : 'Magnification disabled');
 }
 
-/* Override hover magnification to respect setting */
+// Dock icon magnification cascade
 const _dockItems = document.querySelectorAll('.dock-item');
 _dockItems.forEach((item, i) => {
   item.addEventListener('mouseenter', () => {
     if (!magEnabled) return;
     _dockItems.forEach((other, j) => {
       const d = Math.abs(i - j);
-      if (d === 0) return; // handled by CSS :hover
-      if (d === 1) other.style.transform = 'scale(1.2) translateY(-5px)';
+      if (d === 0) return;
+      if (d === 1)      other.style.transform = 'scale(1.2) translateY(-5px)';
       else if (d === 2) other.style.transform = 'scale(1.08) translateY(-2px)';
-      else other.style.transform = '';
+      else              other.style.transform = '';
     });
   });
   item.addEventListener('mouseleave', () => {
@@ -2652,119 +2568,89 @@ _dockItems.forEach((item, i) => {
   });
 });
 
-/* Dock position */
 function setDockPosition(pos) {
-  const dw = document.getElementById('dock-wrap');
-  dw.style.cssText = ''; // reset
+  const dw   = document.getElementById('dock-wrap');
+  const dock = document.getElementById('dock');
+  dw.style.cssText   = '';
+  dock.style.flexDirection = '';
+  dock.style.padding       = '8px 12px 6px';
   if (pos === 'Bottom') {
     dw.style.cssText = 'position:fixed;bottom:8px;left:0;right:0;display:flex;justify-content:center;z-index:999;';
   } else if (pos === 'Left') {
-    dw.style.cssText = 'position:fixed;left:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;z-index:999;';
-    document.getElementById('dock').style.flexDirection = 'column';
-    document.getElementById('dock').style.borderRadius = '20px';
-    document.getElementById('dock').style.padding = '12px 8px';
+    dw.style.cssText = 'position:fixed;left:8px;top:50%;transform:translateY(-50%);display:flex;z-index:999;';
+    dock.style.flexDirection = 'column';
+    dock.style.borderRadius  = '20px';
+    dock.style.padding       = '12px 8px';
   } else if (pos === 'Right') {
-    dw.style.cssText = 'position:fixed;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;z-index:999;';
-    document.getElementById('dock').style.flexDirection = 'column';
-    document.getElementById('dock').style.borderRadius = '20px';
-    document.getElementById('dock').style.padding = '12px 8px';
-  }
-  if (pos === 'Bottom') {
-    document.getElementById('dock').style.flexDirection = '';
-    document.getElementById('dock').style.padding = '8px 12px 6px';
+    dw.style.cssText = 'position:fixed;right:8px;top:50%;transform:translateY(-50%);display:flex;z-index:999;';
+    dock.style.flexDirection = 'column';
+    dock.style.borderRadius  = '20px';
+    dock.style.padding       = '12px 8px';
   }
   showNotif('📍','Dock','Dock moved to ' + pos);
 }
 
-/* Dock auto-hide */
-let dockHideListeners = { enter: null, leave: null };
 function toggleDockHide(el) {
   el.classList.toggle('on');
-  const hide = el.classList.contains('on');
+  const hide    = el.classList.contains('on');
   const dockWrap = document.getElementById('dock-wrap');
   dockWrap.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1)';
   if (hide) {
     dockWrap.style.transform = 'translateY(110%)';
-    // create sentinel zone at bottom
-    const zone = document.createElement('div');
-    zone.id = 'dock-zone';
-    zone.style.cssText = 'position:fixed;bottom:0;left:0;right:0;height:4px;z-index:998;';
-    document.body.appendChild(zone);
+    let zone = document.getElementById('dock-zone');
+    if (!zone) {
+      zone = document.createElement('div');
+      zone.id = 'dock-zone';
+      zone.style.cssText = 'position:fixed;bottom:0;left:0;right:0;height:4px;z-index:998;';
+      document.body.appendChild(zone);
+    }
     dockHideListeners.enter = () => { dockWrap.style.transform = 'translateY(0)'; };
     dockHideListeners.leave = () => { dockWrap.style.transform = 'translateY(110%)'; };
     zone.addEventListener('mouseenter', dockHideListeners.enter);
     dockWrap.addEventListener('mouseleave', dockHideListeners.leave);
   } else {
     dockWrap.style.transform = 'translateY(0)';
-    document.getElementById('dock-zone')?.remove();
+    const zone = document.getElementById('dock-zone');
+    if (zone) zone.remove();
     if (dockHideListeners.enter) dockWrap.removeEventListener('mouseenter', dockHideListeners.enter);
     if (dockHideListeners.leave) dockWrap.removeEventListener('mouseleave', dockHideListeners.leave);
   }
   showNotif('⬛','Dock','Auto-hide ' + (hide ? 'enabled' : 'disabled'));
 }
 
-/* Menu bar — Show date in clock */
-let showDateInClock = true;
 function toggleShowDate(el) {
   el.classList.toggle('on');
   showDateInClock = el.classList.contains('on');
-  updateClock(); // re-render immediately
+  updateClock();
   showNotif('🕐','Menu Bar', showDateInClock ? 'Date shown in clock' : 'Date hidden from clock');
 }
 
-/* Menu bar — Battery icon */
 function toggleBattery(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
-  const batteryIcon = document.querySelector('.mb-right-icon[title="Battery"]');
-  if (batteryIcon) batteryIcon.style.display = on ? '' : 'none';
+  const bi = document.querySelector('.mb-right-icon[title="Battery"]');
+  if (bi) bi.style.display = on ? '' : 'none';
   showNotif('🔋','Menu Bar', on ? 'Battery icon shown' : 'Battery icon hidden');
 }
 
-// updateClock — respects showDateInClock toggle
-function updateClock() {
-  const n = new Date();
-  const h = n.getHours(), m = n.getMinutes();
-  const ap = h < 12 ? 'AM' : 'PM';
-  const hh = h % 12 || 12;
-  const mm = String(m).padStart(2,'0');
-  const timeStr = `${hh}:${mm} ${ap}`;
-  const dateStr = n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  document.getElementById('mb-clock').textContent = showDateInClock ? `${dateStr}  ${timeStr}` : timeStr;
-}
-
-// ── BROWSER ───────────────────────────────────────────────
-
-let searchEngineUrl = 'https://www.google.com/search?q=';
-
-/* Override processUrl to use dynamic search engine */
-function processUrl(raw) {
-  raw = raw.trim();
-  if (!raw) return '';
-  if (/^https?:\/\//i.test(raw)) return raw;
-  if (/^[\w-]+\.[\w.-]+/.test(raw) && !raw.includes(' ')) return 'https://' + raw;
-  return searchEngineUrl + encodeURIComponent(raw);
-}
-
-function setSearchEngine(val) {
-  searchEngineUrl = val;
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — BROWSER
+   ═══════════════════════════════════════════════════════════ */
+document.getElementById('search-engine-select').addEventListener('change', function() {
+  searchEngineUrl = this.value;
   const names = {
     'https://www.google.com/search?q=':'Google',
     'https://duckduckgo.com/?q=':'DuckDuckGo',
     'https://search.brave.com/search?q=':'Brave',
     'https://www.bing.com/search?q=':'Bing',
   };
-  showNotif('🔍','Browser','Search engine set to ' + (names[val]||val));
-}
+  showNotif('🔍','Browser','Search engine set to ' + (names[this.value] || this.value));
+});
 
-/* Homepage — apply on new tab open */
-function applyHomepage() {
-  const val = document.getElementById('homepage-input').value.trim();
-  showNotif('🏠','Browser','Homepage saved: ' + (val||'New Tab Page'));
-}
-document.getElementById('homepage-input').addEventListener('change', applyHomepage);
+document.getElementById('homepage-input').addEventListener('change', function() {
+  showNotif('🏠','Browser','Homepage saved: ' + (this.value.trim() || 'New Tab Page'));
+});
 
-/* Tab favicons */
 function toggleFavicons(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
@@ -2772,25 +2658,29 @@ function toggleFavicons(el) {
   showNotif('🗂','Tabs', on ? 'Favicons shown' : 'Favicons hidden');
 }
 
-/* New tab shortcuts grid */
 function toggleShortcuts(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
-  const shortcuts = document.querySelector('.ntp-shortcuts');
-  if (shortcuts) shortcuts.style.display = on ? '' : 'none';
+  const sc = document.querySelector('.ntp-shortcuts');
+  if (sc) sc.style.display = on ? '' : 'none';
   showNotif('🆕','New Tab', on ? 'Shortcuts shown' : 'Shortcuts hidden');
 }
 
-/* Cookies — sets iframe allow attribute accordingly */
 function toggleCookies(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
-  // Note: real cookie control needs SW interception; we just track the flag
-  showNotif('🍪','Browser', on ? 'Cookies accepted' : 'Cookies blocked (best-effort via UV)');
+  showNotif('🍪','Browser', on ? 'Cookies accepted' : 'Cookies blocked (via UV)');
 }
 
-// ── PROXY & UV ────────────────────────────────────────────
+function toggleSession(el) {
+  el.classList.toggle('on');
+  const on = el.classList.contains('on');
+  showNotif(on ? '📌' : '○','Browser','Restore last session ' + (on ? 'enabled' : 'disabled'));
+}
 
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — PROXY & UV
+   ═══════════════════════════════════════════════════════════ */
 function reloadSW() {
   showNotif('🔧','Service Worker','Unregistering…');
   navigator.serviceWorker.getRegistrations().then(async regs => {
@@ -2800,7 +2690,7 @@ function reloadSW() {
     setTimeout(async () => {
       await registerSW();
       refreshProxyStatus();
-      showNotif(swReady?'✅':'⚠️','Service Worker', swReady ? 'Re-registered successfully' : 'Registration failed — check server');
+      showNotif(swReady ? '✅' : '⚠️','Service Worker', swReady ? 'Re-registered successfully' : 'Registration failed');
     }, 500);
   });
 }
@@ -2814,49 +2704,43 @@ function clearProxyCache() {
   });
 }
 
-/* Bare server path — update in __uv$config at runtime if possible */
 document.getElementById('bare-path-input').addEventListener('change', function() {
   const val = this.value.trim();
-  if (window.__uv$config) {
-    window.__uv$config.bare = val;
-  }
+  if (window.__uv$config) window.__uv$config.bare = val;
   showNotif('🔗','Proxy','Bare server path updated to ' + val);
 });
 
 function refreshProxyStatus() {
   const uvBadge = document.getElementById('uv-status-badge');
   const swBadge = document.getElementById('sw-status-badge');
-  uvBadge.textContent = uvReady ? 'Loaded' : 'Not Loaded';
-  uvBadge.className = 's-badge ' + (uvReady ? 'green' : 'yellow');
-  swBadge.textContent = swReady ? 'Active' : 'Not Ready';
-  swBadge.className = 's-badge ' + (swReady ? 'green' : 'yellow');
+  if (uvBadge) { uvBadge.textContent = uvReady ? 'Loaded' : 'Not Loaded'; uvBadge.className = 's-badge ' + (uvReady ? 'green' : 'yellow'); }
+  if (swBadge) { swBadge.textContent = swReady ? 'Active' : 'Not Ready'; swBadge.className = 's-badge ' + (swReady ? 'green' : 'yellow'); }
   const cfg = window.__uv$config;
   if (cfg) {
-    document.getElementById('proxy-prefix-display').textContent = cfg.prefix || '/service/uv/';
-    document.getElementById('bare-path-input').value = cfg.bare || '/bare/';
+    const pp = document.getElementById('proxy-prefix-display');
+    const bp = document.getElementById('bare-path-input');
+    if (pp) pp.textContent = cfg.prefix || '/service/uv/';
+    if (bp) bp.value = cfg.bare || '/bare/';
   }
 }
 
-// ── PRIVACY ───────────────────────────────────────────────
-
-/* Block trackers — injects a Content-Security-Policy meta if possible */
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — PRIVACY
+   ═══════════════════════════════════════════════════════════ */
 function toggleBlockTrackers(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
-  const existing = document.getElementById('tracker-csp');
-  if (on && !existing) {
-    const m = document.createElement('meta');
+  let m = document.getElementById('tracker-csp');
+  if (on && !m) {
+    m = document.createElement('meta');
     m.id = 'tracker-csp';
     m.httpEquiv = 'Content-Security-Policy';
     m.content = "connect-src 'self' https: wss:; img-src 'self' https: data: blob:;";
     document.head.appendChild(m);
-  } else if (!on && existing) {
-    existing.remove();
-  }
-  showNotif(on?'🚫':'✓','Privacy', on ? 'Tracker blocking enabled' : 'Tracker blocking disabled');
+  } else if (!on && m) { m.remove(); }
+  showNotif(on ? '🚫' : '✓','Privacy', on ? 'Tracker blocking enabled' : 'Tracker blocking disabled');
 }
 
-/* Spoof User Agent — overrides navigator.userAgent via Object.defineProperty */
 function toggleSpoofUA(el) {
   el.classList.toggle('on');
   const on = el.classList.contains('on');
@@ -2867,87 +2751,45 @@ function toggleSpoofUA(el) {
         configurable: true
       });
       showNotif('🎭','Privacy','User agent spoofed as Chrome/Windows');
-    } catch(e) {
-      showNotif('⚠️','Privacy','Could not override UA (already locked by browser)');
-    }
+    } catch(e) { showNotif('⚠️','Privacy','Could not override UA'); }
   } else {
-    try {
-      Object.defineProperty(navigator, 'userAgent', { get: undefined, configurable: true });
-      showNotif('🎭','Privacy','User agent restored');
-    } catch(e) {}
+    try { Object.defineProperty(navigator, 'userAgent', { get: undefined, configurable: true }); } catch(e) {}
+    showNotif('🎭','Privacy','User agent restored');
   }
 }
 
-/* Save browsing history */
-let historySavingEnabled = true;
 function toggleHistory(el) {
   el.classList.toggle('on');
   historySavingEnabled = el.classList.contains('on');
   showNotif('📜','Privacy', historySavingEnabled ? 'History saving enabled' : 'History saving disabled');
 }
 
-/* navigateTo — respects historySavingEnabled */
-function navigateTo(url, tabId) {
-  if (!tabId) tabId = activeTab;
-  const tab = tabs.find(t => t.id === tabId);
-  if (!tab) return;
-  const full = processUrl(url);
-  if (!full) return;
-  if (historySavingEnabled && tab.url && tab.url !== full) {
-    tab.history = tab.history || [];
-    tab.history.push(tab.url);
-    tab.historyIndex = tab.history.length - 1;
-  }
-  tab.forward = [];
-  tab.url = full;
-  tab.title = extractDomain(full);
-  tab.favicon = getFavicon(full);
-  renderTabs();
-  updateUrlBar(full);
-  document.getElementById('tb-title').textContent = tab.title + ' — Nebula';
-  updateNavBtns(tab);
-  loadInFrame(full);
-}
-
 function clearHistory() {
   tabs.forEach(t => { t.history = []; t.historyIndex = -1; t.forward = []; });
-  updateNavBtns(tabs.find(t => t.id === activeTab) || {});
+  const tab = tabs.find(t => t.id === activeTab);
+  if (tab) updateNavBtns(tab);
   showNotif('🗑','History','All browsing history cleared');
 }
 
-/* HTTPS only mode — warn before navigating to http:// */
-let httpsOnlyMode = true;
 function toggleHttpsOnly(el) {
   el.classList.toggle('on');
   httpsOnlyMode = el.classList.contains('on');
   showNotif('🔐','Security', httpsOnlyMode ? 'HTTPS-only mode on' : 'HTTPS-only mode off');
 }
 
-/* Hook into loadInFrame to enforce HTTPS only */
-function loadInFrame(url) {
-  if (httpsOnlyMode && url.startsWith('http://')) {
-    showNotif('⚠️','Security','Blocked: HTTP site. HTTPS-only is enabled.');
-    document.getElementById('sec-banner').classList.add('show');
-  }
-  _baseLoadInFrame(url);
-}
-
-// ── NOTIFICATIONS ─────────────────────────────────────────
-
-let notifsEnabled = true;
-let dndEnabled    = false;
-let notifDuration = 4000;
-
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — NOTIFICATIONS
+   ═══════════════════════════════════════════════════════════ */
 function toggleNotifications(el) {
   el.classList.toggle('on');
   notifsEnabled = el.classList.contains('on');
-  showNotif('🔔','Notifications', notifsEnabled ? 'Notifications enabled' : 'Notifications disabled');
+  _baseShowNotif('🔔','Notifications', notifsEnabled ? 'Notifications enabled' : 'Notifications disabled');
 }
 
 function toggleDND(el) {
   el.classList.toggle('on');
   dndEnabled = el.classList.contains('on');
-  showNotif(dndEnabled?'🔕':'🔔','Do Not Disturb', dndEnabled ? 'DND on — notifications silenced' : 'DND off — notifications active');
+  _baseShowNotif(dndEnabled ? '🔕' : '🔔','Do Not Disturb', dndEnabled ? 'DND on — notifications silenced' : 'DND off');
 }
 
 function setNotifDuration(val) {
@@ -2956,139 +2798,175 @@ function setNotifDuration(val) {
   showNotif('⏱','Notifications','Duration set to ' + val);
 }
 
-/* Override showNotif to respect DND and enabled toggle */
-function showNotif(icon, title, body, duration) {
-  if (!notifsEnabled || dndEnabled) return;
-  _baseShowNotif(icon, title, body, duration !== undefined ? duration : notifDuration);
-}
-
-// ── ABOUT PAGE ────────────────────────────────────────────
-
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — ABOUT
+   ═══════════════════════════════════════════════════════════ */
 function refreshAboutPage() {
-  document.getElementById('about-platform').textContent = navigator.platform || navigator.userAgentData?.platform || '—';
-  document.getElementById('about-ua').textContent = navigator.userAgent;
-  const mem = performance.memory ? (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + ' MB' : 'N/A';
-  document.getElementById('about-memory').textContent = mem;
-  const swBadge = document.getElementById('about-sw');
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    const active = regs.some(r => r.active);
-    swBadge.textContent = active ? 'Active' : 'Inactive';
-    swBadge.className = 's-badge ' + (active ? 'green' : 'yellow');
-  }).catch(() => {
-    swBadge.textContent = 'N/A'; swBadge.className = 's-badge';
-  });
+  const plat = document.getElementById('about-platform');
+  const ua   = document.getElementById('about-ua');
+  const mem  = document.getElementById('about-memory');
+  const sw   = document.getElementById('about-sw');
+  if (plat) plat.textContent = navigator.platform || '—';
+  if (ua)   ua.textContent   = navigator.userAgent;
+  if (mem)  mem.textContent  = performance.memory ? (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + ' MB' : 'N/A';
+  if (sw) {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      const active = regs.some(r => r.active);
+      sw.textContent = active ? 'Active' : 'Inactive';
+      sw.className   = 's-badge ' + (active ? 'green' : 'yellow');
+    }).catch(() => { sw.textContent = 'N/A'; sw.className = 's-badge'; });
+  }
 }
 
-/* Full reset */
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS — RESET
+   ═══════════════════════════════════════════════════════════ */
 function resetSettings() {
-  // Restore dark mode
-  const darkToggle = document.getElementById('toggle-dark');
-  if (!darkToggle.classList.contains('on')) { darkToggle.classList.add('on'); toggleDarkMode(darkToggle); }
-  // Restore accent
-  const blueEl = document.querySelector('.s-swatch[data-color="#3b82f6"]');
-  if (blueEl) setAccentColor(blueEl);
-  // Font size
-  document.getElementById('font-size-slider').value = 12;
+  // Dark mode on
+  const dt = document.getElementById('toggle-dark');
+  if (!dt.classList.contains('on')) toggleDarkMode(dt); else toggleDarkMode(dt); // toggle twice to re-apply
+  dt.classList.add('on'); toggleDarkMode({classList:{contains:()=>true,toggle:()=>{},add:()=>{},remove:()=>{}}}); // force dark
+  // Simpler direct approach:
+  document.documentElement.style.setProperty('--bg','#0e0e0e');
+  document.documentElement.style.setProperty('--surface','#1a1a1e');
+  document.documentElement.style.setProperty('--surface2','#242428');
+  document.documentElement.style.setProperty('--surface3','#2e2e34');
+  document.documentElement.style.setProperty('--win-bg','#121214');
+  document.documentElement.style.setProperty('--text','#e8e8ea');
+  document.documentElement.style.setProperty('--text2','#9a9aa8');
+  document.documentElement.style.setProperty('--text3','#5a5a68');
+  dt.classList.add('on');
+
+  // Accent blue
+  const blue = document.querySelector('.s-swatch[data-color="#3b82f6"]');
+  if (blue) setAccentColor(blue);
+
+  // Font size 12
+  const fs = document.getElementById('font-size-slider');
+  fs.value = 12;
   document.getElementById('font-size-val').textContent = '12px';
   document.body.style.fontSize = '';
-  // Blur
-  const blurT = document.getElementById('toggle-blur');
-  if (!blurT.classList.contains('on')) { blurT.classList.add('on'); toggleBlur(blurT); }
-  document.getElementById('blur-slider').value = 30;
+  updateSliderFill(fs);
+
+  // Blur on at 30
+  const bt = document.getElementById('toggle-blur');
+  if (!bt.classList.contains('on')) bt.classList.add('on');
+  const bs = document.getElementById('blur-slider');
+  bs.value = 30;
   document.getElementById('blur-val').textContent = '30px';
-  // Wallpaper
+  updateSliderFill(bs);
+
+  // Wallpaper 0
   setWallpaper(document.querySelector('.s-wallpaper-thumb[data-wp="0"]'), 0);
-  // Dock size
-  document.getElementById('dock-size-slider').value = 46;
+
+  // Dock size 46
+  const ds = document.getElementById('dock-size-slider');
+  ds.value = 46;
   setDockSize(46);
+
   // Dock autohide off
-  const hideT = document.getElementById('toggle-autohide');
-  if (hideT.classList.contains('on')) toggleDockHide(hideT);
+  const hat = document.getElementById('toggle-autohide');
+  if (hat.classList.contains('on')) toggleDockHide(hat);
+
   // Magnification on
-  const magT = document.getElementById('toggle-mag');
-  if (!magT.classList.contains('on')) { magT.classList.add('on'); magEnabled = true; }
+  const mt = document.getElementById('toggle-mag');
+  if (!mt.classList.contains('on')) mt.classList.add('on');
+  magEnabled = true;
+
   // Date in clock on
   showDateInClock = true;
   document.getElementById('toggle-date').classList.add('on');
   updateClock();
-  // Battery icon on
-  const batT = document.getElementById('toggle-battery');
-  if (!batT.classList.contains('on')) { batT.classList.add('on'); }
-  const battIcon = document.querySelector('.mb-right-icon[title="Battery"]');
-  if (battIcon) battIcon.style.display = '';
-  // Search engine
+
+  // Battery on
+  document.getElementById('toggle-battery').classList.add('on');
+  const bi = document.querySelector('.mb-right-icon[title="Battery"]');
+  if (bi) bi.style.display = '';
+
+  // Search engine google
   searchEngineUrl = 'https://www.google.com/search?q=';
   document.getElementById('search-engine-select').value = 'https://www.google.com/search?q=';
-  // History saving on
+
+  // History on, https on
   historySavingEnabled = true;
-  document.getElementById('toggle-history').classList.add('on');
-  // HTTPS only on
   httpsOnlyMode = true;
+  document.getElementById('toggle-history').classList.add('on');
   document.getElementById('toggle-https').classList.add('on');
-  // Notifs on
-  notifsEnabled = true; dndEnabled = false;
+
+  // Notifs on, DND off
+  notifsEnabled = true; dndEnabled = false; notifDuration = 4000;
   document.getElementById('toggle-notifs').classList.add('on');
   document.getElementById('toggle-dnd').classList.remove('on');
-  notifDuration = 4000;
-  // Shortcuts + favicons on
+  document.getElementById('notif-duration-select').value = '4 seconds';
+
+  // Favicons + shortcuts on
   document.getElementById('toggle-favicons').classList.add('on');
   document.getElementById('toggle-shortcuts').classList.add('on');
+  document.querySelectorAll('.tab-favicon').forEach(f => f.style.display = '');
   const sc = document.querySelector('.ntp-shortcuts');
   if (sc) sc.style.display = '';
-  document.querySelectorAll('.tab-favicon').forEach(f => f.style.display = '');
+
   // Grid overlay on
   document.getElementById('toggle-grid').classList.add('on');
   const gs = document.getElementById('grid-style');
   if (gs) gs.textContent = '';
+
   // Motion on
   document.getElementById('toggle-motion').classList.remove('on');
   const ms = document.getElementById('motion-style');
   if (ms) ms.textContent = '';
+
   _baseShowNotif('🔄','Settings','All settings restored to defaults', 4000);
 }
 
-// ── SLIDER FILL UTILITY ───────────────────────────────────
+/* ═══════════════════════════════════════════════════════════
+   SLIDER FILL UTILITY
+   ═══════════════════════════════════════════════════════════ */
 function updateSliderFill(slider) {
-  const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+  const pct    = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
   const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#3b82f6';
-  slider.style.background = `linear-gradient(to right, ${accent} 0%, ${accent} ${pct}%, var(--surface3) ${pct}%, var(--surface3) 100%)`;
+  slider.style.background = `linear-gradient(to right,${accent} 0%,${accent} ${pct}%,var(--surface3) ${pct}%,var(--surface3) 100%)`;
 }
 
-// Initialise slider fills on load
 ['font-size-slider','blur-slider','dock-size-slider'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) { updateSliderFill(el); el.addEventListener('input', () => updateSliderFill(el)); }
+  if (el) updateSliderFill(el);
 });
 
-// ── WIRE UP HTML onclick attributes ──────────────────────
-// Replace generic toggleSetting calls in HTML with real handlers
-document.getElementById('toggle-dark').onclick        = function(){ toggleDarkMode(this); };
-document.getElementById('toggle-motion').onclick      = function(){ toggleReduceMotion(this); };
-document.getElementById('toggle-blur').onclick        = function(){ toggleBlur(this); };
-document.getElementById('toggle-autowall').onclick    = function(){ toggleAutoWallpaper(this); };
-document.getElementById('toggle-grid').onclick        = function(){ toggleWallpaperGrid(this); };
-document.getElementById('toggle-mag').onclick         = function(){ toggleMagnification(this); };
-document.getElementById('toggle-autohide').onclick    = function(){ toggleDockHide(this); };
-document.getElementById('toggle-date').onclick        = function(){ toggleShowDate(this); };
-document.getElementById('toggle-battery').onclick     = function(){ toggleBattery(this); };
-document.getElementById('toggle-session').onclick     = function(){ this.classList.toggle('on'); showNotif(this.classList.contains('on')?'📌':'○','Browser','Restore last session ' + (this.classList.contains('on')?'enabled':'disabled')); };
-document.getElementById('toggle-favicons').onclick    = function(){ toggleFavicons(this); };
-document.getElementById('toggle-shortcuts').onclick   = function(){ toggleShortcuts(this); };
-document.getElementById('toggle-cookies').onclick     = function(){ toggleCookies(this); };
-document.getElementById('toggle-trackers').onclick    = function(){ toggleBlockTrackers(this); };
-document.getElementById('toggle-ua').onclick          = function(){ toggleSpoofUA(this); };
-document.getElementById('toggle-history').onclick     = function(){ toggleHistory(this); };
-document.getElementById('toggle-https').onclick       = function(){ toggleHttpsOnly(this); };
-document.getElementById('toggle-notifs').onclick      = function(){ toggleNotifications(this); };
-document.getElementById('toggle-dnd').onclick         = function(){ toggleDND(this); };
+/* ═══════════════════════════════════════════════════════════
+   WIRE UP ALL SETTINGS BUTTON/TOGGLE EVENTS
+   ═══════════════════════════════════════════════════════════ */
+document.getElementById('toggle-dark').addEventListener('click',       function(){ toggleDarkMode(this); });
+document.getElementById('toggle-motion').addEventListener('click',     function(){ toggleReduceMotion(this); });
+document.getElementById('toggle-blur').addEventListener('click',       function(){ toggleBlur(this); });
+document.getElementById('toggle-autowall').addEventListener('click',   function(){ toggleAutoWallpaper(this); });
+document.getElementById('toggle-grid').addEventListener('click',       function(){ toggleWallpaperGrid(this); });
+document.getElementById('toggle-mag').addEventListener('click',        function(){ toggleMagnification(this); });
+document.getElementById('toggle-autohide').addEventListener('click',   function(){ toggleDockHide(this); });
+document.getElementById('toggle-date').addEventListener('click',       function(){ toggleShowDate(this); });
+document.getElementById('toggle-battery').addEventListener('click',    function(){ toggleBattery(this); });
+document.getElementById('toggle-session').addEventListener('click',    function(){ toggleSession(this); });
+document.getElementById('toggle-favicons').addEventListener('click',   function(){ toggleFavicons(this); });
+document.getElementById('toggle-shortcuts').addEventListener('click',  function(){ toggleShortcuts(this); });
+document.getElementById('toggle-cookies').addEventListener('click',    function(){ toggleCookies(this); });
+document.getElementById('toggle-trackers').addEventListener('click',   function(){ toggleBlockTrackers(this); });
+document.getElementById('toggle-ua').addEventListener('click',         function(){ toggleSpoofUA(this); });
+document.getElementById('toggle-history').addEventListener('click',    function(){ toggleHistory(this); });
+document.getElementById('toggle-https').addEventListener('click',      function(){ toggleHttpsOnly(this); });
+document.getElementById('toggle-notifs').addEventListener('click',     function(){ toggleNotifications(this); });
+document.getElementById('toggle-dnd').addEventListener('click',        function(){ toggleDND(this); });
 
-// Dock position select
-document.querySelector('#page-dock .s-select').addEventListener('change', function(){ setDockPosition(this.value); });
+document.getElementById('dock-position-select').addEventListener('change', function(){ setDockPosition(this.value); });
+document.getElementById('notif-duration-select').addEventListener('change', function(){ setNotifDuration(this.value); });
+document.getElementById('autoplay-select').addEventListener('change', function(){ showNotif('🔊','Browser','Autoplay set to ' + this.value); });
 
-// Notif duration select
-document.querySelector('#page-notifications .s-select').addEventListener('change', function(){ setNotifDuration(this.value); });
+document.getElementById('btn-reload-sw').addEventListener('click',     reloadSW);
+document.getElementById('btn-clear-cache').addEventListener('click',   clearProxyCache);
+document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
+document.getElementById('btn-reset-settings').addEventListener('click',resetSettings);
+document.getElementById('btn-test-notif').addEventListener('click',    () => showNotif('🔔','Test Notification','Notifications are working!'));
 
-// ── SETTINGS SEARCH ───────────────────────────────────────
+/* Settings search */
 document.getElementById('settings-search-input').addEventListener('input', function() {
   const q = this.value.toLowerCase();
   document.querySelectorAll('.settings-nav-item').forEach(item => {
@@ -3096,21 +2974,13 @@ document.getElementById('settings-search-input').addEventListener('input', funct
   });
 });
 
-// ── FOCUS MANAGEMENT ──────────────────────────────────────
-settingsWin.addEventListener('mousedown', () => {
-  settingsWin.classList.add('focused');
-  document.getElementById('browser-win').classList.remove('focused');
-});
-document.getElementById('browser-win').addEventListener('mousedown', () => {
-  document.getElementById('browser-win').classList.add('focused');
-  settingsWin.classList.remove('focused');
-});
-createTab('', 'New Tab'); // Start with a new tab page
+/* ═══════════════════════════════════════════════════════════
+   INITIALISE
+   ═══════════════════════════════════════════════════════════ */
+createTab('', 'New Tab');
 
-// Play open animation on first load
 requestAnimationFrame(() => {
-  const win = document.getElementById('browser-win');
-  winAnimate(win, 'win-opening', 380, () => {});
+  winAnimate(document.getElementById('browser-win'), 'win-opening', 380, () => {});
 });
 </script>
 </body>

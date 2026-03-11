@@ -1374,7 +1374,7 @@ body::after{
                 <div class="s-row-label">Proxy Prefix</div>
               </div>
               <div class="s-row-ctrl">
-                <span class="s-proxy-path" id="proxy-prefix-display">/service/uv/</span>
+                <span class="s-proxy-path" id="proxy-prefix-display">/tiw/~/</span>
               </div>
             </div>
           </div>
@@ -1386,7 +1386,7 @@ body::after{
                 <div class="s-row-label">Bare Server Path</div>
               </div>
               <div class="s-row-ctrl">
-                <input class="s-input" type="text" value="/bare/" id="bare-path-input" style="width:130px"/>
+                <input class="s-input" type="text" value="https://atomserver-production-a861.up.railway.app" id="bare-path-input" style="width:130px"/>
               </div>
             </div>
             <div class="s-row">
@@ -1739,7 +1739,9 @@ async function registerSW() {
   if (!('serviceWorker' in navigator)) return false;
   try {
     const cfg   = window.__uv$config;
-    const scope = cfg ? cfg.prefix : '/service/uv/';
+    const scope = cfg ? cfg.prefix : '/tiw/~/';
+    // Server must send: Service-Worker-Allowed: / on /uv/uv.sw.js
+    // so the SW can control scope outside its own /uv/ directory
     const reg   = await navigator.serviceWorker.register(UV_SW, { scope });
     if (reg.installing || reg.waiting) {
       await new Promise(resolve => {
@@ -1755,8 +1757,17 @@ async function registerSW() {
     return true;
   } catch(e) {
     console.warn('[Nebula] SW registration failed:', e.message);
-    swReady = false;
-    return false;
+    // Fallback: register without explicit scope
+    try {
+      await navigator.serviceWorker.register(UV_SW);
+      await navigator.serviceWorker.ready;
+      swReady = true;
+      return true;
+    } catch(e2) {
+      console.warn('[Nebula] SW fallback failed:', e2.message);
+      swReady = false;
+      return false;
+    }
   }
 }
 
@@ -1992,7 +2003,7 @@ function loadInFrame(url) {
   } else {
     stopFrameTracking();
     const cfg    = window.__uv$config;
-    const prefix = cfg ? cfg.prefix : '/service/uv/';
+    const prefix = cfg ? cfg.prefix : '/tiw/~/';
     frame.srcdoc = `<!DOCTYPE html><html><head><style>
       *{margin:0;padding:0;box-sizing:border-box}
       body{background:#0e0e0e;color:#9a9aa8;display:flex;flex-direction:column;
@@ -2719,7 +2730,7 @@ function refreshProxyStatus() {
   if (cfg) {
     const pp = document.getElementById('proxy-prefix-display');
     const bp = document.getElementById('bare-path-input');
-    if (pp) pp.textContent = cfg.prefix || '/service/uv/';
+    if (pp) pp.textContent = cfg.prefix || '/tiw/~/';
     if (bp) bp.value = cfg.bare || '/bare/';
   }
 }
